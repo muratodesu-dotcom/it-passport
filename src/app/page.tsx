@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { questions } from "@/data/questions";
 
 const categories = [
   {
@@ -35,20 +36,96 @@ const categories = [
   },
 ];
 
+const totalQuestions = questions.length;
+const totalCategories = categories.length - 1;
+const estimatedMinutes = Math.ceil(totalQuestions * 0.7);
+
+const featureCards = [
+  {
+    title: "学習導線を強化",
+    description: "ホームからクイズ・学習・履歴に最短で移動できる導線を整理しました。",
+    icon: "🧭",
+  },
+  {
+    title: "Doom Scroll学習",
+    description: "復習カードが無限に流れるような感覚で、テンポよく連続インプットできます。",
+    icon: "🌀",
+  },
+  {
+    title: "試験向けの密度",
+    description: "分野別の学習量がひと目で分かり、短いスキマ時間でも着手しやすい設計です。",
+    icon: "⚡",
+  },
+];
+
 export default function Home() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <header className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          ITパスポート試験
-        </h1>
-        <p className="text-lg text-[var(--muted)]">学習＆模擬テストアプリ</p>
+    <div className="max-w-6xl mx-auto px-4 py-12">
+      <header className="mb-12 rounded-[2rem] border border-[var(--card-border)] bg-[var(--card)] p-8 shadow-sm">
+        <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
+          <div>
+            <p className="mb-3 inline-flex rounded-full bg-[var(--badge-bg)] px-3 py-1 text-sm font-medium text-[var(--primary)]">
+              ITパスポート対策をもっと楽しく、もっと濃く
+            </p>
+            <h1 className="mb-4 text-4xl font-bold leading-tight bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent">
+              ITパスポート試験 学習＆模擬テストアプリ
+            </h1>
+            <p className="max-w-2xl text-lg leading-relaxed text-[var(--muted)]">
+              分野別クイズ、解説付き学習、履歴トラッキングに加えて、流し見復習ができるDoom Scrollモードを追加しました。
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/quiz?category=all"
+                className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+              >
+                まずは総合クイズへ
+              </Link>
+              <Link
+                href="/study?category=strategy"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+              >
+                Doom Scroll学習を試す
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-2xl bg-[var(--badge-bg)] p-5">
+              <p className="text-xs text-[var(--muted)] mb-2">収録問題数</p>
+              <p className="text-3xl font-bold">{totalQuestions}</p>
+            </div>
+            <div className="rounded-2xl bg-[var(--badge-bg)] p-5">
+              <p className="text-xs text-[var(--muted)] mb-2">分野数</p>
+              <p className="text-3xl font-bold">{totalCategories}</p>
+            </div>
+            <div className="rounded-2xl bg-[var(--badge-bg)] p-5 col-span-2">
+              <p className="text-xs text-[var(--muted)] mb-2">総合クイズ目安時間</p>
+              <p className="text-3xl font-bold">約{estimatedMinutes}分</p>
+              <p className="mt-2 text-sm text-[var(--muted)]">移動中は流し見学習、自宅では模擬テスト、という使い分けがおすすめです。</p>
+            </div>
+          </div>
+        </div>
       </header>
 
+      <section className="mb-12 grid gap-4 md:grid-cols-3">
+        {featureCards.map((feature) => (
+          <div
+            key={feature.title}
+            className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm"
+          >
+            <div className="mb-3 text-3xl">{feature.icon}</div>
+            <h2 className="mb-2 text-lg font-semibold">{feature.title}</h2>
+            <p className="text-sm leading-relaxed text-[var(--muted)]">{feature.description}</p>
+          </div>
+        ))}
+      </section>
+
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6 text-center">
-          クイズモードで挑戦
-        </h2>
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="text-xl font-semibold">クイズモードで挑戦</h2>
+          <p className="text-sm text-[var(--muted)]">本番感覚でテンポよく回答。全分野・分野別の両方に対応。</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {categories.map((cat) => (
             <Link
@@ -78,28 +155,39 @@ export default function Home() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-6 text-center">
-          学習モードで復習
-        </h2>
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="text-xl font-semibold">学習モードで復習</h2>
+          <p className="text-sm text-[var(--muted)]">集中して理解する通常モードと、連続インプット向けのDoom Scrollモードを搭載。</p>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {categories.slice(1).map((cat) => (
             <Link
               key={cat.id}
               href={`/study?category=${cat.id}`}
-              className="block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 text-center transition-all hover:shadow-lg hover:-translate-y-0.5"
+              className="block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 transition-all hover:shadow-lg hover:-translate-y-0.5"
             >
-              <span className="text-2xl block mb-2">{cat.icon}</span>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-2xl">{cat.icon}</span>
+                <span className="rounded-full bg-[var(--badge-bg)] px-2 py-1 text-xs text-[var(--muted)]">{cat.count} cards</span>
+              </div>
               <h3 className="font-semibold mb-1">{cat.title}</h3>
-              <p className="text-xs text-[var(--muted)]">解説付き学習</p>
+              <p className="text-xs text-[var(--muted)] mb-3">解説付き学習 / Doom Scroll対応</p>
+              <span className="text-sm font-medium text-[var(--primary)]">学習を始める →</span>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="text-center">
+      <section className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">履歴を見て、伸びを確認</h2>
+          <p className="text-sm leading-relaxed text-[var(--muted)]">
+            クイズ結果は学習履歴に保存されます。最高スコア・平均スコア・合格率を見ながら次の復習計画を立てられます。
+          </p>
+        </div>
         <Link
           href="/history"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] hover:shadow-md transition-all hover:-translate-y-0.5 text-[var(--muted)] hover:text-[var(--foreground)]"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--background)] hover:shadow-md transition-all hover:-translate-y-0.5 text-[var(--muted)] hover:text-[var(--foreground)]"
         >
           <span>📊</span>
           <span className="font-medium">学習履歴を見る</span>
