@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import DarkModeToggle from "@/components/DarkModeToggle";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,8 +13,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
-      <body className="min-h-screen">{children}</body>
+    <html lang="ja" suppressHydrationWarning>
+      <body className="min-h-screen">
+        <DarkModeToggle />
+        {children}
+      </body>
     </html>
   );
 }
