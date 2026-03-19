@@ -16,6 +16,17 @@ export interface QuizState {
   isFinished: boolean;
 }
 
+export interface QuizResult {
+  id: string;
+  date: string;
+  category: string;
+  score: number;
+  total: number;
+  percentage: number;
+  timeSeconds: number;
+  passed: boolean;
+}
+
 export const categoryLabels: Record<Category, string> = {
   strategy: "ストラテジ系",
   management: "マネジメント系",
