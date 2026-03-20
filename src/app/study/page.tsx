@@ -20,6 +20,8 @@ type LessonBlock = {
   title: string;
   summary: string;
   bullets: string[];
+  example: string;
+  quickCheck: string[];
   memoryHook: string;
 };
 
@@ -95,16 +97,42 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
         "SWOTは内部環境と外部環境を整理する分析、PPMは事業配分、BSCは評価指標という役割の違いを区別しましょう。",
         "PDCAは改善サイクルなので、単発の計画ではなく継続的な見直しとセットで出題されます。",
       ],
+      example: "新規サービスを考えるなら、まず理念に沿って目的を確認し、SWOTで現状を分析し、PPMで投資判断を行い、BSCで成果を測り、PDCAで改善します。",
+      quickCheck: [
+        "理念と売上目標を言い分けられるか。",
+        "SWOT・PPM・BSC・PDCAの役割を1行ずつ説明できるか。",
+      ],
       memoryHook: "理念は『なぜ存在するか』、戦略は『どう戦うか』、評価は『どう測るか』で切り分ける。",
+    },
+    {
+      title: "マーケティングと顧客戦略",
+      summary:
+        "CRMのような顧客接点の考え方は、単なる管理ツールではなく、売上や満足度を伸ばすための戦略として理解すると定着します。",
+      bullets: [
+        "CRMは顧客情報の蓄積が目的ではなく、関係強化による継続利用や満足度向上が目的です。",
+        "BSCの顧客視点や経営理念と関連づけると、企業活動のどこに位置づくか見えやすくなります。",
+        "選択肢に『社内効率化』『勤怠管理』があれば、顧客戦略とズレていないかを確認しましょう。",
+      ],
+      example: "購入履歴を分析しておすすめ商品を提案する施策は、顧客との関係強化につながるのでCRMらしい施策と判断できます。",
+      quickCheck: [
+        "その施策は顧客との接点を良くするものか。",
+        "売上向上だけでなく満足度向上まで説明できるか。",
+      ],
+      memoryHook: "CRMは『顧客との関係』、社内効率化は別テーマと分けて考える。",
     },
     {
       title: "法務・企業活動の頻出テーマ",
       summary:
-        "ストラテジ系では、個人情報保護法・著作権法・CRM・SCMのように、対象や目的を正しく言い分けられるかが得点差になります。",
+        "ストラテジ系では、個人情報保護法・著作権法・SCMのように、対象や目的を正しく言い分けられるかが得点差になります。",
       bullets: [
         "個人情報は『生存する個人を識別できるか』が軸で、法人情報は通常含まれません。",
         "著作権法は作品そのものを守る一方、言語・規約・解法のようなアイデアやルールそのものは対象外です。",
-        "CRMは顧客関係、SCMは供給連鎖の最適化と覚えると、現場系の選択肢と混同しにくくなります。",
+        "SCMは調達から販売までの供給連鎖全体を最適化する考え方で、部分最適ではなく全体最適がキーワードです。",
+      ],
+      example: "『法人の所在地』『プログラム言語』『問い合わせ管理』のような語が選択肢に出たら、誰を守る法か、どこまでが供給連鎖かを軸に切り分けます。",
+      quickCheck: [
+        "個人情報かどうかを『個人識別』で判断できるか。",
+        "著作物とアイデア・ルールの違いを説明できるか。",
       ],
       memoryHook: "『誰を守る法か』『何を最適化する仕組みか』の2軸で読む。",
     },
@@ -119,7 +147,28 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
         "V字モデルは上流工程とテスト工程の対応関係、アジャイルは短い反復で価値を届ける考え方が中心です。",
         "インシデント管理は復旧優先、問題管理は原因分析優先と順番で覚えると迷いません。",
       ],
+      example: "開発前にWBSで作業を分け、ガントチャートで進捗を追い、リリース後に障害が起きたらまずインシデント管理で復旧する、という流れで理解するとつながります。",
+      quickCheck: [
+        "WBS・ガントチャート・SLA・監査の役割を混同せず説明できるか。",
+        "『まず復旧、次に原因分析』を即答できるか。",
+      ],
       memoryHook: "まず計画、次に提供、問題が起きたら復旧、その後に原因分析。",
+    },
+    {
+      title: "開発モデルの比較",
+      summary:
+        "V字モデルとアジャイルは、工程の進め方も問題の問われ方も異なります。比較軸を持つと一気に解きやすくなります。",
+      bullets: [
+        "V字モデルは上流工程と対応するテストを結びつける考え方が中心です。",
+        "アジャイルは短い反復とフィードバック重視で、要件変化に強い点が特徴です。",
+        "『最初に全要件を固定』『少しずつ作って改善』のどちらかで選択肢を見分けると失点しにくいです。",
+      ],
+      example: "『顧客の反応を見ながら機能を追加する』ならアジャイル、『外部設計に対応する結合テストを行う』ならV字モデルの話です。",
+      quickCheck: [
+        "結合テストに対応する上流工程を答えられるか。",
+        "アジャイルの特徴をウォーターフォールと対比して言えるか。",
+      ],
+      memoryHook: "V字は『対応関係』、アジャイルは『反復改善』で覚える。",
     },
     {
       title: "規格・見積もり・計画立案",
@@ -129,6 +178,11 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
         "ISO/IEC 27001は情報セキュリティ、ISO/IEC 20000はITサービス、ISO 9001は品質管理です。",
         "ファンクションポイント法はソースコード量ではなく、利用者から見た機能量で規模を見積もります。",
         "共通フレームのシステム化計画では、業務分析・目的整理・方針決定のような上流の検討を行います。",
+      ],
+      example: "規格問題では『何を管理する規格か』、見積もり問題では『何を数えるか』、工程問題では『何を決める段階か』を先に決めると迷いにくくなります。",
+      quickCheck: [
+        "27001・20000・9001の用途を即答できるか。",
+        "FP法が機能量ベースだと説明できるか。",
       ],
       memoryHook: "規格は『何を管理するか』、見積もりは『何を数えるか』を確認する。",
     },
@@ -143,6 +197,11 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
         "CPU・メモリ・補助記憶装置・OS・DBMS・ルータの役割を対比で覚えると選択肢を素早く消せます。",
         "OSI参照モデルは層の番号だけでなく、ルータ=第3層のように代表機器とセットで覚えるのが有効です。",
       ],
+      example: "1010₂を10進数に直すときは 8+2 と分解し、ネットワーク機器の問題では『中継だけか、経路選択するか』で層を見分けます。",
+      quickCheck: [
+        "2進数の各桁の重みを書き出せるか。",
+        "ルータ・L2スイッチ・ハブの違いを層で説明できるか。",
+      ],
       memoryHook: "数字問題は式、機器問題は役割、ネットワーク問題は層で整理する。",
     },
     {
@@ -154,7 +213,28 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
         "マルウェアや不正アクセスの問題は、攻撃名と対策名を対で確認すると覚えやすくなります。",
         "OSやデータベースの基本用語は、利用者から見たメリットや運用上の役割と結びつけると定着します。",
       ],
+      example: "『なりすまし防止』なら認証、『内容を読めなくする』なら暗号化、『利用権限を制限する』ならアクセス制御、のように目的で切り分けます。",
+      quickCheck: [
+        "攻撃名を見たとき、守るべき性質を答えられるか。",
+        "暗号化・認証・アクセス制御を目的で区別できるか。",
+      ],
       memoryHook: "攻撃は『何を狙うか』、対策は『何を守るか』で読む。",
+    },
+    {
+      title: "学習を伸ばす計算手順",
+      summary:
+        "計算問題が苦手でも、式の置き方と単位確認の順番を固定すると安定して点を取れるようになります。",
+      bullets: [
+        "問題文の数値を書き出す→単位をそろえる→式を立てる→答えの桁感を確認する、の順に進めます。",
+        "bitとbyte、Kとk、秒とミリ秒を取り違えると、理解していても失点しやすいです。",
+        "途中式を残すだけで、見直し時にどこでズレたかをすぐ発見できます。",
+      ],
+      example: "転送速度の問題なら、まずMbpsかMB/sかを見て単位をそろえてから計算すれば、8倍違いのミスを防げます。",
+      quickCheck: [
+        "単位をそろえてから式を書く習慣があるか。",
+        "答えが大きすぎる・小さすぎると感じたら見直せるか。",
+      ],
+      memoryHook: "数値は『書き出す→単位をそろえる→式→桁感チェック』で固定する。",
     },
   ],
 };
@@ -379,13 +459,16 @@ function StudyContent() {
           </div>
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
-          {lessonBlocks.map((lesson) => (
+        <div className="mt-5 grid gap-4 xl:grid-cols-3">
+          {lessonBlocks.map((lesson, index) => (
             <section
               key={lesson.title}
               className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/10"
             >
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-200">Lesson</p>
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-200">Lesson {index + 1}</p>
+                <span className="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-medium text-sky-700 dark:bg-sky-500/10 dark:text-sky-100">拡張版</span>
+              </div>
               <h3 className="mt-2 font-semibold text-lg">{lesson.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{lesson.summary}</p>
               <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
@@ -396,6 +479,21 @@ function StudyContent() {
                   </li>
                 ))}
               </ul>
+              <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50/80 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/10">
+                <p className="font-semibold text-sky-900 dark:text-sky-100">ミニケース</p>
+                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50">{lesson.example}</p>
+              </div>
+              <div className="mt-4 rounded-xl border border-dashed border-sky-200/80 px-4 py-3 dark:border-sky-400/20">
+                <p className="text-sm font-semibold">30秒チェック</p>
+                <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                  {lesson.quickCheck.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="mt-0.5">✓</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <div className="mt-4 rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-500/10 dark:text-sky-100">
                 <span className="font-semibold">覚え方:</span> {lesson.memoryHook}
               </div>
