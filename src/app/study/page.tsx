@@ -41,6 +41,23 @@ type CoverageFocus = {
   studyActions: string[];
 };
 
+
+type ReadinessAudit = {
+  area: string;
+  currentCoverage: string;
+  thinSpots: string[];
+  upgradeAdded: string[];
+  examPriority: string;
+};
+
+type DeepDiveModule = {
+  title: string;
+  whyImportant: string;
+  mustKnow: string[];
+  scenarioDrill: string;
+  finalCheck: string[];
+};
+
 const examTipMap: Record<Category, ExamTipSection[]> = {
   strategy: [
     {
@@ -689,6 +706,267 @@ const coverageFocusMap: Record<Category, CoverageFocus[]> = {
   ],
 };
 
+const readinessAuditMap: Record<Category, ReadinessAudit[]> = {
+  strategy: [
+    {
+      area: "経営戦略とフレームワーク",
+      currentCoverage: "理念・SWOT・PPM・BSC・PDCAの基礎は押さえられており、主要フレームワークの見分けはしやすい状態です。",
+      thinSpots: [
+        "競争戦略の選び方とフレームワーク同士の接続が薄く、問題文の場面設定に落とし込む練習が不足していました。",
+        "KPI・KGI・CSF・4P・STPを1つの施策ストーリーにまとめる学習導線が少なめでした。",
+      ],
+      upgradeAdded: [
+        "市場分析・競争戦略・数値目標のレッスンを追加し、STP→4P→KPI/KGIの流れを学べるようにしました。",
+        "各フレームワークを『何の場面で使うか』という試験視点で横断整理しました。",
+      ],
+      examPriority: "High",
+    },
+    {
+      area: "法務・ガバナンス",
+      currentCoverage: "個人情報と著作権は扱えていましたが、法務分野全体では守る対象の比較が十分ではありませんでした。",
+      thinSpots: [
+        "営業秘密、CSR、コーポレートガバナンス、内部統制の関係が断片的でした。",
+        "『誰を守るか』『何を守るか』の切り分け練習が少なく、ひっかけに弱い構成でした。",
+      ],
+      upgradeAdded: [
+        "法務・知的財産・企業責任のレッスンを厚くし、保護対象と制度目的を並べて整理できるようにしました。",
+        "ガバナンス系の追加フォーカスで、法令・企業責任・統制の違いを復習しやすくしました。",
+      ],
+      examPriority: "High",
+    },
+    {
+      area: "会計・DX・全体最適",
+      currentCoverage: "損益分岐点やCRM/SCMはあったものの、会計指標とDX・ERP・BPRの広がりに偏りがありました。",
+      thinSpots: [
+        "財務指標の比較問題、利益段階、全体最適を問う経営手法の選び分けが不足していました。",
+        "DXを単なるIT化と見分けるための実務ケースが少なめでした。",
+      ],
+      upgradeAdded: [
+        "会計・収益性・経営指標、業務改善・DX・全体最適のレッスンを追加済みです。",
+        "ROE/ROAやERP/BPR/DXの違いをケースベースで確認できる深掘りモジュールを追加しました。",
+      ],
+      examPriority: "High",
+    },
+  ],
+  management: [
+    {
+      area: "開発モデルとテスト体系",
+      currentCoverage: "WBS、V字モデル、アジャイルなど主要語句は揃っていました。",
+      thinSpots: [
+        "レビュー、単体・結合・システム・受入テストの体系化が弱く、担当者と目的の比較が不足していました。",
+        "ウォーターフォールとアジャイルの向き不向きを状況で判断する練習が少なめでした。",
+      ],
+      upgradeAdded: [
+        "開発モデルの比較とテスト/レビュー整理の導線を強化し、工程対応を繰り返し確認できる構成にしました。",
+        "深掘りモジュールで『誰が何を確認するか』を本番向けに整理しました。",
+      ],
+      examPriority: "High",
+    },
+    {
+      area: "プロジェクト管理",
+      currentCoverage: "WBS、ガントチャート、クリティカルパス、SLAなど定番論点は一通りありました。",
+      thinSpots: [
+        "リスク対応、品質管理、EVMS的な進捗感覚など『管理の意味』まで踏み込む説明が薄めでした。",
+        "レビューとテストの違い、遅延影響の読み取りが単発で終わりがちでした。",
+      ],
+      upgradeAdded: [
+        "プロジェクト管理の定番論点レッスンを追加し、最長経路・品質確認・リスク対応をまとめて復習できるようにしました。",
+        "追加問題でレビュー/受入テスト/リスク判断の瞬発力も補強しました。",
+      ],
+      examPriority: "High",
+    },
+    {
+      area: "運用・統制・事業継続",
+      currentCoverage: "インシデント管理や監査はあった一方、運用継続性を支える知識は厚みに差がありました。",
+      thinSpots: [
+        "BCP、RTO/RPO、変更管理、内部統制、サービスデスクなど運用保守分野が不足していました。",
+        "『障害対応』『変更統制』『監査』『継続計画』の役割差を横断比較する材料が少なめでした。",
+      ],
+      upgradeAdded: [
+        "運用・統制・事業継続、サービスマネジメントと保守運用の実務感覚を追加しました。",
+        "災害時と平常時の管理論点を分けて学べる構成へ拡張しました。",
+      ],
+      examPriority: "High",
+    },
+  ],
+  technology: [
+    {
+      area: "ネットワークとプロトコル",
+      currentCoverage: "ルータ、HTTPS、IaaS、サブネットなど主要キーワードは入っていました。",
+      thinSpots: [
+        "DNS、DHCP、NAT、VPN、無線LANなど周辺定番をまとめて整理する流れが不足していました。",
+        "機器・プロトコル・サービスモデルを同じ場面図で結びつける学習が薄めでした。",
+      ],
+      upgradeAdded: [
+        "ネットワーク・プロトコル・クラウドのレッスンを追加し、用途と管理範囲で見分ける導線を作りました。",
+        "新しい確認問題でDNSや多要素認証など頻出周辺テーマも補いました。",
+      ],
+      examPriority: "High",
+    },
+    {
+      area: "セキュリティ基礎",
+      currentCoverage: "公開鍵暗号やHTTPSの基礎はありましたが、守る目的別の整理が十分ではありませんでした。",
+      thinSpots: [
+        "ハッシュ、電子署名、多要素認証、攻撃と対策の対応関係が薄く、暗号化との違いが曖昧になりやすい状態でした。",
+        "CIAと技術要素を対応づける復習材料が少なめでした。",
+      ],
+      upgradeAdded: [
+        "セキュリティとシステム基礎、データベース・認証・最新技術のレッスンを追加しました。",
+        "暗号・認証・認可・改ざん検知を区別する深掘りモジュールを追加しました。",
+      ],
+      examPriority: "High",
+    },
+    {
+      area: "計算・DB・システム構成",
+      currentCoverage: "2進数、RAID、主キーなどは学べる一方、計算手順やDB設計の背景説明に伸びしろがありました。",
+      thinSpots: [
+        "論理演算、単位換算、正規化、外部キー、OS/ミドルウェア/仮想化の比較が不足していました。",
+        "公式を覚えるだけでなく、なぜその答えになるかを説明する練習が薄めでした。",
+      ],
+      upgradeAdded: [
+        "学習を伸ばす計算手順、OS・仮想化・システム構成の整理を追加しました。",
+        "DBとシステム構成を目的ベースで確認できるチェック項目を増やしました。",
+      ],
+      examPriority: "High",
+    },
+  ],
+};
+
+const deepDiveModulesMap: Record<Category, DeepDiveModule[]> = {
+  strategy: [
+    {
+      title: "会計指標を一気につなぐ",
+      whyImportant: "ROE・ROA・利益率は単独暗記だと混ざりやすく、分母の違いを理解しているかが本番でよく問われます。",
+      mustKnow: [
+        "ROE = 当期純利益 ÷ 自己資本 × 100",
+        "ROA = 利益 ÷ 総資産 × 100。自己資本ではなく会社全体の資産効率を見る指標です。",
+        "売上総利益→営業利益→経常利益→当期純利益の順に、差し引く費用や損益の範囲が広がります。",
+      ],
+      scenarioDrill: "『売上は増えたが販管費も増えた』という場面では、売上総利益だけでなく営業利益がどう変わるかを確認すると、利益段階の違いが整理できます。",
+      finalCheck: [
+        "分母が自己資本か総資産かを即答できるか。",
+        "利益段階を上から順に説明できるか。",
+      ],
+    },
+    {
+      title: "マーケティングをストーリーで覚える",
+      whyImportant: "STP、4P、KPI/KGIは別々に覚えるより、1つの施策の流れに載せると圧倒的に忘れにくくなります。",
+      mustKnow: [
+        "STPは『誰に売るか』を決める流れ、4Pは『どう売るか』を決める施策です。",
+        "KGIは最終到達点、KPIは途中の進捗計測、CSFは成功の鍵です。",
+        "CRMは顧客との関係強化、SCMは供給網の最適化、ERPは基幹業務の統合です。",
+      ],
+      scenarioDrill: "『学生向けに価格を抑えた新サービスをSNS中心で拡販し、3か月継続率をKPIに置く』という文を見たら、ターゲティング・Price・Promotion・KPIの要素に分解してみましょう。",
+      finalCheck: [
+        "STPの後に4Pが来る理由を説明できるか。",
+        "CRM/SCM/ERPを対象範囲で見分けられるか。",
+      ],
+    },
+    {
+      title: "法務を保護対象で切り分ける",
+      whyImportant: "法務は用語だけ追うと混ざりやすく、『何を守る制度か』で整理できる人が強い分野です。",
+      mustKnow: [
+        "著作権は表現された著作物を守り、アイデアや言語そのものは通常守りません。",
+        "営業秘密は秘密管理性・有用性・非公知性の3要件です。",
+        "個人情報、コンプライアンス、CSR、ガバナンスは、法律・倫理・統制の観点が少しずつ異なります。",
+      ],
+      scenarioDrill: "『顧客名簿の持ち出し』『新製品ロゴの模倣』『社内ルール違反の放置』を見たとき、個人情報・商標/不正競争・コンプライアンスのどれが中心かを判定してみましょう。",
+      finalCheck: [
+        "営業秘密の3要件を言えるか。",
+        "著作権と営業秘密の違いを保護対象で説明できるか。",
+      ],
+    },
+  ],
+  management: [
+    {
+      title: "テスト工程を担当者込みで整理する",
+      whyImportant: "V字モデルは暗記しやすい反面、テストの目的と担当者まで意識しないと選択肢で迷いやすくなります。",
+      mustKnow: [
+        "単体テストは詳細設計に対応し、モジュール単位の確認です。",
+        "結合テストは外部設計に対応し、モジュール間の連携やインタフェースを確認します。",
+        "受入テストは利用者側視点で、業務要件を満たすかを最終確認します。",
+      ],
+      scenarioDrill: "『発注担当者が実業務シナリオで確認する』なら受入テスト、『プログラム部品を組み合わせて確認する』なら結合テスト、と場面から逆引きできるようにしましょう。",
+      finalCheck: [
+        "結合テストに対応する上流工程を即答できるか。",
+        "レビューとテストの違いを実行有無で説明できるか。",
+      ],
+    },
+    {
+      title: "リスク対応を行動で覚える",
+      whyImportant: "回避・低減・移転・受容は日本語だけだと似て見えるため、具体的な行動に変換できることが重要です。",
+      mustKnow: [
+        "回避は危険要因そのものをなくすこと、低減は起こりにくくすることです。",
+        "移転は保険や外部委託などで影響を他へ分散すること、受容は対策コストと比較して受け入れることです。",
+        "クリティカルパスは遅延が全体日程へ直撃する最長経路です。",
+      ],
+      scenarioDrill: "『障害が怖いので新機能を見送る』『バックアップ回線を用意する』『サイバー保険へ加入する』をそれぞれ回避・低減・移転に分類してみましょう。",
+      finalCheck: [
+        "保険加入を移転と即答できるか。",
+        "最長経路が遅れると何が起きるか説明できるか。",
+      ],
+    },
+    {
+      title: "運用・統制・BCPを平常時と非常時で分ける",
+      whyImportant: "運用保守は用語が多いため、『普段の安定運用』と『非常時の継続』に分けると一気に整理しやすくなります。",
+      mustKnow: [
+        "インシデント管理は早期復旧、問題管理は再発防止、変更管理は安全な変更統制です。",
+        "BCPは事業継続計画、RTOは復旧目標時間、RPOは許容データ損失時点です。",
+        "内部統制は業務の有効性・効率性、財務報告の信頼性、法令遵守、資産保全を支えます。",
+      ],
+      scenarioDrill: "『災害後4時間以内に受注再開』『本番変更は事前審査』『問い合わせ窓口を一本化』を見て、BCP/RTO・変更管理・サービスデスクに切り分けましょう。",
+      finalCheck: [
+        "RTOとRPOを言い分けられるか。",
+        "変更管理とインシデント管理の違いを説明できるか。",
+      ],
+    },
+  ],
+  technology: [
+    {
+      title: "ネットワークを通信の流れで覚える",
+      whyImportant: "DNS、DHCP、HTTPS、VPNは単体暗記より、接続の流れに並べる方が本番で迷いません。",
+      mustKnow: [
+        "DNSは名前解決、DHCPはIPアドレス配布、HTTPSはWeb通信の暗号化です。",
+        "VPNは公衆網上に安全な仮想専用線を作る技術です。",
+        "ルータは第3層で経路制御し、L2スイッチは同一ネットワーク内のフレーム転送を担います。",
+      ],
+      scenarioDrill: "『URLを入力してから安全にWebページを開くまで』を、DNS→IP取得済み確認→HTTPS通信確立の順で口頭説明してみましょう。",
+      finalCheck: [
+        "DNSとDHCPを混同せず説明できるか。",
+        "VPNの用途をリモートアクセスで説明できるか。",
+      ],
+    },
+    {
+      title: "セキュリティ技術を守る目的で分類する",
+      whyImportant: "暗号化・ハッシュ・電子署名・多要素認証は頻出ですが、目的を取り違えると一気に失点しやすいです。",
+      mustKnow: [
+        "暗号化は内容秘匿、ハッシュは改ざん検知や照合、電子署名は本人性と完全性の確認に使います。",
+        "多要素認証は知識・所持・生体など異なる要素を組み合わせる認証です。",
+        "機密性・完全性・可用性のどれを高める技術かを意識すると整理しやすくなります。",
+      ],
+      scenarioDrill: "『保存パスワード』『送信文書の改ざん確認』『ログイン時のスマホ確認コード』を見て、ハッシュ・電子署名/完全性・多要素認証へ割り当てましょう。",
+      finalCheck: [
+        "電子署名を機密性対策と誤認していないか。",
+        "多要素認証の『異なる要素』を説明できるか。",
+      ],
+    },
+    {
+      title: "計算とDBを手順で固める",
+      whyImportant: "計算問題とDB問題は、正しい手順を固定するだけで得点が安定しやすい領域です。",
+      mustKnow: [
+        "2進数変換では桁の重みを書き、通信計算ではbit/byteと秒の単位をそろえます。",
+        "主キーは一意でNULL不可、外部キーは表同士の関連付けです。",
+        "RAIDは故障対策、バックアップは消失後の復旧対策で、役割が同じではありません。",
+      ],
+      scenarioDrill: "『500MBのファイルを100Mbps回線で送る』問題では、まずbyteをbitへそろえるか、MB/s換算するかを決めてから計算しましょう。DB問題では、顧客テーブルと注文テーブルの関係を外部キーで表せるか考えます。",
+      finalCheck: [
+        "bit/byte換算を省略していないか。",
+        "主キーと外部キーを役割で言い分けられるか。",
+      ],
+    },
+  ],
+};
+
 const questionCoachingMap: Record<Category, QuestionCoaching[]> = {
   strategy: [
     { takeaway: "経営理念は数値目標ではなく、企業の存在意義を示す言葉です。", trap: "売上目標や制度の説明が出たら、理念ではなく個別施策の可能性があります。", checkpoint: "その選択肢は『なぜその会社が存在するか』に答えているかを確認しましょう。" },
@@ -750,6 +1028,8 @@ function StudyContent() {
   const categoryExamTips = examTipMap[category as Category] || [];
   const lessonBlocks = lessonBlocksMap[category as Category] || [];
   const coverageFocuses = coverageFocusMap[category as Category] || [];
+  const readinessAudits = readinessAuditMap[category as Category] || [];
+  const deepDiveModules = deepDiveModulesMap[category as Category] || [];
   const questionCoaching = questionCoachingMap[category as Category]?.[currentIndex];
 
   const handleGenerateAiNote = async () => {
@@ -1068,6 +1348,116 @@ function StudyContent() {
                     <li key={action} className="flex gap-2">
                       <span className="mt-0.5">→</span>
                       <span>{action}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8 rounded-3xl border border-fuchsia-200/70 bg-fuchsia-50/70 p-6 shadow-sm dark:border-fuchsia-400/20 dark:bg-fuchsia-400/10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-fuchsia-700 dark:text-fuchsia-200">現状分析 → 補強ポイント</p>
+            <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の現行レッスン監査</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
+              既存の出題とレッスンをもとに、どこまでカバーできていて、どこが薄かったかを試験視点で整理しました。追加した内容がどの弱点を埋めるのかまで一覧で確認できます。
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+            <p className="text-xs text-[var(--muted)]">見るポイント</p>
+            <p className="mt-1 font-medium">今ある強み / 薄い論点 / 追加補強</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 xl:grid-cols-3">
+          {readinessAudits.map((audit) => (
+            <section
+              key={audit.area}
+              className="rounded-2xl border border-fuchsia-200/70 bg-white/85 p-5 dark:border-fuchsia-400/20 dark:bg-black/10"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="font-semibold text-lg">{audit.area}</h3>
+                <span className="rounded-full bg-fuchsia-100 px-3 py-1 text-[11px] font-medium text-fuchsia-700 dark:bg-fuchsia-500/10 dark:text-fuchsia-100">{audit.examPriority}</span>
+              </div>
+              <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-4 py-3 text-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
+                <p className="font-semibold text-emerald-900 dark:text-emerald-100">現在のカバー状況</p>
+                <p className="mt-1 leading-relaxed text-emerald-900/80 dark:text-emerald-50">{audit.currentCoverage}</p>
+              </div>
+              <div className="mt-4 rounded-xl border border-rose-200/80 bg-rose-50/70 px-4 py-3 text-sm dark:border-rose-400/20 dark:bg-rose-500/10">
+                <p className="font-semibold text-rose-900 dark:text-rose-100">薄かった点</p>
+                <ul className="mt-2 space-y-2 leading-relaxed text-rose-900/80 dark:text-rose-50">
+                  {audit.thinSpots.map((spot) => (
+                    <li key={spot} className="flex gap-2">
+                      <span className="mt-0.5">!</span>
+                      <span>{spot}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-4 rounded-xl border border-dashed border-fuchsia-200/80 px-4 py-3 dark:border-fuchsia-400/20">
+                <p className="text-sm font-semibold">今回追加した補強</p>
+                <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                  {audit.upgradeAdded.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="mt-0.5">→</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8 rounded-3xl border border-teal-200/70 bg-teal-50/70 p-6 shadow-sm dark:border-teal-400/20 dark:bg-teal-400/10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-teal-700 dark:text-teal-200">本番対応の深掘り</p>
+            <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の深掘りモジュール</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
+              単語暗記で終わらせず、理由・場面・チェックポイントまで確認できるように、試験で差がつく論点をミニ講義形式で追加しました。
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+            <p className="text-xs text-[var(--muted)]">おすすめ</p>
+            <p className="mt-1 font-medium">弱点1つにつき1モジュール集中</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 xl:grid-cols-3">
+          {deepDiveModules.map((module) => (
+            <section
+              key={module.title}
+              className="rounded-2xl border border-teal-200/70 bg-white/85 p-5 dark:border-teal-400/20 dark:bg-black/10"
+            >
+              <h3 className="font-semibold text-lg">{module.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{module.whyImportant}</p>
+              <div className="mt-4 rounded-xl border border-teal-200/80 bg-teal-50/70 px-4 py-3 text-sm dark:border-teal-400/20 dark:bg-teal-500/10">
+                <p className="font-semibold text-teal-900 dark:text-teal-100">絶対に押さえたいこと</p>
+                <ul className="mt-2 space-y-2 leading-relaxed text-teal-900/80 dark:text-teal-50">
+                  {module.mustKnow.map((point) => (
+                    <li key={point} className="flex gap-2">
+                      <span className="mt-0.5">•</span>
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50/80 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/10">
+                <p className="font-semibold text-sky-900 dark:text-sky-100">場面で確認する</p>
+                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50">{module.scenarioDrill}</p>
+              </div>
+              <div className="mt-4 rounded-xl border border-dashed border-teal-200/80 px-4 py-3 dark:border-teal-400/20">
+                <p className="text-sm font-semibold">仕上げチェック</p>
+                <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                  {module.finalCheck.map((item) => (
+                    <li key={item} className="flex gap-2">
+                      <span className="mt-0.5">✓</span>
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
