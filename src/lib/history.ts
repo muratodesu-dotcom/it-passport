@@ -13,13 +13,25 @@ export function getHistory(): QuizResult[] {
 }
 
 export function saveResult(result: QuizResult): void {
-  const history = getHistory();
-  history.unshift(result);
-  // Keep last 50 results
-  if (history.length > 50) history.length = 50;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  if (typeof window === "undefined") return;
+
+  try {
+    const history = getHistory();
+    history.unshift(result);
+    // Keep last 50 results
+    if (history.length > 50) history.length = 50;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  } catch {
+    // Ignore storage errors so quiz completion still works.
+  }
 }
 
 export function clearHistory(): void {
-  localStorage.removeItem(STORAGE_KEY);
+  if (typeof window === "undefined") return;
+
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch {
+    // Ignore storage errors so the page remains usable.
+  }
 }

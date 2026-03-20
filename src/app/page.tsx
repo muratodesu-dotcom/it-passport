@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { questions } from "@/data/questions";
 
-const categories = [
+const categoryDefinitions = [
   {
     id: "all",
     title: "全分野",
     description: "ストラテジ・マネジメント・テクノロジの全50問",
     color: "from-indigo-500 to-purple-600",
     icon: "📚",
-    count: 50,
   },
   {
     id: "strategy",
@@ -16,7 +15,6 @@ const categories = [
     description: "企業活動、法務、経営戦略、システム戦略",
     color: "from-blue-500 to-cyan-500",
     icon: "💼",
-    count: 17,
   },
   {
     id: "management",
@@ -24,7 +22,6 @@ const categories = [
     description: "開発技術、プロジェクトマネジメント、サービスマネジメント",
     color: "from-green-500 to-emerald-500",
     icon: "📋",
-    count: 17,
   },
   {
     id: "technology",
@@ -32,9 +29,16 @@ const categories = [
     description: "基礎理論、コンピュータシステム、技術要素、セキュリティ",
     color: "from-purple-500 to-pink-500",
     icon: "💻",
-    count: 16,
   },
 ];
+
+const categories = categoryDefinitions.map((category) => ({
+  ...category,
+  count:
+    category.id === "all"
+      ? questions.length
+      : questions.filter((question) => question.category === category.id).length,
+}));
 
 const totalQuestions = questions.length;
 const totalCategories = categories.length - 1;

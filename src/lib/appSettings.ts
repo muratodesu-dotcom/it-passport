@@ -38,5 +38,10 @@ export function saveAiSettings(settings: AiSettings) {
     return;
   }
 
-  window.localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  const normalizedSettings: AiSettings = {
+    apiKey: settings.apiKey.trim(),
+    model: settings.model.trim() || defaultAiSettings.model,
+  };
+
+  window.localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(normalizedSettings));
 }

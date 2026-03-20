@@ -18,8 +18,8 @@ function ResultsContent() {
   const questionsParam = searchParams.get("questions") || "";
   const timeParam = parseInt(searchParams.get("time") || "0", 10);
 
-  const answerList = answersParam.split(",").map(Number);
-  const questionIds = questionsParam.split(",").map(Number);
+  const answerList = answersParam ? answersParam.split(",").map((value) => Number.parseInt(value, 10)) : [];
+  const questionIds = questionsParam ? questionsParam.split(",").map((value) => Number.parseInt(value, 10)).filter((value) => Number.isFinite(value)) : [];
   const questions = questionIds
     .map((id) => allQuestions.find((q) => q.id === id))
     .filter(Boolean);
