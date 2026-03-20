@@ -11,6 +11,71 @@ type FeedItem = {
   questionIndex: number;
 };
 
+type ExamTipSection = {
+  title: string;
+  points: string[];
+};
+
+const examTipMap: Record<Category, ExamTipSection[]> = {
+  strategy: [
+    {
+      title: "頻出キーワードのつながり",
+      points: [
+        "SWOT・PPM・BSC・PDCAは『経営分析→戦略立案→評価→改善』の流れで整理すると覚えやすいです。",
+        "CRMは顧客との関係強化、SCMは供給の全体最適化、経営理念は企業の存在意義と目的、という役割の違いを区別しましょう。",
+        "著作権・個人情報保護法は『何が保護対象か』『何が対象外か』を対比で覚えるとひっかけに強くなります。",
+      ],
+    },
+    {
+      title: "本番での見抜き方",
+      points: [
+        "選択肢に『短期的な売上目標』『給与体系』のような限定的な説明が出たら、経営理念や戦略概念ではない可能性が高いです。",
+        "法務問題は用語の定義を問うことが多いため、『個人』『法人』『著作物そのもの』など主語に注目すると正答しやすくなります。",
+      ],
+    },
+  ],
+  management: [
+    {
+      title: "工程と管理手法の整理",
+      points: [
+        "WBSは作業分解、ガントチャートは進捗の見える化、SLAは品質水準の合意、というように『何を管理するものか』で覚えましょう。",
+        "V字モデルは上流工程と対応するテスト工程をセットで暗記すると得点源になります。",
+        "インシデント管理と問題管理は混同しやすいので、『まず復旧、次に原因究明』の順で整理するのがコツです。",
+      ],
+    },
+    {
+      title: "迷いやすい論点",
+      points: [
+        "ISO/IEC 27001、ISO/IEC 20000、ISO 9001は用途の違いを表で比較する感覚で覚えると混乱しません。",
+        "見積もり問題では『機能で測るのか』『コード量で測るのか』を判別すると正解を選びやすくなります。",
+      ],
+    },
+  ],
+  technology: [
+    {
+      title: "テクノロジ系の得点パターン",
+      points: [
+        "計算・ネットワーク・セキュリティは頻出です。公式や仕組みを丸暗記するだけでなく、『なぜそうなるか』を1行で説明できる状態を目指しましょう。",
+        "CPU、メモリ、OS、データベース、ネットワーク機器は『役割の違い』を整理すると選択肢の消去がしやすくなります。",
+        "セキュリティは攻撃手法・対策・認証方式をセットで覚えると応用問題にも対応しやすいです。",
+      ],
+    },
+    {
+      title: "計算問題の対策",
+      points: [
+        "2進数変換、論理演算、稼働率、転送速度は途中式を紙に残す習慣をつけるとケアレスミスを減らせます。",
+        "単位は bit と byte、k と K、Mbps と MB/s を取り違えないことが重要です。",
+      ],
+    },
+  ],
+};
+
+const commonExamTips = [
+  "ITパスポート本番は『知っているか』より『似た用語を区別できるか』が問われやすいため、正解と不正解の差分を意識して復習しましょう。",
+  "1問に時間をかけすぎず、迷ったら消去法で仮置きし、最後に戻るのが得点を落としにくい進め方です。",
+  "学習モードで理解→クイズモードで瞬発力確認→履歴で弱点洗い出し、の3段階で回すと定着しやすいです。",
+];
+
 function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -28,6 +93,7 @@ function StudyContent() {
   const categoryLabel = categoryLabels[category as Category] || category;
   const studiedCount = showAnswer ? currentIndex + 1 : currentIndex;
   const mastery = questions.length > 0 ? Math.round((studiedCount / questions.length) * 100) : 0;
+  const categoryExamTips = examTipMap[category as Category] || [];
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -176,6 +242,41 @@ function StudyContent() {
         </div>
       </div>
 
+      <div className="mb-8 rounded-3xl border border-amber-200/70 bg-amber-50/70 p-6 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-amber-700 dark:text-amber-200">試験で点を取りやすくするコツ</p>
+            <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の頻出論点を先に整理</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
+              問題をただ読むだけでなく、出題パターン・間違えやすい語句・本番での判断軸も合わせて確認できるようにしました。
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+            <p className="text-xs text-[var(--muted)]">おすすめの使い方</p>
+            <p className="mt-1 font-medium">要点確認 → 各問題の解説 → クイズで再確認</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {categoryExamTips.map((section) => (
+            <section
+              key={section.title}
+              className="rounded-2xl border border-amber-200/70 bg-white/80 p-5 dark:border-amber-400/20 dark:bg-black/10"
+            >
+              <h3 className="font-semibold">{section.title}</h3>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                {section.points.map((point) => (
+                  <li key={point} className="flex gap-2">
+                    <span className="mt-0.5">•</span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>
           {!doomScrollMode ? (
@@ -232,14 +333,28 @@ function StudyContent() {
                 </div>
               ) : (
                 <>
-                  <div className="bg-[var(--explanation-bg)] border border-[var(--explanation-border)] rounded-xl p-5 mb-6 fade-in">
+                  <div className="bg-[var(--explanation-bg)] border border-[var(--explanation-border)] rounded-xl p-5 mb-4 fade-in">
                     <p className="font-bold mb-2 text-[var(--explanation-title)]">
-                      正解: {String.fromCharCode(65 + question.correctIndex)}. {" "}
+                      正解: {String.fromCharCode(65 + question.correctIndex)}.{" "}
                       {question.options[question.correctIndex]}
                     </p>
                     <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
                       {question.explanation}
                     </p>
+                  </div>
+
+                  <div className="mb-6 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4">
+                    <p className="text-sm font-semibold">試験での確認ポイント</p>
+                    <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                      <li className="flex gap-2">
+                        <span className="mt-0.5">✓</span>
+                        <span>正解の根拠を10秒以内で言い換えられるか確認しましょう。</span>
+                      </li>
+                      <li className="flex gap-2">
+                        <span className="mt-0.5">✓</span>
+                        <span>誤答の選択肢がなぜ違うかも1つだけ説明できると、類題に強くなります。</span>
+                      </li>
+                    </ul>
                   </div>
 
                   <div className="flex gap-3">
@@ -337,9 +452,14 @@ function StudyContent() {
                       </div>
 
                       {revealed && (
-                        <p className="mt-3 text-sm leading-relaxed text-[var(--explanation-text)] fade-in">
-                          {feedQuestion.explanation}
-                        </p>
+                        <div className="fade-in">
+                          <p className="mt-3 text-sm leading-relaxed text-[var(--explanation-text)]">
+                            {feedQuestion.explanation}
+                          </p>
+                          <p className="mt-2 text-xs leading-relaxed text-[var(--muted)]">
+                            本番では、正解の理由だけでなく他の選択肢との違いも一緒に確認すると記憶が安定します。
+                          </p>
+                        </div>
                       )}
                     </div>
                   </article>
@@ -362,6 +482,18 @@ function StudyContent() {
               {focusTips.map((tip) => (
                 <li key={tip} className="flex gap-2">
                   <span className="mt-0.5 text-base">✨</span>
+                  <span>{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm">
+            <h2 className="font-semibold mb-3">本番向けチェックリスト</h2>
+            <ul className="space-y-3 text-sm text-[var(--muted)] leading-relaxed">
+              {commonExamTips.map((tip) => (
+                <li key={tip} className="flex gap-2">
+                  <span className="mt-0.5 text-base">📝</span>
                   <span>{tip}</span>
                 </li>
               ))}
