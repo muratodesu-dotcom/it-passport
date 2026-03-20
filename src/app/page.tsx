@@ -182,6 +182,33 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="mb-12">
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="text-xl font-semibold">ゲームモードで楽しく学ぶ</h2>
+          <Link href="/games" className="text-sm font-medium text-[var(--primary)]">すべて見る →</Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {[
+            { id: "matching", title: "用語マッチング", desc: "用語と説明をペアにしよう", icon: "🔗", color: "from-cyan-500 to-blue-600" },
+            { id: "flashcards", title: "フラッシュカード", desc: "めくって覚えて仕分けする", icon: "🃏", color: "from-violet-500 to-purple-600" },
+            { id: "speed", title: "スピードチャレンジ", desc: "60秒で何問解ける？", icon: "⚡", color: "from-orange-500 to-red-500" },
+          ].map((game) => (
+            <Link
+              key={game.id}
+              href={`/games/${game.id}`}
+              className="group block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 transition-all hover:shadow-lg hover:-translate-y-0.5"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">{game.icon}</span>
+                <span className={`text-xs text-white px-2 py-0.5 rounded-full bg-gradient-to-r ${game.color}`}>NEW</span>
+              </div>
+              <h3 className="font-semibold mb-1 group-hover:text-[var(--primary)]">{game.title}</h3>
+              <p className="text-xs text-[var(--muted)]">{game.desc}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold mb-2">履歴を見て、伸びを確認</h2>
