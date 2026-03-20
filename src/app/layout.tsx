@@ -22,6 +22,7 @@ export default function RootLayout({
             <Link href="/" className="text-sm font-semibold tracking-wide text-[var(--foreground)]">IT Passport</Link>
             <nav className="flex items-center gap-3 text-sm">
               <Link href="/study?category=strategy" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Study</Link>
+              <Link href="/games" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Games</Link>
               <Link href="/history" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">History</Link>
               <Link href="/settings" className="rounded-full border border-[var(--card-border)] px-3 py-1.5 font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--card)]">Settings</Link>
             </nav>
