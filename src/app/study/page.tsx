@@ -16,6 +16,29 @@ type ExamTipSection = {
   points: string[];
 };
 
+type LessonSection = {
+  title: string;
+  summary: string;
+  bullets: string[];
+};
+
+type LessonHighlight = {
+  label: string;
+  value: string;
+};
+
+type QuickCheck = {
+  prompt: string;
+  answer: string;
+};
+
+type CategoryLesson = {
+  overview: string;
+  highlights: LessonHighlight[];
+  sections: LessonSection[];
+  quickChecks: QuickCheck[];
+};
+
 const examTipMap: Record<Category, ExamTipSection[]> = {
   strategy: [
     {
@@ -70,6 +93,138 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
   ],
 };
 
+const lessonMap: Record<Category, CategoryLesson> = {
+  strategy: {
+    overview:
+      "ストラテジ系は『会社が何を目指し、どう競争し、どのルールに従うか』を整理する分野です。用語だけを暗記するより、経営判断の流れに沿って並べると定着しやすくなります。",
+    highlights: [
+      { label: "軸", value: "経営・戦略・法務を1本の流れで理解" },
+      { label: "頻出", value: "SWOT / PPM / CRM / SCM / 著作権 / 個人情報" },
+      { label: "解き方", value: "目的・対象・主語の違いで選択肢を切る" },
+    ],
+    sections: [
+      {
+        title: "1. 経営戦略の基本線を作る",
+        summary: "まずは企業の全体像をつかみます。",
+        bullets: [
+          "経営理念は企業の存在意義、経営戦略はその実現方法、売上目標はその途中の数値指標です。",
+          "SWOTでは内部要因の強み・弱みと、外部要因の機会・脅威を分けて考えます。",
+          "PPMは『成長率』と『市場占有率』で事業の立ち位置を判断します。",
+        ],
+      },
+      {
+        title: "2. 業務全体を最適化する視点を持つ",
+        summary: "企業活動のどこを改善する用語なのかを区別します。",
+        bullets: [
+          "CRMは顧客との関係強化、SCMは調達から販売までの全体最適です。",
+          "BSCは財務だけでなく顧客・業務プロセス・学習と成長も評価対象に含めます。",
+          "PDCAは改善の循環なので、単なる実行手順ではなく『評価と改善』が重要です。",
+        ],
+      },
+      {
+        title: "3. 法務は保護対象を対比で覚える",
+        summary: "似ている言葉ほど『何が守られるのか』を明確にします。",
+        bullets: [
+          "個人情報は生存する個人を識別できる情報で、法人情報そのものは含みません。",
+          "著作権は表現を保護しますが、アルゴリズムやプログラム言語そのものは保護対象外です。",
+          "法務問題では主語と対象を丁寧に読むだけで正答率が上がります。",
+        ],
+      },
+    ],
+    quickChecks: [
+      { prompt: "CRMとSCMの違いを一言で言うと？", answer: "CRMは顧客関係、SCMは供給連鎖の最適化です。" },
+      { prompt: "SWOTのOとTは何を表す？", answer: "Opportunity（機会）とThreat（脅威）です。" },
+      { prompt: "著作権が守るのはアイデアか表現か？", answer: "表現です。" },
+    ],
+  },
+  management: {
+    overview:
+      "マネジメント系は『どう進め、どう品質を守り、どう運用するか』を扱う分野です。工程・役割・目的を結び付けると、似た用語の混同を防げます。",
+    highlights: [
+      { label: "軸", value: "開発工程・運用管理・品質保証の対応関係" },
+      { label: "頻出", value: "WBS / V字モデル / ITIL / SLA / ISO規格" },
+      { label: "解き方", value: "何を管理し、誰と合意し、どこで使うかで判別" },
+    ],
+    sections: [
+      {
+        title: "1. 工程ごとの役割を切り分ける",
+        summary: "管理手法は『何を見える化するか』で覚えます。",
+        bullets: [
+          "WBSは作業の分解、ガントチャートは日程と進捗の可視化です。",
+          "V字モデルは上流工程とテスト工程が対応していることがポイントです。",
+          "アジャイルは短い反復で価値を出す考え方で、要件固定型とは逆です。",
+        ],
+      },
+      {
+        title: "2. サービス管理は目的の違いで区別する",
+        summary: "似た管理プロセスでも優先事項が異なります。",
+        bullets: [
+          "インシデント管理は素早い復旧、問題管理は根本原因の究明です。",
+          "SLAはサービス提供者と利用者の品質合意であり、内部向け工程表ではありません。",
+          "システム監査は独立した立場で信頼性・安全性・効率性を評価します。",
+        ],
+      },
+      {
+        title: "3. 規格と見積もりはセットで整理する",
+        summary: "番号暗記ではなく、用途と対象で覚えます。",
+        bullets: [
+          "ISO/IEC 27001はISMS、ISO/IEC 20000はITサービス、ISO 9001は品質です。",
+          "ファンクションポイント法は機能数から規模を見積もり、LOC法はコード量を基準にします。",
+          "共通フレームの計画段階では、開発前に業務分析やシステム化方針を固めます。",
+        ],
+      },
+    ],
+    quickChecks: [
+      { prompt: "インシデント管理の最優先は？", answer: "サービスの迅速な復旧です。" },
+      { prompt: "外部設計に対応するテストは？", answer: "結合テストです。" },
+      { prompt: "ISO/IEC 27001は何の規格？", answer: "情報セキュリティマネジメントシステムの規格です。" },
+    ],
+  },
+  technology: {
+    overview:
+      "テクノロジ系は『計算の基礎』『コンピュータの構成』『ネットワークとセキュリティ』を横断する分野です。公式暗記よりも、仕組みを短く説明できる状態を目指すと強くなります。",
+    highlights: [
+      { label: "軸", value: "基礎理論→システム構成→通信・安全対策" },
+      { label: "頻出", value: "2進数 / CPU / OS / DB / ネットワーク / 暗号" },
+      { label: "解き方", value: "役割・単位・処理順序を明確にして消去法" },
+    ],
+    sections: [
+      {
+        title: "1. 計算分野は途中式で勝つ",
+        summary: "数字に強くなるだけで安定して点が取れます。",
+        bullets: [
+          "2進数や論理演算は、桁ごとに丁寧に書き出すとミスが減ります。",
+          "性能や転送速度は、bitとbyte、秒と分など単位変換を先に確認します。",
+          "稼働率・処理時間は、式の意味を理解していれば応用問題にも対応できます。",
+        ],
+      },
+      {
+        title: "2. コンピュータの役割分担を整理する",
+        summary: "装置やソフトウェアの違いを一問一答で言えるようにします。",
+        bullets: [
+          "CPUは演算と制御、メモリは一時記憶、補助記憶装置は長期保存です。",
+          "OSはハードウェア資源の管理、DBMSはデータの効率的な管理を担います。",
+          "アプリケーション層とOS層の役割差を押さえると、選択肢の見分けが速くなります。",
+        ],
+      },
+      {
+        title: "3. セキュリティは攻撃と対策を対で覚える",
+        summary: "単語単体ではなく、防御の意図まで理解します。",
+        bullets: [
+          "マルウェア、フィッシング、DoSなどは被害の出方の違いで区別します。",
+          "認証・暗号・アクセス制御は、どの脅威に効くかまで考えると忘れにくいです。",
+          "ネットワーク機器やプロトコルは、接続経路のどこで働くかを意識すると整理できます。",
+        ],
+      },
+    ],
+    quickChecks: [
+      { prompt: "CPUと主記憶の役割の違いは？", answer: "CPUは処理、主記憶は作業中データの一時保存です。" },
+      { prompt: "MbpsとMB/sは同じ単位？", answer: "違います。bitとbyteで8倍の差があります。" },
+      { prompt: "セキュリティ対策は何とセットで覚える？", answer: "対応する攻撃手法や脅威とセットです。" },
+    ],
+  },
+};
+
 const commonExamTips = [
   "ITパスポート本番は『知っているか』より『似た用語を区別できるか』が問われやすいため、正解と不正解の差分を意識して復習しましょう。",
   "1問に時間をかけすぎず、迷ったら消去法で仮置きし、最後に戻るのが得点を落としにくい進め方です。",
@@ -90,10 +245,12 @@ function StudyContent() {
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
   const question = questions[currentIndex];
-  const categoryLabel = categoryLabels[category as Category] || category;
+  const categoryKey = (category as Category) in categoryLabels ? (category as Category) : "strategy";
+  const categoryLabel = categoryLabels[categoryKey] || category;
   const studiedCount = showAnswer ? currentIndex + 1 : currentIndex;
   const mastery = questions.length > 0 ? Math.round((studiedCount / questions.length) * 100) : 0;
-  const categoryExamTips = examTipMap[category as Category] || [];
+  const categoryExamTips = examTipMap[categoryKey] || [];
+  const categoryLesson = lessonMap[categoryKey];
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -242,6 +399,52 @@ function StudyContent() {
         </div>
       </div>
 
+      <div className="mb-8 rounded-3xl border border-sky-200/70 bg-sky-50/80 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-sky-700 dark:text-sky-200">レッスンを拡張しました</p>
+            <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の全体像を先に理解する</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
+              {categoryLesson.overview}
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+            <p className="text-xs text-[var(--muted)]">おすすめ順</p>
+            <p className="mt-1 font-medium">全体像 → 問題演習 → クイック確認</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {categoryLesson.highlights.map((highlight) => (
+            <div key={highlight.label} className="rounded-2xl border border-sky-200/80 bg-white/80 p-4 dark:border-sky-400/20 dark:bg-black/10">
+              <p className="text-xs text-[var(--muted)]">{highlight.label}</p>
+              <p className="mt-2 text-sm font-semibold leading-relaxed">{highlight.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          {categoryLesson.sections.map((section) => (
+            <section
+              key={section.title}
+              className="rounded-2xl border border-sky-200/70 bg-white/80 p-5 dark:border-sky-400/20 dark:bg-black/10"
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide text-sky-700 dark:text-sky-200">Lesson</p>
+              <h3 className="mt-2 font-semibold">{section.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">{section.summary}</p>
+              <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                {section.bullets.map((bullet) => (
+                  <li key={bullet} className="flex gap-2">
+                    <span className="mt-0.5">•</span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+
       <div className="mb-8 rounded-3xl border border-amber-200/70 bg-amber-50/70 p-6 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -272,6 +475,28 @@ function StudyContent() {
                   </li>
                 ))}
               </ul>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8 rounded-3xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-[var(--primary)]">クイック確認</p>
+            <h2 className="mt-2 text-2xl font-bold">3問だけ口頭で答えてから先に進む</h2>
+          </div>
+          <p className="max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+            画面を読むだけで終わらせず、短くでも自分の言葉で説明すると理解が定着しやすくなります。
+          </p>
+        </div>
+        <div className="mt-5 grid gap-4 md:grid-cols-3">
+          {categoryLesson.quickChecks.map((check) => (
+            <section key={check.prompt} className="rounded-2xl border border-[var(--card-border)] bg-[var(--background)] p-4">
+              <p className="text-xs font-semibold text-[var(--muted)]">Q</p>
+              <p className="mt-2 font-medium leading-relaxed">{check.prompt}</p>
+              <p className="mt-4 text-xs font-semibold text-[var(--muted)]">答えの軸</p>
+              <p className="mt-1 text-sm leading-relaxed text-[var(--muted)]">{check.answer}</p>
             </section>
           ))}
         </div>
