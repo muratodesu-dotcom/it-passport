@@ -5,7 +5,7 @@ const categoryDefinitions = [
   {
     id: "all",
     title: "全分野",
-    description: "ストラテジ・マネジメント・テクノロジの全50問",
+    description: `ストラテジ・マネジメント・テクノロジの全${questions.length}問`,
     color: "from-indigo-500 to-purple-600",
     icon: "📚",
   },
