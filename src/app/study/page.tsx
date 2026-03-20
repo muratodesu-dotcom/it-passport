@@ -32,6 +32,13 @@ type QuestionCoaching = {
   checkpoint: string;
 };
 
+type CoverageFocus = {
+  title: string;
+  whyItMatters: string;
+  topics: string[];
+  studyActions: string[];
+};
+
 const examTipMap: Record<Category, ExamTipSection[]> = {
   strategy: [
     {
@@ -39,7 +46,7 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
       points: [
         "SWOT・PPM・BSC・PDCAは『経営分析→戦略立案→評価→改善』の流れで整理すると覚えやすいです。",
         "CRMは顧客との関係強化、SCMは供給の全体最適化、経営理念は企業の存在意義と目的、という役割の違いを区別しましょう。",
-        "著作権・個人情報保護法は『何が保護対象か』『何が対象外か』を対比で覚えるとひっかけに強くなります。",
+        "著作権・個人情報保護法・不正競争防止法は『何が保護対象か』『何が対象外か』を対比で覚えるとひっかけに強くなります。",
       ],
     },
     {
@@ -47,6 +54,15 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
       points: [
         "選択肢に『短期的な売上目標』『給与体系』のような限定的な説明が出たら、経営理念や戦略概念ではない可能性が高いです。",
         "法務問題は用語の定義を問うことが多いため、『個人』『法人』『著作物そのもの』など主語に注目すると正答しやすくなります。",
+        "財務指標は分子と分母を逆にしたひっかけが定番なので、利益率・回転率・資本利益率の『何を何で割るか』を口に出して確認しましょう。",
+      ],
+    },
+    {
+      title: "追加で深掘りしたい論点",
+      points: [
+        "企業会計では損益分岐点、売上総利益、営業利益、ROE、ROA、付加価値などの関係を整理すると得点源になります。",
+        "経営管理ではKPI・KGI・CSF、ERP、アウトソーシング、EA、DXなど『目的と効果』を問う問題にも備えましょう。",
+        "ガバナンス分野では内部統制、コーポレートガバナンス、CSR、コンプライアンスの違いを説明できる状態を目指しましょう。",
       ],
     },
   ],
@@ -64,6 +80,15 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
       points: [
         "ISO/IEC 27001、ISO/IEC 20000、ISO 9001は用途の違いを表で比較する感覚で覚えると混乱しません。",
         "見積もり問題では『機能で測るのか』『コード量で測るのか』を判別すると正解を選びやすくなります。",
+        "レビュー、単体テスト、結合テスト、システムテスト、受入テストの担当者と目的を横並びで整理すると失点を減らせます。",
+      ],
+    },
+    {
+      title: "追加で深掘りしたい論点",
+      points: [
+        "プロジェクト管理ではクリティカルパス、EVMS、品質・コスト・納期のトレードオフ、リスク対応策の違いを復習すると実戦的です。",
+        "運用管理では可用性、キャパシティ、変更管理、構成管理、バックアップ、ジョブ管理、監視の役割を整理しましょう。",
+        "BCP、RTO、RPO、監査証跡、内部統制は、災害対策・統制・監査をまとめて出題されやすい周辺論点です。",
       ],
     },
   ],
@@ -81,11 +106,19 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
       points: [
         "2進数変換、論理演算、稼働率、転送速度は途中式を紙に残す習慣をつけるとケアレスミスを減らせます。",
         "単位は bit と byte、k と K、Mbps と MB/s を取り違えないことが重要です。",
+        "CPUクロック・MIPS・キャッシュ・主記憶容量は混同しやすいので、性能指標と記憶容量を別の概念として区別しましょう。",
+      ],
+    },
+    {
+      title: "追加で深掘りしたい論点",
+      points: [
+        "ハードウェアでは論理回路、メモリ階層、入出力装置、RAID、仮想化を押さえると取りこぼしを減らせます。",
+        "ネットワークではTCP/IP、HTTP、DNS、DHCP、NAT、VPN、無線LAN、サブネットの基本まで広げると本番向きです。",
+        "データベースでは主キー・外部キー・正規化・トランザクション、セキュリティでは認証・認可・暗号・署名・マルウェア対策まで押さえたいです。",
       ],
     },
   ],
 };
-
 
 const lessonBlocksMap: Record<Category, LessonBlock[]> = {
   strategy: [
@@ -111,7 +144,7 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
         "CRMのような顧客接点の考え方は、単なる管理ツールではなく、売上や満足度を伸ばすための戦略として理解すると定着します。",
       bullets: [
         "CRMは顧客情報の蓄積が目的ではなく、関係強化による継続利用や満足度向上が目的です。",
-        "BSCの顧客視点や経営理念と関連づけると、企業活動のどこに位置づくか見えやすくなります。",
+        "4P、STP、BSCの顧客視点と関連づけると、企業活動のどこに位置づくか見えやすくなります。",
         "選択肢に『社内効率化』『勤怠管理』があれば、顧客戦略とズレていないかを確認しましょう。",
       ],
       example: "購入履歴を分析しておすすめ商品を提案する施策は、顧客との関係強化につながるのでCRMらしい施策と判断できます。",
@@ -122,20 +155,52 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
       memoryHook: "CRMは『顧客との関係』、社内効率化は別テーマと分けて考える。",
     },
     {
-      title: "法務・企業活動の頻出テーマ",
+      title: "法務・知的財産・企業責任",
       summary:
-        "ストラテジ系では、個人情報保護法・著作権法・SCMのように、対象や目的を正しく言い分けられるかが得点差になります。",
+        "ストラテジ系では、個人情報保護法・著作権法・不正競争防止法・コンプライアンスのように、保護対象と目的を言い分けられるかが鍵になります。",
       bullets: [
         "個人情報は『生存する個人を識別できるか』が軸で、法人情報は通常含まれません。",
         "著作権法は作品そのものを守る一方、言語・規約・解法のようなアイデアやルールそのものは対象外です。",
-        "SCMは調達から販売までの供給連鎖全体を最適化する考え方で、部分最適ではなく全体最適がキーワードです。",
+        "営業秘密は秘密管理性・有用性・非公知性の3要件、コンプライアンスは法令と社会規範の遵守です。",
       ],
-      example: "『法人の所在地』『プログラム言語』『問い合わせ管理』のような語が選択肢に出たら、誰を守る法か、どこまでが供給連鎖かを軸に切り分けます。",
+      example: "『プログラム言語』『営業秘密』『個人データ』『CSR』が並んだら、何を法が守るのか、企業に何を求めるのかで切り分けます。",
       quickCheck: [
         "個人情報かどうかを『個人識別』で判断できるか。",
-        "著作物とアイデア・ルールの違いを説明できるか。",
+        "著作物と営業秘密の違いを説明できるか。",
       ],
-      memoryHook: "『誰を守る法か』『何を最適化する仕組みか』の2軸で読む。",
+      memoryHook: "法務問題は『誰を守るか』『何を守るか』を先に決める。",
+    },
+    {
+      title: "会計・収益性・経営指標",
+      summary:
+        "ITパスポートのストラテジ系は文系知識だけではなく、収益性や費用構造を問う計算・指標問題も出ます。式の意味まで理解すると安定します。",
+      bullets: [
+        "損益分岐点は売上高と総費用が一致する点で、固定費・変動費・利益の関係を整理して覚えます。",
+        "ROEは自己資本に対する利益、ROAは総資産に対する利益、売上高利益率は売上に対する利益と、分母の違いが重要です。",
+        "売上総利益、営業利益、経常利益、当期純利益は、どの費用や収益が差し引かれた後かを段階で理解しましょう。",
+      ],
+      example: "売上が増えても固定費が大きければ損益分岐点を超えないことがあります。指標問題でも、どの資源に対して利益を測っているかを見れば判断しやすくなります。",
+      quickCheck: [
+        "ROEの分母が自己資本だと即答できるか。",
+        "損益分岐点を『利益ゼロの売上高』と言い換えられるか。",
+      ],
+      memoryHook: "利益率は『利益÷何か』。分母が何かを最優先で確認する。",
+    },
+    {
+      title: "業務改善・DX・全体最適",
+      summary:
+        "BPR、SCM、ERP、DXはどれも『業務を良くする』言葉ですが、対象範囲と変革の深さが違います。そこを区別できると本番で強いです。",
+      bullets: [
+        "BPRは業務プロセスの抜本的再設計、SCMは供給連鎖全体の最適化、ERPは基幹業務の統合管理です。",
+        "DXは単なるデジタル化ではなく、データや技術を使ってビジネスモデルや組織を変革する考え方です。",
+        "部分最適か全体最適か、既存改善か抜本改革かを見分けると類似語に強くなります。",
+      ],
+      example: "紙をPDF化するだけなら単なるデジタル化ですが、顧客行動データを活用してサービス提供方法そのものを変えるならDXに近い発想です。",
+      quickCheck: [
+        "BPR・SCM・ERP・DXの違いを1文ずつ説明できるか。",
+        "その施策が部分改善か全体変革かを判断できるか。",
+      ],
+      memoryHook: "改善の対象を見る。業務手順、供給網、基幹業務、ビジネスモデルは全部別。",
     },
   ],
   management: [
@@ -187,6 +252,38 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
       ],
       memoryHook: "規格は『何を管理するか』、見積もりは『何を数えるか』を確認する。",
     },
+    {
+      title: "プロジェクト管理の定番論点",
+      summary:
+        "スケジュール・コスト・品質・リスクの管理は、ITパスポートでも定番の出題領域です。公式よりも『管理目的』を理解すると対応しやすくなります。",
+      bullets: [
+        "クリティカルパスは最も所要時間が長い経路で、遅れると全体日程が遅れます。",
+        "リスク対応は回避・低減・移転・受容の違いを、何をするかで区別します。",
+        "レビューは成果物の欠陥を早期に見つける静的な確認、テストは実行して確認する動的な確認です。",
+      ],
+      example: "保険加入は移転、危険な機能を取りやめるのは回避、二重化で障害確率を下げるのは低減というように、行動レベルで言い換えると覚えやすくなります。",
+      quickCheck: [
+        "クリティカルパスを『最長経路』と言えるか。",
+        "レビューとテストの違いを説明できるか。",
+      ],
+      memoryHook: "遅延はクリティカルパス、未然防止はレビュー、動作確認はテスト。",
+    },
+    {
+      title: "運用・統制・事業継続",
+      summary:
+        "障害対応、変更管理、内部統制、BCPは、運用開始後にサービスを安定して続けるための知識として出題されます。",
+      bullets: [
+        "BCPは災害や障害時の事業継続と早期復旧の計画で、RTOは復旧目標時間、RPOは許容できるデータ損失時点です。",
+        "内部統制は業務の有効性・効率性、財務報告の信頼性、法令遵守、資産保全を支えます。",
+        "構成管理・変更管理・監視・バックアップは、サービス品質を落とさないための運用の土台です。",
+      ],
+      example: "大規模障害が起きても受注業務を4時間以内に復旧する、と決めるならBCPとRTOの考え方が必要です。変更管理が甘いと、復旧したはずのサービスが別の変更で再び不安定になります。",
+      quickCheck: [
+        "BCPの目的を『継続と早期復旧』と言えるか。",
+        "内部統制の4目的を1つでも具体例で説明できるか。",
+      ],
+      memoryHook: "運用は止めない工夫、統制は暴走させない工夫、BCPは非常時でも続ける工夫。",
+    },
   ],
   technology: [
     {
@@ -236,6 +333,128 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
         "答えが大きすぎる・小さすぎると感じたら見直せるか。",
       ],
       memoryHook: "数値は『書き出す→単位をそろえる→式→桁感チェック』で固定する。",
+    },
+    {
+      title: "ネットワーク・プロトコル・クラウド",
+      summary:
+        "ネットワーク分野は機器名だけでなく、プロトコルがどの場面で使われるかまで分かると一気に解きやすくなります。クラウドも提供範囲の違いが定番です。",
+      bullets: [
+        "HTTP/HTTPSはWeb、SMTPはメール送信、DNSは名前解決、DHCPはIPアドレス自動配布と、役割で覚えます。",
+        "VPNは公衆回線上に安全な仮想専用線を作る技術で、リモートアクセスや拠点間接続に使われます。",
+        "IaaS・PaaS・SaaSは、利用者がどこまで管理するかで区別すると理解しやすいです。",
+      ],
+      example: "『サーバ証明書でWeb通信を暗号化』はHTTPS、『名前をIPアドレスへ変換』はDNS、『仮想マシン提供』はIaaS、というように用途ベースで判別します。",
+      quickCheck: [
+        "DNS・DHCP・HTTPS・VPNの役割を1行ずつ言えるか。",
+        "IaaSとSaaSの違いを利用者の管理範囲で説明できるか。",
+      ],
+      memoryHook: "通信は『何をするプロトコルか』、クラウドは『どこまで借りるか』で覚える。",
+    },
+    {
+      title: "データベース・認証・最新技術",
+      summary:
+        "データ管理とセキュリティはITパスポートで毎回のように顔を出す重要分野です。最近よく見るAIやIoTも、基本概念として整理しておくと安心です。",
+      bullets: [
+        "主キーは一意かつNULL不可、外部キーは他テーブルとの関連付け、正規化は冗長性や更新不整合の削減を目的にします。",
+        "公開鍵暗号、電子署名、多要素認証、ハッシュ化は『暗号化なのか、本人確認なのか、改ざん検知なのか』で区別しましょう。",
+        "AI・機械学習・IoTは、データ収集→分析→活用の流れと実務例を結びつけると、用語問題に対応しやすくなります。",
+      ],
+      example: "パスワード保管にはハッシュ化、Webサイトの本人確認には認証、文書の改ざん検知には電子署名、家電の接続にはIoTというように、目的ごとに技術を割り当てます。",
+      quickCheck: [
+        "主キーと外部キーの違いを説明できるか。",
+        "暗号・署名・認証・ハッシュの役割を区別できるか。",
+      ],
+      memoryHook: "DBは『表の関係』、認証は『誰か確認』、署名は『改ざん検知』、AI/IoTは『データ活用』。",
+    },
+  ],
+};
+
+const coverageFocusMap: Record<Category, CoverageFocus[]> = {
+  strategy: [
+    {
+      title: "会計・指標の計算問題",
+      whyItMatters: "既存の問題は概念中心で、計算や財務指標の比較にやや薄さがありました。試験ではROE、利益、費用構造を問う設問が出やすいです。",
+      topics: ["損益分岐点", "ROE/ROA", "売上総利益・営業利益", "固定費と変動費"],
+      studyActions: [
+        "式を暗記するだけでなく、分母が何を意味するかを声に出して確認する。",
+        "数値がなくても『利益ゼロ』『資本に対する効率』のように日本語へ言い換える。",
+      ],
+    },
+    {
+      title: "法務・ガバナンスの切り分け",
+      whyItMatters: "著作権と個人情報はある程度カバー済みですが、営業秘密、コンプライアンス、CSR、内部統制とのつながりは薄めでした。",
+      topics: ["営業秘密3要件", "コンプライアンス", "CSR", "コーポレートガバナンス"],
+      studyActions: [
+        "各法制度について『何を守るか』『誰に義務があるか』で比較表を作る。",
+        "似た用語を1問1答ではなく、表形式で横比較して覚える。",
+      ],
+    },
+    {
+      title: "全体最適を扱う経営手法",
+      whyItMatters: "CRMやSCMはあるものの、ERP、BPR、KPI/KGI、DXなど実務寄りの重要テーマが不足していました。",
+      topics: ["ERP", "BPR", "DX", "KPI/KGI/CSF"],
+      studyActions: [
+        "『顧客』『供給網』『基幹業務』『変革』のように対象範囲で見分ける。",
+        "具体例を自分の職場や架空の会社に当てはめて分類する。",
+      ],
+    },
+  ],
+  management: [
+    {
+      title: "テストとレビューの体系化",
+      whyItMatters: "V字モデルはありましたが、レビュー・単体/結合/システム/受入テストの整理が不十分でした。",
+      topics: ["デザインレビュー", "単体テスト", "結合テスト", "受入テスト"],
+      studyActions: [
+        "『誰が何を確認するか』の軸で一覧化する。",
+        "静的レビューと動的テストを混同しないよう、実行の有無で区別する。",
+      ],
+    },
+    {
+      title: "運用・継続・統制",
+      whyItMatters: "障害復旧の基礎はある一方で、BCP、RTO/RPO、内部統制、変更管理など継続運用の重要論点がまだ薄い状態でした。",
+      topics: ["BCP", "RTO/RPO", "内部統制", "変更管理"],
+      studyActions: [
+        "災害対策・日常運用・監査の3つに分けて学ぶ。",
+        "『止めない』『元に戻せる』『証跡を残す』観点で各手法を説明する。",
+      ],
+    },
+    {
+      title: "リスクとプロジェクト管理",
+      whyItMatters: "WBSやクリティカルパスはありますが、リスク対応・品質管理・進捗遅延の考え方をもう一段深く押さえる必要があります。",
+      topics: ["リスク回避/低減/移転/受容", "クリティカルパス", "品質管理", "SLA"],
+      studyActions: [
+        "各対応策を『何をする行動か』で覚える。",
+        "作業が遅れたときに全体日程へ影響するか、クリティカルパスで確認する癖をつける。",
+      ],
+    },
+  ],
+  technology: [
+    {
+      title: "プロトコルとネットワークの幅",
+      whyItMatters: "ルータやサブネットはあるものの、DNS、DHCP、HTTP/SMTP、NAT、無線LANなどの周辺知識が不足していました。",
+      topics: ["DNS", "DHCP", "HTTP/HTTPS", "VPN"],
+      studyActions: [
+        "各プロトコルを『何を解決するためのものか』で覚える。",
+        "通信の流れを図にして、名前解決→接続→暗号化の順に整理する。",
+      ],
+    },
+    {
+      title: "セキュリティの基本セット",
+      whyItMatters: "DoSやXSSはありますが、認証、ハッシュ、電子署名、多要素認証など守りの土台知識が薄めでした。",
+      topics: ["多要素認証", "ハッシュ化", "公開鍵暗号", "電子署名"],
+      studyActions: [
+        "機密性・完全性・可用性のどれに効くかで技術を分類する。",
+        "『暗号化』『認証』『改ざん検知』を別物として整理する。",
+      ],
+    },
+    {
+      title: "ハードウェア・DB・論理思考",
+      whyItMatters: "2進数の導入はありますが、論理演算、メモリ階層、主キー/外部キー、SQLの周辺知識はまだ伸ばせます。",
+      topics: ["AND/OR/NOT", "キャッシュと主記憶", "主キー/外部キー", "正規化"],
+      studyActions: [
+        "数表や真理値表を手で書いて慣れる。",
+        "データベースは『一意性』『関連付け』『重複削減』の目的で整理する。",
+      ],
     },
   ],
 };
@@ -300,6 +519,7 @@ function StudyContent() {
   const mastery = questions.length > 0 ? Math.round((studiedCount / questions.length) * 100) : 0;
   const categoryExamTips = examTipMap[category as Category] || [];
   const lessonBlocks = lessonBlocksMap[category as Category] || [];
+  const coverageFocuses = coverageFocusMap[category as Category] || [];
   const questionCoaching = questionCoachingMap[category as Category]?.[currentIndex];
 
   const handleGenerateAiNote = async () => {
@@ -552,6 +772,53 @@ function StudyContent() {
               </div>
               <div className="mt-4 rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-500/10 dark:text-sky-100">
                 <span className="font-semibold">覚え方:</span> {lesson.memoryHook}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8 rounded-3xl border border-violet-200/70 bg-violet-50/70 p-6 shadow-sm dark:border-violet-400/20 dark:bg-violet-400/10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-violet-700 dark:text-violet-200">弱点になりやすい範囲を先回り</p>
+            <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の薄かった論点と、追加した学習テーマ</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
+              既存コンテンツを見直し、出題範囲に対して相対的に薄かったテーマを整理しました。どこを重点的に復習すべきか、理由と学習アクションまで一緒に確認できます。
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+            <p className="text-xs text-[var(--muted)]">使いどころ</p>
+            <p className="mt-1 font-medium">レッスン前の棚卸し / 試験前の総点検</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 xl:grid-cols-3">
+          {coverageFocuses.map((focus) => (
+            <section
+              key={focus.title}
+              className="rounded-2xl border border-violet-200/70 bg-white/85 p-5 dark:border-violet-400/20 dark:bg-black/10"
+            >
+              <h3 className="font-semibold text-lg">{focus.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{focus.whyItMatters}</p>
+              <div className="mt-4">
+                <p className="text-sm font-semibold text-violet-900 dark:text-violet-100">重点トピック</p>
+                <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                  {focus.topics.map((topic) => (
+                    <span key={topic} className="rounded-full bg-violet-100 px-3 py-1 font-medium text-violet-700 dark:bg-violet-500/10 dark:text-violet-100">{topic}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-dashed border-violet-200/80 px-4 py-3 dark:border-violet-400/20">
+                <p className="text-sm font-semibold">すすめる勉強アクション</p>
+                <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                  {focus.studyActions.map((action) => (
+                    <li key={action} className="flex gap-2">
+                      <span className="mt-0.5">→</span>
+                      <span>{action}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </section>
           ))}
