@@ -16,13 +16,20 @@ function QuizContent() {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>([]);
-  const [startTime] = useState(Date.now());
+  const [startTime, setStartTime] = useState(() => Date.now());
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
     const qs = shuffleQuestions(getQuestionsByCategory(category));
+    const nextStartTime = Date.now();
+
     setQuestions(qs);
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setShowExplanation(false);
     setAnswers(new Array(qs.length).fill(null));
+    setStartTime(nextStartTime);
+    setElapsed(0);
   }, [category]);
 
   // Live timer
@@ -81,6 +88,22 @@ function QuizContent() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [currentQuestion, showExplanation, handleAnswer, handleNext]);
+
+  if (questions.length === 0) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 text-center shadow-sm">
+          <p className="text-lg font-medium">このカテゴリの問題が見つかりません。</p>
+          <button
+            onClick={() => router.push("/")}
+            className="mt-4 rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+          >
+            ホームに戻る
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentQuestion) {
     return <LoadingSpinner />;

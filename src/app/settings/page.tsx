@@ -1,22 +1,45 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { AiSettings, defaultAiSettings, loadAiSettings, saveAiSettings } from "@/lib/appSettings";
 
 export default function SettingsPage() {
   const [settings, setSettings] = useState<AiSettings>(defaultAiSettings);
   const [savedMessage, setSavedMessage] = useState("");
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     setSettings(loadAiSettings());
+
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
+
+  const showTemporaryMessage = (message: string) => {
+    setSavedMessage(message);
+
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = window.setTimeout(() => setSavedMessage(""), 2500);
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    saveAiSettings(settings);
-    setSavedMessage("保存しました。Doom Scroll学習などのAI生成機能でこの設定が使われます。");
-    window.setTimeout(() => setSavedMessage(""), 2500);
+
+    const normalizedSettings: AiSettings = {
+      apiKey: settings.apiKey.trim(),
+      model: settings.model.trim() || defaultAiSettings.model,
+    };
+
+    setSettings(normalizedSettings);
+    saveAiSettings(normalizedSettings);
+    showTemporaryMessage("保存しました。Doom Scroll学習などのAI生成機能でこの設定が使われます。");
   };
 
   return (
@@ -84,8 +107,7 @@ export default function SettingsPage() {
             onClick={() => {
               setSettings(defaultAiSettings);
               saveAiSettings(defaultAiSettings);
-              setSavedMessage("設定をリセットしました。");
-              window.setTimeout(() => setSavedMessage(""), 2500);
+              showTemporaryMessage("設定をリセットしました。");
             }}
             className="rounded-xl bg-[var(--secondary-btn-bg)] px-5 py-3 font-medium transition-colors hover:bg-[var(--secondary-btn-hover)]"
           >
