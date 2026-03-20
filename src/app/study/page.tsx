@@ -16,6 +16,19 @@ type ExamTipSection = {
   points: string[];
 };
 
+type LessonBlock = {
+  title: string;
+  summary: string;
+  bullets: string[];
+  memoryHook: string;
+};
+
+type QuestionCoaching = {
+  takeaway: string;
+  trap: string;
+  checkpoint: string;
+};
+
 const examTipMap: Record<Category, ExamTipSection[]> = {
   strategy: [
     {
@@ -70,6 +83,113 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
   ],
 };
 
+
+const lessonBlocksMap: Record<Category, LessonBlock[]> = {
+  strategy: [
+    {
+      title: "経営戦略の基本フレーム",
+      summary:
+        "経営理念・SWOT・PPM・BSC・PDCAは、それぞれ単独で覚えるよりも『現状把握→方針決定→評価→改善』の流れに乗せると理解しやすくなります。",
+      bullets: [
+        "経営理念は企業の存在意義、戦略は理念を実現するための方向性です。",
+        "SWOTは内部環境と外部環境を整理する分析、PPMは事業配分、BSCは評価指標という役割の違いを区別しましょう。",
+        "PDCAは改善サイクルなので、単発の計画ではなく継続的な見直しとセットで出題されます。",
+      ],
+      memoryHook: "理念は『なぜ存在するか』、戦略は『どう戦うか』、評価は『どう測るか』で切り分ける。",
+    },
+    {
+      title: "法務・企業活動の頻出テーマ",
+      summary:
+        "ストラテジ系では、個人情報保護法・著作権法・CRM・SCMのように、対象や目的を正しく言い分けられるかが得点差になります。",
+      bullets: [
+        "個人情報は『生存する個人を識別できるか』が軸で、法人情報は通常含まれません。",
+        "著作権法は作品そのものを守る一方、言語・規約・解法のようなアイデアやルールそのものは対象外です。",
+        "CRMは顧客関係、SCMは供給連鎖の最適化と覚えると、現場系の選択肢と混同しにくくなります。",
+      ],
+      memoryHook: "『誰を守る法か』『何を最適化する仕組みか』の2軸で読む。",
+    },
+  ],
+  management: [
+    {
+      title: "開発と運用の全体像",
+      summary:
+        "マネジメント系は、開発工程・運用管理・品質保証を別々ではなく、システムのライフサイクル全体として理解すると整理しやすくなります。",
+      bullets: [
+        "WBSとガントチャートは計画と進捗の可視化、SLAはサービス品質の合意、監査は第三者視点の評価です。",
+        "V字モデルは上流工程とテスト工程の対応関係、アジャイルは短い反復で価値を届ける考え方が中心です。",
+        "インシデント管理は復旧優先、問題管理は原因分析優先と順番で覚えると迷いません。",
+      ],
+      memoryHook: "まず計画、次に提供、問題が起きたら復旧、その後に原因分析。",
+    },
+    {
+      title: "規格・見積もり・計画立案",
+      summary:
+        "ITパスポートでは、規格名と目的、見積もり手法と評価対象の対応を問う問題が定番です。",
+      bullets: [
+        "ISO/IEC 27001は情報セキュリティ、ISO/IEC 20000はITサービス、ISO 9001は品質管理です。",
+        "ファンクションポイント法はソースコード量ではなく、利用者から見た機能量で規模を見積もります。",
+        "共通フレームのシステム化計画では、業務分析・目的整理・方針決定のような上流の検討を行います。",
+      ],
+      memoryHook: "規格は『何を管理するか』、見積もりは『何を数えるか』を確認する。",
+    },
+  ],
+  technology: [
+    {
+      title: "計算・ハードウェア・ネットワーク",
+      summary:
+        "テクノロジ系は、計算問題と機器の役割問題を同時に押さえると得点が安定します。暗記だけでなく、仕組みを一文で説明できることが重要です。",
+      bullets: [
+        "2進数、論理演算、処理性能、転送速度は途中式を残しながら確認すると失点を減らせます。",
+        "CPU・メモリ・補助記憶装置・OS・DBMS・ルータの役割を対比で覚えると選択肢を素早く消せます。",
+        "OSI参照モデルは層の番号だけでなく、ルータ=第3層のように代表機器とセットで覚えるのが有効です。",
+      ],
+      memoryHook: "数字問題は式、機器問題は役割、ネットワーク問題は層で整理する。",
+    },
+    {
+      title: "セキュリティとシステム基礎",
+      summary:
+        "認証方式・攻撃手法・対策技術は単語だけだと混ざりやすいため、『何を防ぐか』『どこで使うか』までセットで押さえましょう。",
+      bullets: [
+        "暗号化・認証・アクセス制御は目的が違うので、機密性・完全性・可用性との関連も意識すると強いです。",
+        "マルウェアや不正アクセスの問題は、攻撃名と対策名を対で確認すると覚えやすくなります。",
+        "OSやデータベースの基本用語は、利用者から見たメリットや運用上の役割と結びつけると定着します。",
+      ],
+      memoryHook: "攻撃は『何を狙うか』、対策は『何を守るか』で読む。",
+    },
+  ],
+};
+
+const questionCoachingMap: Record<Category, QuestionCoaching[]> = {
+  strategy: [
+    { takeaway: "経営理念は数値目標ではなく、企業の存在意義を示す言葉です。", trap: "売上目標や制度の説明が出たら、理念ではなく個別施策の可能性があります。", checkpoint: "その選択肢は『なぜその会社が存在するか』に答えているかを確認しましょう。" },
+    { takeaway: "SWOTのSはStrengthで、内部環境の強みを指します。", trap: "StrategyやSystemのような英単語の印象に引っぱられないことが大切です。", checkpoint: "4語を順番に口に出して言えるか確認しましょう。" },
+    { takeaway: "BSCは財務・顧客・業務プロセス・学習と成長の4視点です。", trap: "もっともらしい言葉でも、正式な4視点に含まれないものは誤りです。", checkpoint: "4視点を略さず日本語で言い換えられるか試しましょう。" },
+    { takeaway: "損益分岐点は利益ゼロになる売上高のラインです。", trap: "最大利益や固定費ゼロといった極端な表現は誤りになりやすいです。", checkpoint: "売上高と総費用が一致する場面をイメージできるか確認しましょう。" },
+    { takeaway: "PDCAのCはCheckで、実行結果の評価です。", trap: "ControlやChangeは語感が似ていますが、正式な用語ではありません。", checkpoint: "P→D→C→Aの各段階を自分の学習にも当てはめてみましょう。" },
+    { takeaway: "PPMの花形は高成長・高占有率の事業です。", trap: "成長率と占有率の高低を入れ替えて覚えると失点しやすいです。", checkpoint: "花形・金のなる木・問題児・負け犬の4象限を言えるか確認しましょう。" },
+    { takeaway: "法人の所在地は、通常は個人情報保護法の個人情報に当たりません。", trap: "『情報』という言葉だけで個人情報と思い込まないことが重要です。", checkpoint: "生存する個人を識別できるか、という基準で各選択肢を見直しましょう。" },
+    { takeaway: "著作権法はプログラム言語そのものを保護しません。", trap: "プログラムとプログラム言語を混同すると引っかかります。", checkpoint: "表現として完成した作品か、ルールや概念かを切り分けましょう。" },
+    { takeaway: "CRMは顧客との関係を強化して売上や満足度を高める考え方です。", trap: "社内業務の効率化や品質管理はCRMの中心目的ではありません。", checkpoint: "その施策は顧客との接点を良くするものかを考えましょう。" },
+    { takeaway: "SCMは調達から販売までをつなぐ供給連鎖全体の最適化です。", trap: "人事や問い合わせ管理など、チェーン外の業務と混同しやすいです。", checkpoint: "部分最適ではなく全体最適かどうかを判断軸にしましょう。" },
+  ],
+  management: [
+    { takeaway: "WBSは作業を階層的に分解した構成図です。", trap: "予算表や役割表と混同しないようにしましょう。", checkpoint: "大きな作業を小さなタスクへ分解する流れを思い浮かべましょう。" },
+    { takeaway: "インシデント管理の目的は、サービスを早く復旧させることです。", trap: "原因究明は問題管理の役割なので順番を混同しないことが大切です。", checkpoint: "『まず復旧、次に分析』と言えるか確認しましょう。" },
+    { takeaway: "V字モデルでは結合テストは外部設計に対応します。", trap: "要件定義・内部設計・結合テストの対応を入れ替えやすい点に注意です。", checkpoint: "上流とテストを線で結ぶイメージで復習しましょう。" },
+    { takeaway: "アジャイル開発は短い反復で開発と改善を繰り返します。", trap: "要件を最初にすべて固定する考え方はウォーターフォール寄りです。", checkpoint: "少しずつ作って見直す流れがあるかで判断しましょう。" },
+    { takeaway: "ISMSの国際規格はISO/IEC 27001です。", trap: "9001や20000は別分野の規格なので用途で区別しましょう。", checkpoint: "規格名を見たら『情報セキュリティか、品質か、ITサービスか』を即答できるか確認しましょう。" },
+    { takeaway: "ガントチャートは横棒で進捗を時系列に表します。", trap: "依存関係を強く表すネットワーク図とは役割が異なります。", checkpoint: "横軸が時間、縦軸が作業の図を頭に描けるか確認しましょう。" },
+    { takeaway: "システム監査は独立した立場で信頼性や安全性を評価します。", trap: "監査人が開発や運用を直接担当するわけではありません。", checkpoint: "第三者視点で評価しているかを見抜きましょう。" },
+    { takeaway: "SLAはサービス品質の水準を合意した文書です。", trap: "契約金額や仕様書そのものとは役割が違います。", checkpoint: "可用性や応答時間のような品質指標が含まれるか確認しましょう。" },
+    { takeaway: "ファンクションポイント法は機能量で開発規模を見積もります。", trap: "LOC法のようなコード量ベースと混同しやすいです。", checkpoint: "利用者から見える機能を数える手法かどうかで判断しましょう。" },
+    { takeaway: "システム化計画では業務分析と方針決定のような上流検討を行います。", trap: "詳細設計やテストケース作成はもっと後の工程です。", checkpoint: "今その工程は『何を作るか決める段階』かを考えましょう。" },
+  ],
+  technology: [
+    { takeaway: "2進数1010は10進数で10です。", trap: "桁の重みを飛ばして足すと誤りやすいです。", checkpoint: "2³, 2², 2¹, 2⁰の重みを書き出して確認しましょう。" },
+    { takeaway: "OSI第3層で動く代表機器はルータです。", trap: "ハブやリピータは下位層、L2スイッチは第2層なので区別が必要です。", checkpoint: "機器名を見たらOSIの層を1つ答えられるようにしましょう。" },
+  ],
+};
+
 const commonExamTips = [
   "ITパスポート本番は『知っているか』より『似た用語を区別できるか』が問われやすいため、正解と不正解の差分を意識して復習しましょう。",
   "1問に時間をかけすぎず、迷ったら消去法で仮置きし、最後に戻るのが得点を落としにくい進め方です。",
@@ -94,6 +214,8 @@ function StudyContent() {
   const studiedCount = showAnswer ? currentIndex + 1 : currentIndex;
   const mastery = questions.length > 0 ? Math.round((studiedCount / questions.length) * 100) : 0;
   const categoryExamTips = examTipMap[category as Category] || [];
+  const lessonBlocks = lessonBlocksMap[category as Category] || [];
+  const questionCoaching = questionCoachingMap[category as Category]?.[currentIndex];
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -242,6 +364,46 @@ function StudyContent() {
         </div>
       </div>
 
+      <div className="mb-8 rounded-3xl border border-sky-200/70 bg-sky-50/80 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/10">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-sky-700 dark:text-sky-200">レッスン拡張ガイド</p>
+            <h2 className="mt-2 text-2xl font-bold">{categoryLabel}を面で理解するミニレッスン</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
+              1問ずつの暗記に偏らないよう、出題テーマをまとまりで理解できるレッスンブロックを追加しました。先に全体像を掴んでから個別問題へ進むと、似た用語の区別がかなり楽になります。
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+            <p className="text-xs text-[var(--muted)]">おすすめの進め方</p>
+            <p className="mt-1 font-medium">全体像 → 例題 → 解説 → クイズ</p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          {lessonBlocks.map((lesson) => (
+            <section
+              key={lesson.title}
+              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/10"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-200">Lesson</p>
+              <h3 className="mt-2 font-semibold text-lg">{lesson.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{lesson.summary}</p>
+              <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
+                {lesson.bullets.map((point) => (
+                  <li key={point} className="flex gap-2">
+                    <span className="mt-0.5">•</span>
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-500/10 dark:text-sky-100">
+                <span className="font-semibold">覚え方:</span> {lesson.memoryHook}
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+
       <div className="mb-8 rounded-3xl border border-amber-200/70 bg-amber-50/70 p-6 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -342,6 +504,25 @@ function StudyContent() {
                       {question.explanation}
                     </p>
                   </div>
+
+{questionCoaching && (
+                    <div className="mb-4 grid gap-3 rounded-xl border border-sky-200/80 bg-sky-50/80 p-4 text-sm shadow-sm dark:border-sky-400/20 dark:bg-sky-500/10">
+                      <div>
+                        <p className="font-semibold text-sky-900 dark:text-sky-100">この問題の学習ポイント</p>
+                        <p className="mt-1 text-[var(--muted)]">{questionCoaching.takeaway}</p>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <div className="rounded-lg bg-white/80 p-3 dark:bg-black/10">
+                          <p className="font-medium">ひっかけポイント</p>
+                          <p className="mt-1 text-[var(--muted)]">{questionCoaching.trap}</p>
+                        </div>
+                        <div className="rounded-lg bg-white/80 p-3 dark:bg-black/10">
+                          <p className="font-medium">確認のひとこと</p>
+                          <p className="mt-1 text-[var(--muted)]">{questionCoaching.checkpoint}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="mb-6 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4">
                     <p className="text-sm font-semibold">試験での確認ポイント</p>
