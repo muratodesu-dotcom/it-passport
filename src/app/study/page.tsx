@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense, useMemo, useRef } from "react";
 import { getQuestionsByCategory } from "@/data/questions";
 import { categoryLabels, Category } from "@/lib/types";
+import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 type FeedItem = {
@@ -287,6 +288,10 @@ function StudyContent() {
   const [doomScrollMode, setDoomScrollMode] = useState(false);
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [revealedFeedItems, setRevealedFeedItems] = useState<number[]>([]);
+  const [aiSettings, setAiSettings] = useState(defaultAiSettings);
+  const [aiNote, setAiNote] = useState("");
+  const [aiError, setAiError] = useState("");
+  const [isGeneratingAiNote, setIsGeneratingAiNote] = useState(false);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
   const question = questions[currentIndex];
@@ -297,9 +302,60 @@ function StudyContent() {
   const lessonBlocks = lessonBlocksMap[category as Category] || [];
   const questionCoaching = questionCoachingMap[category as Category]?.[currentIndex];
 
+  const handleGenerateAiNote = async () => {
+    if (!aiSettings.apiKey || !aiSettings.model) {
+      setAiError("先にSettingsでAPIキーとモデルを保存してください。");
+      setAiNote("");
+      return;
+    }
+
+    setIsGeneratingAiNote(true);
+    setAiError("");
+
+    try {
+      const response = await fetch("/api/generate-study-note", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiKey: aiSettings.apiKey,
+          model: aiSettings.model,
+          prompt: `ITパスポート試験の${categoryLabel}について学習中です。現在の問題: ${question.question}
+選択肢: ${question.options.join(" / ")}
+正解: ${question.options[question.correctIndex]}
+既存解説: ${question.explanation}
+
+最新の実務トピックや関連ニュースがあればWeb検索も使いながら、学習者向けに日本語で以下を作ってください。
+1. 120〜220文字の要点まとめ
+2. 実務でのつながり3点
+3. 試験でひっかかりやすいポイント2点
+4. Doom Scroll向けの追加ミニテーマ1つ`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(typeof data.error === "string" ? data.error : "AI生成に失敗しました。");
+      }
+
+      setAiNote(typeof data.text === "string" ? data.text : "");
+    } catch (error) {
+      setAiError(error instanceof Error ? error.message : "AI生成に失敗しました。");
+      setAiNote("");
+    } finally {
+      setIsGeneratingAiNote(false);
+    }
+  };
+
+  useEffect(() => {
+    setAiSettings(loadAiSettings());
+  }, []);
+
   useEffect(() => {
     setCurrentIndex(0);
     setShowAnswer(false);
+    setAiNote("");
+    setAiError("");
     setFeedItems(
       questions.slice(0, Math.min(4, questions.length)).map((_, index) => ({
         feedId: `${category}-${index}`,
@@ -777,6 +833,39 @@ function StudyContent() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="rounded-2xl border border-violet-200/70 bg-violet-50/70 p-5 shadow-sm dark:border-violet-400/20 dark:bg-violet-500/10">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="font-semibold">AIで補足ノートを生成</h2>
+                <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
+                  Settingsで保存したAPIキーとモデルを使って、現在の問題にひもづく追加学習ノートを生成します。Web検索を使った最新補足も含められます。
+                </p>
+              </div>
+              <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-violet-700 dark:bg-black/10 dark:text-violet-100">{aiSettings.model || "model未設定"}</span>
+            </div>
+            <div className="mt-4 space-y-3">
+              <button
+                onClick={handleGenerateAiNote}
+                disabled={isGeneratingAiNote}
+                className="w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isGeneratingAiNote ? "生成中…" : "この問題のAIノートを作る"}
+              </button>
+              <button
+                onClick={() => router.push("/settings")}
+                className="w-full rounded-xl bg-white/80 px-4 py-3 text-sm font-medium transition-colors hover:bg-white dark:bg-black/10 dark:hover:bg-black/20"
+              >
+                Settingsを開く
+              </button>
+              {aiError ? <p className="text-sm text-rose-600">{aiError}</p> : null}
+              {aiNote ? (
+                <div className="rounded-xl border border-violet-200/80 bg-white/90 p-4 text-sm leading-relaxed whitespace-pre-wrap dark:border-violet-400/20 dark:bg-black/10">
+                  {aiNote}
+                </div>
+              ) : null}
+            </div>
           </div>
 
           <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm">
