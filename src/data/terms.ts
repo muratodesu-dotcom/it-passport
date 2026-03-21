@@ -46,6 +46,33 @@ export const termPairs: TermPair[] = [
   { term: "Society 5.0", description: "サイバー空間とフィジカル空間を融合させた人間中心の未来社会像", category: "strategy" },
   { term: "フィンテック", description: "金融とIT技術を組み合わせた革新的な金融サービスの総称", category: "strategy" },
   { term: "グリーンIT", description: "IT機器の省電力化やITを活用した環境負荷低減の取り組み", category: "strategy" },
+  // --- QC7つ道具・OR ---
+  { term: "パレート図", description: "項目を出現頻度の大きい順に棒グラフで並べ累積比率を折れ線で示す図", category: "strategy" },
+  { term: "特性要因図", description: "結果と原因の関係を魚の骨状に整理する図（フィッシュボーン図）", category: "strategy" },
+  { term: "散布図", description: "2つの変数の相関関係を点の分布で視覚的に表す図", category: "strategy" },
+  { term: "管理図", description: "時系列データの変動を管理限界線で監視し工程の安定性を判断する図", category: "strategy" },
+  { term: "線形計画法", description: "一次式の制約条件のもとで目的関数を最大化・最小化する数理的手法", category: "strategy" },
+  { term: "ABC分析", description: "品目を金額順にA・B・Cに分類し重点管理する在庫管理手法", category: "strategy" },
+  // --- 労働法・契約 ---
+  { term: "36協定", description: "時間外・休日労働を行うために労使間で締結する労働基準法第36条の協定", category: "strategy" },
+  { term: "フレックスタイム制", description: "コアタイムとフレキシブルタイムを設け出退勤を柔軟にする勤務制度", category: "strategy" },
+  { term: "裁量労働制", description: "実労働時間に関わらず所定時間を働いたとみなす労働制度", category: "strategy" },
+  { term: "請負契約", description: "仕事の完成を約束し成果物に対して報酬が支払われる契約形態", category: "strategy" },
+  { term: "準委任契約", description: "業務の遂行を委託する契約で成果物の完成義務がない契約形態", category: "strategy" },
+  { term: "偽装請負", description: "請負を装いながら実態は労働者派遣である違法な契約形態", category: "strategy" },
+  // --- Eコマース ---
+  { term: "BtoB", description: "企業間で行われる電子商取引の形態", category: "strategy" },
+  { term: "ロングテール", description: "ニッチ商品の多品種少量販売が全体の大きな売上を占める現象", category: "strategy" },
+  { term: "EDI", description: "企業間で商取引データを標準書式で電子的に交換する仕組み", category: "strategy" },
+  { term: "オムニチャネル", description: "実店舗・EC・SNS等あらゆる販売チャネルを統合し一貫した顧客体験を提供する戦略", category: "strategy" },
+  // --- MOT・イノベーション ---
+  { term: "イノベーションのジレンマ", description: "優良企業が既存顧客対応に注力し破壊的技術への対応が遅れる現象", category: "strategy" },
+  { term: "MOT", description: "技術を事業に結びつけて経済的価値を創出する技術経営の手法", category: "strategy" },
+  { term: "死の谷", description: "研究成果を製品化・事業化する段階で直面する資金等の障壁", category: "strategy" },
+  { term: "キャズム", description: "初期採用者と前期多数採用者の間に存在する市場普及の溝", category: "strategy" },
+  // --- システム企画 ---
+  { term: "ROI", description: "投資額に対する利益の割合を示す投資利益率の指標", category: "strategy" },
+  { term: "TCO", description: "システムの導入から廃棄までのライフサイクル全体の総所有コスト", category: "strategy" },
   { term: "クリティカルパス", description: "遅延するとプロジェクト全体の完了が遅れる最長経路", category: "management" },
   { term: "変更管理", description: "システム変更の影響やリスクを管理して安定運用を保つ活動", category: "management" },
   { term: "受入テスト", description: "利用者や発注者の立場で要求どおりに動作するか確認するテスト", category: "management" },
