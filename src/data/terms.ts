@@ -121,6 +121,25 @@ export const termPairs: TermPair[] = [
   { term: "リリース管理", description: "テスト済みのソフトウェアを本番環境に安全に展開するプロセス", category: "management" },
   { term: "ITガバナンス", description: "経営戦略に沿ってIT投資や活用を組織的に統制する仕組み", category: "management" },
   { term: "EVM", description: "PV・EV・ACの3指標でプロジェクトの進捗とコストを管理する手法", category: "management" },
+  // --- システム監査・内部統制 ---
+  { term: "システム監査", description: "独立した立場から情報システムの信頼性・安全性・効率性を客観的に評価する活動", category: "management" },
+  { term: "内部統制", description: "業務の有効性・財務報告の信頼性・法令遵守・資産保全を目的とした組織的統制の仕組み", category: "management" },
+  // --- SLA ---
+  { term: "SLM", description: "SLAで合意したサービス品質を維持・改善するための継続的管理プロセス", category: "management" },
+  // --- PMBOK ---
+  { term: "リスクマトリクス", description: "リスクの発生確率と影響度をマッピングして優先順位を決定する手法", category: "management" },
+  { term: "品質保証", description: "成果物やプロセスが品質要求を満たしていることを体系的に確認する活動", category: "management" },
+  { term: "コミュニケーションチャネル", description: "n(n-1)/2で求めるプロジェクト関係者間の情報伝達経路の数", category: "management" },
+  // --- ソフトウェア開発管理 ---
+  { term: "ファンクションポイント法", description: "機能の数と複雑さからソフトウェア規模を見積もる手法", category: "management" },
+  { term: "COCOMO", description: "ソースコード行数をもとに数式モデルで開発工数を見積もる手法", category: "management" },
+  { term: "デルファイ法", description: "匿名アンケートを繰り返して専門家の合意を得る見積もり手法", category: "management" },
+  { term: "インスペクション", description: "モデレータ主導でチェックリスト等を用いて欠陥を検出する公式レビュー手法", category: "management" },
+  { term: "ウォークスルー", description: "作成者が参加者に説明しながら問題点を発見する非公式レビュー手法", category: "management" },
+  // --- 共通フレーム・品質 ---
+  { term: "共通フレーム", description: "ソフトウェアライフサイクル全体の作業内容を標準化した日本独自の枠組み（SLCP-JCF）", category: "management" },
+  { term: "予防保守", description: "潜在的な障害が顕在化する前に予防的にソフトウェアを修正する保守", category: "management" },
+  { term: "CMMI", description: "組織のソフトウェア開発プロセスの成熟度を5段階で評価するモデル", category: "management" },
 
   // ===== テクノロジ系 =====
   { term: "OSI参照モデル", description: "ネットワーク通信を7つの階層に分けた標準モデル", category: "technology" },
