@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect, Suspense, useMemo, useRef } from "react";
+import { useState, useEffect, Suspense, useMemo, useRef, useCallback } from "react";
 import { getQuestionsByCategory } from "@/data/questions";
 import { categoryLabels, Category } from "@/lib/types";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
@@ -1168,18 +1168,24 @@ function StudyContent() {
   const questions = useMemo(() => getQuestionsByCategory(category), [category]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
-  const [doomScrollMode, setDoomScrollMode] = useState(false);
+  const [doomScrollMode, setDoomScrollMode] = useState(true);
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [revealedFeedItems, setRevealedFeedItems] = useState<number[]>([]);
+  const [selectedFeedAnswers, setSelectedFeedAnswers] = useState<Record<string, number>>({});
   const [aiSettings, setAiSettings] = useState(defaultAiSettings);
   const [aiNote, setAiNote] = useState("");
   const [aiError, setAiError] = useState("");
   const [isGeneratingAiNote, setIsGeneratingAiNote] = useState(false);
+  const [showStudyGuide, setShowStudyGuide] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [activeFeedIndex, setActiveFeedIndex] = useState(0);
   const loaderRef = useRef<HTMLDivElement | null>(null);
+  const feedCardRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   const question = questions[currentIndex];
   const categoryLabel = categoryLabels[category as Category] || category;
-  const studiedCount = showAnswer ? currentIndex + 1 : currentIndex;
+  const feedAnsweredCount = Object.keys(selectedFeedAnswers).length;
+  const studiedCount = doomScrollMode ? feedAnsweredCount : (showAnswer ? currentIndex + 1 : currentIndex);
   const mastery = questions.length > 0 ? Math.round((studiedCount / questions.length) * 100) : 0;
   const categoryExamTips = examTipMap[category as Category] || [];
   const lessonBlocks = lessonBlocksMap[category as Category] || [];
@@ -1243,12 +1249,13 @@ function StudyContent() {
     setAiNote("");
     setAiError("");
     setFeedItems(
-      questions.slice(0, Math.min(4, questions.length)).map((_, index) => ({
+      questions.slice(0, Math.min(8, questions.length)).map((_, index) => ({
         feedId: `${category}-${index}`,
         questionIndex: index,
       }))
     );
     setRevealedFeedItems([]);
+    setSelectedFeedAnswers({});
   }, [category, questions]);
 
   useEffect(() => {
@@ -1265,25 +1272,78 @@ function StudyContent() {
         setFeedItems((prev) => {
           if (prev.length >= questions.length) return prev;
           const nextIndex = prev.length;
-          return [
-            ...prev,
-            {
-              feedId: `${category}-${nextIndex}`,
-              questionIndex: nextIndex,
-            },
-          ];
+          const batchSize = Math.min(3, questions.length - nextIndex);
+          const newItems = Array.from({ length: batchSize }, (_, i) => ({
+            feedId: `${category}-${nextIndex + i}`,
+            questionIndex: nextIndex + i,
+          }));
+          return [...prev, ...newItems];
         });
       },
-      { rootMargin: "320px 0px" }
+      { rootMargin: "480px 0px" }
     );
 
     observer.observe(node);
     return () => observer.disconnect();
   }, [doomScrollMode, category, questions.length]);
 
+  const handleFeedAnswer = useCallback((feedId: string, questionId: number, optionIndex: number) => {
+    setSelectedFeedAnswers((prev) => {
+      if (prev[feedId] !== undefined) return prev;
+      return { ...prev, [feedId]: optionIndex };
+    });
+    setRevealedFeedItems((prev) =>
+      prev.includes(questionId) ? prev : [...prev, questionId]
+    );
+  }, []);
+
+  const scrollToCard = useCallback((index: number) => {
+    const item = feedItems[index];
+    if (!item) return;
+    const el = feedCardRefs.current.get(item.feedId);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      setActiveFeedIndex(index);
+    }
+  }, [feedItems]);
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (doomScrollMode) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+      if (doomScrollMode) {
+        if (e.key === "j" || e.key === "ArrowDown") {
+          e.preventDefault();
+          const next = Math.min(activeFeedIndex + 1, feedItems.length - 1);
+          scrollToCard(next);
+        }
+        if (e.key === "k" || e.key === "ArrowUp") {
+          e.preventDefault();
+          const prev = Math.max(activeFeedIndex - 1, 0);
+          scrollToCard(prev);
+        }
+        if (e.key >= "1" && e.key <= "4") {
+          e.preventDefault();
+          const item = feedItems[activeFeedIndex];
+          if (item) {
+            const feedQuestion = questions[item.questionIndex];
+            handleFeedAnswer(item.feedId, feedQuestion.id, parseInt(e.key) - 1);
+          }
+        }
+        if (e.key === " " || e.key === "Enter") {
+          e.preventDefault();
+          const item = feedItems[activeFeedIndex];
+          if (item) {
+            const feedQuestion = questions[item.questionIndex];
+            if (!revealedFeedItems.includes(feedQuestion.id)) {
+              setRevealedFeedItems((prev) => [...prev, feedQuestion.id]);
+            }
+          }
+        }
+        return;
+      }
+
       if (e.key === " " || e.key === "Enter") {
         e.preventDefault();
         if (!showAnswer) {
@@ -1301,7 +1361,15 @@ function StudyContent() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [doomScrollMode, showAnswer, currentIndex, questions.length]);
+  }, [doomScrollMode, showAnswer, currentIndex, questions, feedItems, activeFeedIndex, revealedFeedItems, scrollToCard, handleFeedAnswer]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 600);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   if (!question) {
     return (
@@ -1323,70 +1391,76 @@ function StudyContent() {
     "不安な問題は後でクイズモードでもう一度解き、瞬発力を確認しましょう。",
   ];
 
+  const feedCorrectCount = useMemo(() => {
+    return Object.entries(selectedFeedAnswers).reduce((count, [feedId, selected]) => {
+      const item = feedItems.find((fi) => fi.feedId === feedId);
+      if (!item) return count;
+      const q = questions[item.questionIndex];
+      return q && selected === q.correctIndex ? count + 1 : count;
+    }, 0);
+  }, [selectedFeedAnswers, feedItems, questions]);
+
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="mb-8 rounded-3xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div>
+    <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="mb-6 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-4">
             <button
               onClick={() => router.push("/")}
-              className="mb-4 text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+              className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors text-sm"
             >
               ← 戻る
             </button>
-            <p className="text-sm font-medium text-[var(--primary)] mb-2">
-              学習モード - {categoryLabel}
-            </p>
-            <h1 className="text-3xl font-bold mb-3">一問ずつでも、ひたすら流し見でも。</h1>
-            <p className="text-[var(--muted)] max-w-2xl leading-relaxed">
-              通常モードは集中して1問ずつ確認、Doom Scrollモードは次々にカードをめくりながら連続復習できます。
-            </p>
+            <div>
+              <h1 className="text-lg font-bold">{categoryLabel}</h1>
+              <p className="text-xs text-[var(--muted)]">
+                {doomScrollMode
+                  ? `${feedAnsweredCount}問回答 / ${questions.length}問中${feedCorrectCount > 0 ? ` · ${feedCorrectCount}問正解` : ""}`
+                  : `問${currentIndex + 1} / ${questions.length}`}
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 min-w-full lg:min-w-[320px] lg:max-w-[360px]">
-            <div className="rounded-2xl bg-[var(--badge-bg)] p-4">
-              <p className="text-xs text-[var(--muted)] mb-1">進捗</p>
-              <p className="text-2xl font-bold">{mastery}%</p>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 rounded-full bg-[var(--badge-bg)] p-1">
+              <button
+                onClick={() => setDoomScrollMode(true)}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${doomScrollMode ? "bg-[var(--accent)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
+              >
+                フィード
+              </button>
+              <button
+                onClick={() => setDoomScrollMode(false)}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${!doomScrollMode ? "bg-[var(--primary)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
+              >
+                集中
+              </button>
             </div>
-            <div className="rounded-2xl bg-[var(--badge-bg)] p-4">
-              <p className="text-xs text-[var(--muted)] mb-1">見た問題</p>
-              <p className="text-2xl font-bold">{studiedCount}</p>
-            </div>
-            <div className="rounded-2xl bg-[var(--badge-bg)] p-4 col-span-2">
-              <div className="flex items-center justify-between mb-2 text-xs text-[var(--muted)]">
-                <span>学習トラック</span>
-                <span>{studiedCount} / {questions.length}</span>
-              </div>
-              <div className="h-2 w-full rounded-full bg-[var(--progress-bg)] overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-500 to-blue-500 transition-all duration-500"
-                  style={{ width: `${mastery}%` }}
-                />
-              </div>
-            </div>
+            <button
+              onClick={() => setShowStudyGuide(!showStudyGuide)}
+              className="rounded-full bg-[var(--badge-bg)] px-3 py-1.5 text-xs font-medium hover:bg-[var(--secondary-btn-hover)] transition-colors"
+            >
+              {showStudyGuide ? "ガイドを閉じる" : "学習ガイド"}
+            </button>
           </div>
         </div>
 
-        <div className="mt-5 flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setDoomScrollMode(false)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${!doomScrollMode ? "bg-[var(--primary)] text-white" : "bg-[var(--secondary-btn-bg)] hover:bg-[var(--secondary-btn-hover)]"}`}
-          >
-            集中モード
-          </button>
-          <button
-            onClick={() => setDoomScrollMode(true)}
-            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${doomScrollMode ? "bg-[var(--accent)] text-white" : "bg-[var(--secondary-btn-bg)] hover:bg-[var(--secondary-btn-hover)]"}`}
-          >
-            Doom Scrollモード ∞
-          </button>
-          <span className="text-xs text-[var(--muted)]">
-            {doomScrollMode ? "下へスクロールすると問題が自動追加されます。" : "Space / Enter で答え表示、← → で移動できます。"}
-          </span>
+        <div className="mt-3 h-1.5 w-full rounded-full bg-[var(--progress-bg)] overflow-hidden">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-500 to-blue-500 transition-all duration-500"
+            style={{ width: `${mastery}%` }}
+          />
         </div>
+        {doomScrollMode && (
+          <p className="mt-2 text-[10px] text-[var(--muted)] opacity-60">
+            j/k or arrows: navigate · 1-4: answer · space: reveal
+          </p>
+        )}
       </div>
 
-      <div className="mb-8 rounded-3xl border border-sky-200/70 bg-sky-50/80 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/10">
+      {showStudyGuide && (
+      <div className="mb-6 space-y-6 fade-in">
+      <div className="rounded-2xl border border-sky-200/70 bg-sky-50/80 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/10">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-sky-700 dark:text-sky-200">レッスン拡張ガイド</p>
@@ -1657,6 +1731,8 @@ function StudyContent() {
           ))}
         </div>
       </div>
+      </div>
+      )}
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>
@@ -1792,84 +1868,108 @@ function StudyContent() {
               )}
             </>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {feedItems.map((item, feedPosition) => {
                 const feedQuestion = questions[item.questionIndex];
                 const revealed = revealedFeedItems.includes(feedQuestion.id);
+                const selectedAnswer = selectedFeedAnswers[item.feedId];
+                const hasAnswered = selectedAnswer !== undefined;
+                const isActive = feedPosition === activeFeedIndex;
 
                 return (
                   <article
                     key={item.feedId}
-                    className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm slide-in"
+                    ref={(el) => {
+                      if (el) feedCardRefs.current.set(item.feedId, el);
+                    }}
+                    className={`rounded-2xl border-2 bg-[var(--card)] p-5 shadow-sm card-enter transition-colors ${isActive ? "border-[var(--accent)]/40" : "border-[var(--card-border)]"}`}
+                    onClick={() => setActiveFeedIndex(feedPosition)}
                   >
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <div>
-                        <p className="text-xs text-[var(--muted)] mb-1">
-                          {categoryLabel} / フィード {feedPosition + 1}
-                        </p>
-                        <h2 className="font-semibold text-lg">{feedQuestion.question}</h2>
-                      </div>
-                      <span className="rounded-full bg-[var(--badge-bg)] px-3 py-1 text-xs text-[var(--muted)]">
-                        問{item.questionIndex + 1}
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <h2 className="font-semibold leading-snug">{feedQuestion.question}</h2>
+                      <span className="shrink-0 rounded-full bg-[var(--badge-bg)] px-2.5 py-1 text-[11px] text-[var(--muted)]">
+                        {item.questionIndex + 1}/{questions.length}
                       </span>
                     </div>
 
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                       {feedQuestion.options.map((option, optionIndex) => {
                         const isCorrect = optionIndex === feedQuestion.correctIndex;
+                        const isSelected = selectedAnswer === optionIndex;
+                        let optionStyle = "border-[var(--card-border)] hover:border-[var(--option-hover-border)] hover:bg-[var(--option-hover-bg)] cursor-pointer";
+
+                        if (hasAnswered) {
+                          if (isCorrect) {
+                            optionStyle = "border-[var(--success)] bg-[var(--success-bg)]";
+                          } else if (isSelected) {
+                            optionStyle = "border-[var(--danger)] bg-[var(--danger-bg)]";
+                          } else {
+                            optionStyle = "border-[var(--card-border)] opacity-50";
+                          }
+                        }
+
                         return (
-                          <div
+                          <button
                             key={`${item.feedId}-${optionIndex}`}
-                            className={`rounded-xl border p-4 transition-all ${revealed && isCorrect ? "border-[var(--success)] bg-[var(--success-bg)]" : "border-[var(--card-border)]"}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFeedAnswer(item.feedId, feedQuestion.id, optionIndex);
+                            }}
+                            disabled={hasAnswered}
+                            className={`w-full text-left rounded-xl border-2 px-4 py-3 transition-all ${optionStyle} ${hasAnswered && isSelected && !isCorrect ? "animate-shake" : ""}`}
                           >
-                            <span className="mr-3 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
+                            <span className="mr-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--badge-bg)] text-xs font-medium">
                               {String.fromCharCode(65 + optionIndex)}
                             </span>
-                            {option}
-                          </div>
+                            <span className="text-sm">{option}</span>
+                          </button>
                         );
                       })}
                     </div>
 
-                    <div className="mt-4 rounded-xl bg-[var(--badge-bg)] p-4">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-semibold">{revealed ? "答えを表示中" : "まだ答えは隠れています"}</p>
-                          <p className="text-xs text-[var(--muted)] mt-1">
-                            {revealed ? `正解は ${String.fromCharCode(65 + feedQuestion.correctIndex)} です。` : "スクロールの勢いに飲まれず、まず自分で考えてみましょう。"}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() =>
-                            setRevealedFeedItems((prev) =>
-                              revealed ? prev.filter((id) => id !== feedQuestion.id) : [...prev, feedQuestion.id]
-                            )
-                          }
-                          className="rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)] transition-colors"
-                        >
-                          {revealed ? "答えを閉じる" : "答えを見る"}
-                        </button>
+                    {hasAnswered && (
+                      <div className="mt-3 rounded-xl bg-[var(--explanation-bg)] border border-[var(--explanation-border)] p-4 card-enter">
+                        <p className="text-sm font-semibold text-[var(--explanation-title)] mb-1">
+                          {selectedAnswer === feedQuestion.correctIndex ? "正解!" : `不正解 — 正解は ${String.fromCharCode(65 + feedQuestion.correctIndex)}`}
+                        </p>
+                        <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
+                          {feedQuestion.explanation}
+                        </p>
                       </div>
+                    )}
 
-                      {revealed && (
-                        <div className="fade-in">
-                          <p className="mt-3 text-sm leading-relaxed text-[var(--explanation-text)]">
-                            {feedQuestion.explanation}
-                          </p>
-                          <p className="mt-2 text-xs leading-relaxed text-[var(--muted)]">
-                            本番では、正解の理由だけでなく他の選択肢との違いも一緒に確認すると記憶が安定します。
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                    {!hasAnswered && revealed && (
+                      <div className="mt-3 rounded-xl bg-[var(--explanation-bg)] border border-[var(--explanation-border)] p-4 card-enter">
+                        <p className="text-sm font-semibold text-[var(--explanation-title)] mb-1">
+                          正解: {String.fromCharCode(65 + feedQuestion.correctIndex)}. {feedQuestion.options[feedQuestion.correctIndex]}
+                        </p>
+                        <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
+                          {feedQuestion.explanation}
+                        </p>
+                      </div>
+                    )}
                   </article>
                 );
               })}
 
-              <div ref={loaderRef} className="rounded-2xl border border-dashed border-[var(--card-border)] p-5 text-center text-sm text-[var(--muted)]">
-                {feedItems.length < questions.length
-                  ? "さらに下へスクロールすると次の問題が流れてきます…"
-                  : "ここまでで全問題を読み切りました。上に戻って復習してもOKです。"}
+              <div ref={loaderRef} className="py-8 text-center">
+                {feedItems.length < questions.length ? (
+                  <div className="inline-flex items-center gap-2 text-sm text-[var(--muted)]">
+                    <span className="inline-block h-4 w-4 rounded-full border-2 border-[var(--muted)] border-t-transparent animate-spin" />
+                    読み込み中…
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-dashed border-[var(--card-border)] p-5">
+                    <p className="text-sm font-medium mb-1">全{questions.length}問を表示しました</p>
+                    <p className="text-xs text-[var(--muted)]">{feedAnsweredCount}問回答済み · {feedCorrectCount}問正解</p>
+                    <button
+                      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                      className="mt-3 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)] transition-colors"
+                    >
+                      トップに戻る
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -1952,6 +2052,16 @@ function StudyContent() {
           </div>
         </aside>
       </div>
+
+      {showScrollTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-lg hover:bg-[var(--primary-hover)] transition-all hover:scale-105 fade-in"
+          aria-label="トップに戻る"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+        </button>
+      )}
     </div>
   );
 }
