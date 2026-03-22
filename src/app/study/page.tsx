@@ -1511,7 +1511,7 @@ function StudyContent() {
           />
         </div>
         {doomScrollMode && (
-          <p className="mt-2 text-[10px] text-[var(--muted)] opacity-60">
+          <p className="mt-2 text-[10px] text-[var(--muted)]">
             j/k or arrows: navigate · 1-4: answer · space: reveal
           </p>
         )}
@@ -1901,7 +1901,7 @@ function StudyContent() {
                   >
                     答えと解説を見る
                   </button>
-                  <p className="text-center text-xs text-[var(--muted)] opacity-60">
+                  <p className="text-center text-xs text-[var(--muted)]">
                     キーボード: Space / Enterで表示
                   </p>
                 </div>

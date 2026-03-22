@@ -196,7 +196,7 @@ function QuizContent() {
               </span>
               {option}
               {!showExplanation && (
-                <span className="float-right text-xs text-[var(--muted)] opacity-60 mt-1">
+                <span className="float-right text-xs text-[var(--muted)] mt-1">
                   {index + 1}
                 </span>
               )}
@@ -207,7 +207,7 @@ function QuizContent() {
 
       {/* Keyboard hint */}
       {!showExplanation && (
-        <p className="text-center text-xs text-[var(--muted)] mb-4 opacity-60">
+        <p className="text-center text-xs text-[var(--muted)] mb-4">
           キーボード: 1〜4で選択
         </p>
       )}
