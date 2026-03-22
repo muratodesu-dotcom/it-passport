@@ -219,4 +219,15 @@ export const termPairs: TermPair[] = [
   { term: "PNG", description: "可逆圧縮で透過表示に対応した画質劣化のない画像形式", category: "technology" },
   { term: "可逆圧縮", description: "圧縮前のデータを完全に復元できる圧縮方式（ZIP・PNG等）", category: "technology" },
   { term: "テザリング", description: "スマートフォンの通信回線を使って他の機器をインターネット接続する機能", category: "technology" },
+  // --- 数値表現・論理演算 ---
+  { term: "AND（論理積）", description: "両方の入力が1のときだけ1を出力する論理演算", category: "technology" },
+  { term: "OR（論理和）", description: "どちらか一方でも1であれば1を出力する論理演算", category: "technology" },
+  { term: "NOT（否定）", description: "入力の値を反転させる論理演算（1→0、0→1）", category: "technology" },
+  { term: "XOR（排他的論理和）", description: "2つの入力が異なるとき1を出力する論理演算", category: "technology" },
+  { term: "ビット", description: "0か1の2通りを表す情報の最小単位", category: "technology" },
+  { term: "バイト", description: "8ビットで構成される情報量の単位（256通りを表現可能）", category: "technology" },
+  { term: "16進数", description: "0〜9とA〜Fの16種類の記号で数値を表す記数法", category: "technology" },
+  { term: "文字コード", description: "文字と数値の対応を定めた規則（ASCII・Shift_JIS・Unicode等）", category: "technology" },
+  { term: "標本化", description: "アナログ信号を一定間隔で測定して離散値にするA/D変換の最初の処理", category: "technology" },
+  { term: "A/D変換", description: "アナログ信号を標本化→量子化→符号化してデジタルデータに変換する処理", category: "technology" },
 ];
