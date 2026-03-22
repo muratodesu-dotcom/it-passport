@@ -3,9 +3,56 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense, useMemo, useRef, useCallback } from "react";
 import { getQuestionsByCategory } from "@/data/questions";
+import { termPairs } from "@/data/terms";
 import { categoryLabels, Category } from "@/lib/types";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
 import LoadingSpinner from "@/components/LoadingSpinner";
+
+const termLookup = new Map(termPairs.map((t) => [t.term, t.description]));
+
+function TermHighlighter({ text }: { text: string }) {
+  const segments = useMemo(() => {
+    const sorted = Array.from(termLookup.keys()).sort((a, b) => b.length - a.length);
+    const escaped = sorted.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    if (escaped.length === 0) return [{ text, term: false as const }];
+    const regex = new RegExp(`(${escaped.join("|")})`, "g");
+    const parts: { text: string; term: boolean }[] = [];
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({ text: text.slice(lastIndex, match.index), term: false });
+      }
+      parts.push({ text: match[1], term: true });
+      lastIndex = regex.lastIndex;
+    }
+    if (lastIndex < text.length) {
+      parts.push({ text: text.slice(lastIndex), term: false });
+    }
+    return parts;
+  }, [text]);
+
+  return (
+    <>
+      {segments.map((seg, i) =>
+        seg.term ? (
+          <span key={i} className="relative inline-block group/term">
+            <span className="border-b border-dotted border-current cursor-help">{seg.text}</span>
+            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] shadow-lg opacity-0 transition-opacity group-hover/term:opacity-100 w-56 text-center">
+              <span className="font-semibold">{seg.text}</span>
+              <br />
+              {termLookup.get(seg.text)}
+            </span>
+          </span>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        )
+      )}
+    </>
+  );
+}
+
+type GuideSection = "lessons" | "coverage" | "audit" | "deepDive" | "examTips";
 
 type FeedItem = {
   feedId: string;
@@ -1177,6 +1224,10 @@ function StudyContent() {
   const [aiError, setAiError] = useState("");
   const [isGeneratingAiNote, setIsGeneratingAiNote] = useState(false);
   const [showStudyGuide, setShowStudyGuide] = useState(false);
+  const [openGuideSections, setOpenGuideSections] = useState<Record<GuideSection, boolean>>({
+    lessons: true, coverage: false, audit: false, deepDive: false, examTips: false,
+  });
+  const [expandedLessons, setExpandedLessons] = useState<Record<number, boolean>>({});
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [activeFeedIndex, setActiveFeedIndex] = useState(0);
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -1238,6 +1289,14 @@ function StudyContent() {
       setIsGeneratingAiNote(false);
     }
   };
+
+  const toggleGuideSection = useCallback((section: GuideSection) => {
+    setOpenGuideSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  }, []);
+
+  const toggleLesson = useCallback((index: number) => {
+    setExpandedLessons((prev) => ({ ...prev, [index]: !prev[index] }));
+  }, []);
 
   useEffect(() => {
     setAiSettings(loadAiSettings());
@@ -1459,8 +1518,34 @@ function StudyContent() {
       </div>
 
       {showStudyGuide && (
-      <div className="mb-6 space-y-6 fade-in">
-      <div className="rounded-2xl border border-sky-200/70 bg-sky-50/80 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/10">
+      <div className="mb-6 space-y-4 fade-in">
+
+      {/* Table of Contents */}
+      <nav className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[var(--muted)] mb-3">ガイド目次</p>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => toggleGuideSection("lessons")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.lessons ? "bg-sky-100 border-sky-300 text-sky-800 dark:bg-sky-500/20 dark:border-sky-400/40 dark:text-sky-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+            {openGuideSections.lessons ? "▼" : "▶"} ミニレッスン <span className="ml-1.5 text-[10px] opacity-60">{lessonBlocks.length}件</span>
+          </button>
+          <button onClick={() => toggleGuideSection("coverage")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.coverage ? "bg-violet-100 border-violet-300 text-violet-800 dark:bg-violet-500/20 dark:border-violet-400/40 dark:text-violet-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+            {openGuideSections.coverage ? "▼" : "▶"} 弱点カバー <span className="ml-1.5 text-[10px] opacity-60">{coverageFocuses.length}件</span>
+          </button>
+          <button onClick={() => toggleGuideSection("audit")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.audit ? "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800 dark:bg-fuchsia-500/20 dark:border-fuchsia-400/40 dark:text-fuchsia-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+            {openGuideSections.audit ? "▼" : "▶"} レッスン監査 <span className="ml-1.5 text-[10px] opacity-60">{readinessAudits.length}件</span>
+          </button>
+          <button onClick={() => toggleGuideSection("deepDive")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.deepDive ? "bg-teal-100 border-teal-300 text-teal-800 dark:bg-teal-500/20 dark:border-teal-400/40 dark:text-teal-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+            {openGuideSections.deepDive ? "▼" : "▶"} 深掘りモジュール <span className="ml-1.5 text-[10px] opacity-60">{deepDiveModules.length}件</span>
+          </button>
+          <button onClick={() => toggleGuideSection("examTips")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.examTips ? "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-500/20 dark:border-amber-400/40 dark:text-amber-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+            {openGuideSections.examTips ? "▼" : "▶"} 試験のコツ <span className="ml-1.5 text-[10px] opacity-60">{categoryExamTips.length}件</span>
+          </button>
+        </div>
+        <p className="mt-2 text-[10px] text-[var(--muted)]">用語にカーソルを合わせると定義が表示されます</p>
+      </nav>
+
+      {/* Section A: Lessons */}
+      {openGuideSections.lessons && (
+      <div className="rounded-2xl border border-sky-200/70 bg-sky-50/80 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/10 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-sky-700 dark:text-sky-200">レッスン拡張ガイド</p>
@@ -1476,22 +1561,32 @@ function StudyContent() {
         </div>
 
         <div className="mt-5 grid gap-4 xl:grid-cols-3">
-          {lessonBlocks.map((lesson, index) => (
+          {lessonBlocks.map((lesson, index) => {
+            const isExpanded = expandedLessons[index] !== false;
+            return (
             <section
               key={lesson.title}
-              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/10"
+              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/10 transition-all"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-200">Lesson {index + 1}</p>
-                <span className="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-medium text-sky-700 dark:bg-sky-500/10 dark:text-sky-100">拡張版</span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-medium text-sky-700 dark:bg-sky-500/10 dark:text-sky-100">拡張版</span>
+                  <button onClick={() => toggleLesson(index)} className="rounded-full p-1 hover:bg-sky-100 dark:hover:bg-sky-500/20 transition-colors text-sky-600 dark:text-sky-200 text-xs">
+                    {isExpanded ? "▲ 閉じる" : "▼ 開く"}
+                  </button>
+                </div>
               </div>
               <h3 className="mt-2 font-semibold text-lg">{lesson.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{lesson.summary}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]"><TermHighlighter text={lesson.summary} /></p>
+
+              {isExpanded && (
+              <div className="fade-in">
               <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
                 {lesson.bullets.map((point) => (
                   <li key={point} className="flex gap-2">
-                    <span className="mt-0.5">•</span>
-                    <span>{point}</span>
+                    <span className="mt-0.5 shrink-0">•</span>
+                    <span><TermHighlighter text={point} /></span>
                   </li>
                 ))}
               </ul>
@@ -1500,8 +1595,8 @@ function StudyContent() {
                 <ul className="mt-2 space-y-2 leading-relaxed text-emerald-900/80 dark:text-emerald-50">
                   {lesson.examAngles.map((angle) => (
                     <li key={angle} className="flex gap-2">
-                      <span className="mt-0.5">→</span>
-                      <span>{angle}</span>
+                      <span className="mt-0.5 shrink-0">→</span>
+                      <span><TermHighlighter text={angle} /></span>
                     </li>
                   ))}
                 </ul>
@@ -1511,22 +1606,22 @@ function StudyContent() {
                 <ul className="mt-2 space-y-2 leading-relaxed text-rose-900/80 dark:text-rose-50">
                   {lesson.commonTraps.map((trap) => (
                     <li key={trap} className="flex gap-2">
-                      <span className="mt-0.5">!</span>
-                      <span>{trap}</span>
+                      <span className="mt-0.5 shrink-0">!</span>
+                      <span><TermHighlighter text={trap} /></span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50/80 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/10">
                 <p className="font-semibold text-sky-900 dark:text-sky-100">ミニケース</p>
-                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50">{lesson.example}</p>
+                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50"><TermHighlighter text={lesson.example} /></p>
               </div>
               <div className="mt-4 rounded-xl border border-dashed border-sky-200/80 px-4 py-3 dark:border-sky-400/20">
                 <p className="text-sm font-semibold">30秒チェック</p>
                 <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
                   {lesson.quickCheck.map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="mt-0.5">✓</span>
+                      <span className="mt-0.5 shrink-0">✓</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -1535,12 +1630,18 @@ function StudyContent() {
               <div className="mt-4 rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-500/10 dark:text-sky-100">
                 <span className="font-semibold">覚え方:</span> {lesson.memoryHook}
               </div>
+              </div>
+              )}
             </section>
-          ))}
+            );
+          })}
         </div>
       </div>
+      )}
 
-      <div className="mb-8 rounded-3xl border border-violet-200/70 bg-violet-50/70 p-6 shadow-sm dark:border-violet-400/20 dark:bg-violet-400/10">
+      {/* Section B: Coverage Focus */}
+      {openGuideSections.coverage && (
+      <div className="rounded-3xl border border-violet-200/70 bg-violet-50/70 p-6 shadow-sm dark:border-violet-400/20 dark:bg-violet-400/10 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-violet-700 dark:text-violet-200">弱点になりやすい範囲を先回り</p>
@@ -1562,12 +1663,19 @@ function StudyContent() {
               className="rounded-2xl border border-violet-200/70 bg-white/85 p-5 dark:border-violet-400/20 dark:bg-black/10"
             >
               <h3 className="font-semibold text-lg">{focus.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{focus.whyItMatters}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]"><TermHighlighter text={focus.whyItMatters} /></p>
               <div className="mt-4">
                 <p className="text-sm font-semibold text-violet-900 dark:text-violet-100">重点トピック</p>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
                   {focus.topics.map((topic) => (
-                    <span key={topic} className="rounded-full bg-violet-100 px-3 py-1 font-medium text-violet-700 dark:bg-violet-500/10 dark:text-violet-100">{topic}</span>
+                    <span key={topic} className="relative group/term rounded-full bg-violet-100 px-3 py-1 font-medium text-violet-700 dark:bg-violet-500/10 dark:text-violet-100 cursor-help">
+                      {topic}
+                      {termLookup.has(topic) && (
+                        <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] shadow-lg opacity-0 transition-opacity group-hover/term:opacity-100 w-52 text-center font-normal">
+                          <span className="font-semibold">{topic}</span><br />{termLookup.get(topic)}
+                        </span>
+                      )}
+                    </span>
                   ))}
                 </div>
               </div>
@@ -1576,8 +1684,8 @@ function StudyContent() {
                 <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
                   {focus.studyActions.map((action) => (
                     <li key={action} className="flex gap-2">
-                      <span className="mt-0.5">→</span>
-                      <span>{action}</span>
+                      <span className="mt-0.5 shrink-0">→</span>
+                      <span><TermHighlighter text={action} /></span>
                     </li>
                   ))}
                 </ul>
@@ -1586,8 +1694,11 @@ function StudyContent() {
           ))}
         </div>
       </div>
+      )}
 
-      <div className="mb-8 rounded-3xl border border-fuchsia-200/70 bg-fuchsia-50/70 p-6 shadow-sm dark:border-fuchsia-400/20 dark:bg-fuchsia-400/10">
+      {/* Section C: Readiness Audit */}
+      {openGuideSections.audit && (
+      <div className="rounded-3xl border border-fuchsia-200/70 bg-fuchsia-50/70 p-6 shadow-sm dark:border-fuchsia-400/20 dark:bg-fuchsia-400/10 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-fuchsia-700 dark:text-fuchsia-200">現状分析 → 補強ポイント</p>
@@ -1614,15 +1725,15 @@ function StudyContent() {
               </div>
               <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-4 py-3 text-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
                 <p className="font-semibold text-emerald-900 dark:text-emerald-100">現在のカバー状況</p>
-                <p className="mt-1 leading-relaxed text-emerald-900/80 dark:text-emerald-50">{audit.currentCoverage}</p>
+                <p className="mt-1 leading-relaxed text-emerald-900/80 dark:text-emerald-50"><TermHighlighter text={audit.currentCoverage} /></p>
               </div>
               <div className="mt-4 rounded-xl border border-rose-200/80 bg-rose-50/70 px-4 py-3 text-sm dark:border-rose-400/20 dark:bg-rose-500/10">
                 <p className="font-semibold text-rose-900 dark:text-rose-100">薄かった点</p>
                 <ul className="mt-2 space-y-2 leading-relaxed text-rose-900/80 dark:text-rose-50">
                   {audit.thinSpots.map((spot) => (
                     <li key={spot} className="flex gap-2">
-                      <span className="mt-0.5">!</span>
-                      <span>{spot}</span>
+                      <span className="mt-0.5 shrink-0">!</span>
+                      <span><TermHighlighter text={spot} /></span>
                     </li>
                   ))}
                 </ul>
@@ -1632,8 +1743,8 @@ function StudyContent() {
                 <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
                   {audit.upgradeAdded.map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="mt-0.5">→</span>
-                      <span>{item}</span>
+                      <span className="mt-0.5 shrink-0">→</span>
+                      <span><TermHighlighter text={item} /></span>
                     </li>
                   ))}
                 </ul>
@@ -1642,8 +1753,11 @@ function StudyContent() {
           ))}
         </div>
       </div>
+      )}
 
-      <div className="mb-8 rounded-3xl border border-teal-200/70 bg-teal-50/70 p-6 shadow-sm dark:border-teal-400/20 dark:bg-teal-400/10">
+      {/* Section D: Deep Dive */}
+      {openGuideSections.deepDive && (
+      <div className="rounded-3xl border border-teal-200/70 bg-teal-50/70 p-6 shadow-sm dark:border-teal-400/20 dark:bg-teal-400/10 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-teal-700 dark:text-teal-200">本番対応の深掘り</p>
@@ -1665,28 +1779,28 @@ function StudyContent() {
               className="rounded-2xl border border-teal-200/70 bg-white/85 p-5 dark:border-teal-400/20 dark:bg-black/10"
             >
               <h3 className="font-semibold text-lg">{module.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]">{module.whyImportant}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]"><TermHighlighter text={module.whyImportant} /></p>
               <div className="mt-4 rounded-xl border border-teal-200/80 bg-teal-50/70 px-4 py-3 text-sm dark:border-teal-400/20 dark:bg-teal-500/10">
                 <p className="font-semibold text-teal-900 dark:text-teal-100">絶対に押さえたいこと</p>
                 <ul className="mt-2 space-y-2 leading-relaxed text-teal-900/80 dark:text-teal-50">
                   {module.mustKnow.map((point) => (
                     <li key={point} className="flex gap-2">
-                      <span className="mt-0.5">•</span>
-                      <span>{point}</span>
+                      <span className="mt-0.5 shrink-0">•</span>
+                      <span><TermHighlighter text={point} /></span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50/80 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/10">
                 <p className="font-semibold text-sky-900 dark:text-sky-100">場面で確認する</p>
-                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50">{module.scenarioDrill}</p>
+                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50"><TermHighlighter text={module.scenarioDrill} /></p>
               </div>
               <div className="mt-4 rounded-xl border border-dashed border-teal-200/80 px-4 py-3 dark:border-teal-400/20">
                 <p className="text-sm font-semibold">仕上げチェック</p>
                 <ul className="mt-2 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
                   {module.finalCheck.map((item) => (
                     <li key={item} className="flex gap-2">
-                      <span className="mt-0.5">✓</span>
+                      <span className="mt-0.5 shrink-0">✓</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -1696,8 +1810,11 @@ function StudyContent() {
           ))}
         </div>
       </div>
+      )}
 
-      <div className="mb-8 rounded-3xl border border-amber-200/70 bg-amber-50/70 p-6 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/10">
+      {/* Section E: Exam Tips */}
+      {openGuideSections.examTips && (
+      <div className="rounded-3xl border border-amber-200/70 bg-amber-50/70 p-6 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/10 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold text-amber-700 dark:text-amber-200">試験で点を取りやすくするコツ</p>
@@ -1722,8 +1839,8 @@ function StudyContent() {
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
                 {section.points.map((point) => (
                   <li key={point} className="flex gap-2">
-                    <span className="mt-0.5">•</span>
-                    <span>{point}</span>
+                    <span className="mt-0.5 shrink-0">•</span>
+                    <span><TermHighlighter text={point} /></span>
                   </li>
                 ))}
               </ul>
@@ -1731,6 +1848,8 @@ function StudyContent() {
           ))}
         </div>
       </div>
+      )}
+
       </div>
       )}
 
