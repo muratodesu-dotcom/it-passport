@@ -1545,16 +1545,16 @@ function StudyContent() {
 
       {/* Section A: Lessons */}
       {openGuideSections.lessons && (
-      <div className="rounded-2xl border border-sky-200/70 bg-sky-50/80 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/10 fade-in">
+      <div className="rounded-2xl border border-sky-200/70 bg-sky-50 p-6 shadow-sm dark:border-sky-400/20 dark:bg-sky-400/20 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-sky-700 dark:text-sky-200">レッスン拡張ガイド</p>
+            <p className="text-sm font-semibold text-sky-900 dark:text-sky-200">レッスン拡張ガイド</p>
             <h2 className="mt-2 text-2xl font-bold">{categoryLabel}を面で理解するミニレッスン</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
               1問ずつの暗記に偏らないよう、出題テーマをまとまりで理解できるレッスンブロックを追加しました。先に全体像を掴んでから個別問題へ進むと、似た用語の区別がかなり楽になります。
             </p>
           </div>
-          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/20">
             <p className="text-xs text-[var(--muted)]">おすすめの進め方</p>
             <p className="mt-1 font-medium">全体像 → 例題 → 解説 → クイズ</p>
           </div>
@@ -1566,12 +1566,12 @@ function StudyContent() {
             return (
             <section
               key={lesson.title}
-              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/10 transition-all"
+              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/20 transition-all"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-200">Lesson {index + 1}</p>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-medium text-sky-700 dark:bg-sky-500/10 dark:text-sky-100">拡張版</span>
+                  <span className="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-medium text-sky-900 dark:bg-sky-500/20 dark:text-sky-100">拡張版</span>
                   <button onClick={() => toggleLesson(index)} className="rounded-full p-1 hover:bg-sky-100 dark:hover:bg-sky-500/20 transition-colors text-sky-600 dark:text-sky-200 text-xs">
                     {isExpanded ? "▲ 閉じる" : "▼ 開く"}
                   </button>
@@ -1590,9 +1590,9 @@ function StudyContent() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-4 py-3 text-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
+              <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50 px-4 py-3 text-sm dark:border-emerald-400/20 dark:bg-emerald-500/20">
                 <p className="font-semibold text-emerald-900 dark:text-emerald-100">試験で問われやすい角度</p>
-                <ul className="mt-2 space-y-2 leading-relaxed text-emerald-900/80 dark:text-emerald-50">
+                <ul className="mt-2 space-y-2 leading-relaxed text-emerald-950 dark:text-emerald-100">
                   {lesson.examAngles.map((angle) => (
                     <li key={angle} className="flex gap-2">
                       <span className="mt-0.5 shrink-0">→</span>
@@ -1601,9 +1601,9 @@ function StudyContent() {
                   ))}
                 </ul>
               </div>
-              <div className="mt-4 rounded-xl border border-rose-200/80 bg-rose-50/70 px-4 py-3 text-sm dark:border-rose-400/20 dark:bg-rose-500/10">
+              <div className="mt-4 rounded-xl border border-rose-200/80 bg-rose-50 px-4 py-3 text-sm dark:border-rose-400/20 dark:bg-rose-500/20">
                 <p className="font-semibold text-rose-900 dark:text-rose-100">ひっかけ注意</p>
-                <ul className="mt-2 space-y-2 leading-relaxed text-rose-900/80 dark:text-rose-50">
+                <ul className="mt-2 space-y-2 leading-relaxed text-rose-950 dark:text-rose-100">
                   {lesson.commonTraps.map((trap) => (
                     <li key={trap} className="flex gap-2">
                       <span className="mt-0.5 shrink-0">!</span>
@@ -1612,9 +1612,9 @@ function StudyContent() {
                   ))}
                 </ul>
               </div>
-              <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50/80 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/10">
+              <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/20">
                 <p className="font-semibold text-sky-900 dark:text-sky-100">ミニケース</p>
-                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50"><TermHighlighter text={lesson.example} /></p>
+                <p className="mt-1 leading-relaxed text-sky-950 dark:text-sky-100"><TermHighlighter text={lesson.example} /></p>
               </div>
               <div className="mt-4 rounded-xl border border-dashed border-sky-200/80 px-4 py-3 dark:border-sky-400/20">
                 <p className="text-sm font-semibold">30秒チェック</p>
@@ -1627,7 +1627,7 @@ function StudyContent() {
                   ))}
                 </ul>
               </div>
-              <div className="mt-4 rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-500/10 dark:text-sky-100">
+              <div className="mt-4 rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 dark:bg-sky-500/20 dark:text-sky-100">
                 <span className="font-semibold">覚え方:</span> {lesson.memoryHook}
               </div>
               </div>
@@ -1641,16 +1641,16 @@ function StudyContent() {
 
       {/* Section B: Coverage Focus */}
       {openGuideSections.coverage && (
-      <div className="rounded-3xl border border-violet-200/70 bg-violet-50/70 p-6 shadow-sm dark:border-violet-400/20 dark:bg-violet-400/10 fade-in">
+      <div className="rounded-3xl border border-violet-200/70 bg-violet-50 p-6 shadow-sm dark:border-violet-400/20 dark:bg-violet-400/20 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-violet-700 dark:text-violet-200">弱点になりやすい範囲を先回り</p>
+            <p className="text-sm font-semibold text-violet-900 dark:text-violet-200">弱点になりやすい範囲を先回り</p>
             <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の薄かった論点と、追加した学習テーマ</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
               既存コンテンツを見直し、出題範囲に対して相対的に薄かったテーマを整理しました。どこを重点的に復習すべきか、理由と学習アクションまで一緒に確認できます。
             </p>
           </div>
-          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/20">
             <p className="text-xs text-[var(--muted)]">使いどころ</p>
             <p className="mt-1 font-medium">レッスン前の棚卸し / 試験前の総点検</p>
           </div>
@@ -1660,7 +1660,7 @@ function StudyContent() {
           {coverageFocuses.map((focus) => (
             <section
               key={focus.title}
-              className="rounded-2xl border border-violet-200/70 bg-white/85 p-5 dark:border-violet-400/20 dark:bg-black/10"
+              className="rounded-2xl border border-violet-200/70 bg-white/85 p-5 dark:border-violet-400/20 dark:bg-black/20"
             >
               <h3 className="font-semibold text-lg">{focus.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]"><TermHighlighter text={focus.whyItMatters} /></p>
@@ -1668,7 +1668,7 @@ function StudyContent() {
                 <p className="text-sm font-semibold text-violet-900 dark:text-violet-100">重点トピック</p>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
                   {focus.topics.map((topic) => (
-                    <span key={topic} className="relative group/term rounded-full bg-violet-100 px-3 py-1 font-medium text-violet-700 dark:bg-violet-500/10 dark:text-violet-100 cursor-help">
+                    <span key={topic} className="relative group/term rounded-full bg-violet-100 px-3 py-1 font-medium text-violet-900 dark:bg-violet-500/20 dark:text-violet-100 cursor-help">
                       {topic}
                       {termLookup.has(topic) && (
                         <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] shadow-lg opacity-0 transition-opacity group-hover/term:opacity-100 w-52 text-center font-normal">
@@ -1698,16 +1698,16 @@ function StudyContent() {
 
       {/* Section C: Readiness Audit */}
       {openGuideSections.audit && (
-      <div className="rounded-3xl border border-fuchsia-200/70 bg-fuchsia-50/70 p-6 shadow-sm dark:border-fuchsia-400/20 dark:bg-fuchsia-400/10 fade-in">
+      <div className="rounded-3xl border border-fuchsia-200/70 bg-fuchsia-50 p-6 shadow-sm dark:border-fuchsia-400/20 dark:bg-fuchsia-400/20 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-fuchsia-700 dark:text-fuchsia-200">現状分析 → 補強ポイント</p>
+            <p className="text-sm font-semibold text-fuchsia-900 dark:text-fuchsia-200">現状分析 → 補強ポイント</p>
             <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の現行レッスン監査</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
               既存の出題とレッスンをもとに、どこまでカバーできていて、どこが薄かったかを試験視点で整理しました。追加した内容がどの弱点を埋めるのかまで一覧で確認できます。
             </p>
           </div>
-          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/20">
             <p className="text-xs text-[var(--muted)]">見るポイント</p>
             <p className="mt-1 font-medium">今ある強み / 薄い論点 / 追加補強</p>
           </div>
@@ -1717,19 +1717,19 @@ function StudyContent() {
           {readinessAudits.map((audit) => (
             <section
               key={audit.area}
-              className="rounded-2xl border border-fuchsia-200/70 bg-white/85 p-5 dark:border-fuchsia-400/20 dark:bg-black/10"
+              className="rounded-2xl border border-fuchsia-200/70 bg-white/85 p-5 dark:border-fuchsia-400/20 dark:bg-black/20"
             >
               <div className="flex items-center justify-between gap-3">
                 <h3 className="font-semibold text-lg">{audit.area}</h3>
-                <span className="rounded-full bg-fuchsia-100 px-3 py-1 text-[11px] font-medium text-fuchsia-700 dark:bg-fuchsia-500/10 dark:text-fuchsia-100">{audit.examPriority}</span>
+                <span className="rounded-full bg-fuchsia-100 px-3 py-1 text-[11px] font-medium text-fuchsia-900 dark:bg-fuchsia-500/20 dark:text-fuchsia-100">{audit.examPriority}</span>
               </div>
-              <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50/70 px-4 py-3 text-sm dark:border-emerald-400/20 dark:bg-emerald-500/10">
+              <div className="mt-4 rounded-xl border border-emerald-200/80 bg-emerald-50 px-4 py-3 text-sm dark:border-emerald-400/20 dark:bg-emerald-500/20">
                 <p className="font-semibold text-emerald-900 dark:text-emerald-100">現在のカバー状況</p>
-                <p className="mt-1 leading-relaxed text-emerald-900/80 dark:text-emerald-50"><TermHighlighter text={audit.currentCoverage} /></p>
+                <p className="mt-1 leading-relaxed text-emerald-950 dark:text-emerald-100"><TermHighlighter text={audit.currentCoverage} /></p>
               </div>
-              <div className="mt-4 rounded-xl border border-rose-200/80 bg-rose-50/70 px-4 py-3 text-sm dark:border-rose-400/20 dark:bg-rose-500/10">
+              <div className="mt-4 rounded-xl border border-rose-200/80 bg-rose-50 px-4 py-3 text-sm dark:border-rose-400/20 dark:bg-rose-500/20">
                 <p className="font-semibold text-rose-900 dark:text-rose-100">薄かった点</p>
-                <ul className="mt-2 space-y-2 leading-relaxed text-rose-900/80 dark:text-rose-50">
+                <ul className="mt-2 space-y-2 leading-relaxed text-rose-950 dark:text-rose-100">
                   {audit.thinSpots.map((spot) => (
                     <li key={spot} className="flex gap-2">
                       <span className="mt-0.5 shrink-0">!</span>
@@ -1757,16 +1757,16 @@ function StudyContent() {
 
       {/* Section D: Deep Dive */}
       {openGuideSections.deepDive && (
-      <div className="rounded-3xl border border-teal-200/70 bg-teal-50/70 p-6 shadow-sm dark:border-teal-400/20 dark:bg-teal-400/10 fade-in">
+      <div className="rounded-3xl border border-teal-200/70 bg-teal-50 p-6 shadow-sm dark:border-teal-400/20 dark:bg-teal-400/20 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-teal-700 dark:text-teal-200">本番対応の深掘り</p>
+            <p className="text-sm font-semibold text-teal-900 dark:text-teal-200">本番対応の深掘り</p>
             <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の深掘りモジュール</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
               単語暗記で終わらせず、理由・場面・チェックポイントまで確認できるように、試験で差がつく論点をミニ講義形式で追加しました。
             </p>
           </div>
-          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/20">
             <p className="text-xs text-[var(--muted)]">おすすめ</p>
             <p className="mt-1 font-medium">弱点1つにつき1モジュール集中</p>
           </div>
@@ -1776,13 +1776,13 @@ function StudyContent() {
           {deepDiveModules.map((module) => (
             <section
               key={module.title}
-              className="rounded-2xl border border-teal-200/70 bg-white/85 p-5 dark:border-teal-400/20 dark:bg-black/10"
+              className="rounded-2xl border border-teal-200/70 bg-white/85 p-5 dark:border-teal-400/20 dark:bg-black/20"
             >
               <h3 className="font-semibold text-lg">{module.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-[var(--muted)]"><TermHighlighter text={module.whyImportant} /></p>
-              <div className="mt-4 rounded-xl border border-teal-200/80 bg-teal-50/70 px-4 py-3 text-sm dark:border-teal-400/20 dark:bg-teal-500/10">
+              <div className="mt-4 rounded-xl border border-teal-200/80 bg-teal-50 px-4 py-3 text-sm dark:border-teal-400/20 dark:bg-teal-500/20">
                 <p className="font-semibold text-teal-900 dark:text-teal-100">絶対に押さえたいこと</p>
-                <ul className="mt-2 space-y-2 leading-relaxed text-teal-900/80 dark:text-teal-50">
+                <ul className="mt-2 space-y-2 leading-relaxed text-teal-950 dark:text-teal-100">
                   {module.mustKnow.map((point) => (
                     <li key={point} className="flex gap-2">
                       <span className="mt-0.5 shrink-0">•</span>
@@ -1791,9 +1791,9 @@ function StudyContent() {
                   ))}
                 </ul>
               </div>
-              <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50/80 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/10">
+              <div className="mt-4 rounded-xl border border-sky-200/70 bg-sky-50 px-4 py-3 text-sm dark:border-sky-400/20 dark:bg-sky-500/20">
                 <p className="font-semibold text-sky-900 dark:text-sky-100">場面で確認する</p>
-                <p className="mt-1 leading-relaxed text-sky-900/80 dark:text-sky-50"><TermHighlighter text={module.scenarioDrill} /></p>
+                <p className="mt-1 leading-relaxed text-sky-950 dark:text-sky-100"><TermHighlighter text={module.scenarioDrill} /></p>
               </div>
               <div className="mt-4 rounded-xl border border-dashed border-teal-200/80 px-4 py-3 dark:border-teal-400/20">
                 <p className="text-sm font-semibold">仕上げチェック</p>
@@ -1814,16 +1814,16 @@ function StudyContent() {
 
       {/* Section E: Exam Tips */}
       {openGuideSections.examTips && (
-      <div className="rounded-3xl border border-amber-200/70 bg-amber-50/70 p-6 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/10 fade-in">
+      <div className="rounded-3xl border border-amber-200/70 bg-amber-50 p-6 shadow-sm dark:border-amber-400/20 dark:bg-amber-400/20 fade-in">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold text-amber-700 dark:text-amber-200">試験で点を取りやすくするコツ</p>
+            <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">試験で点を取りやすくするコツ</p>
             <h2 className="mt-2 text-2xl font-bold">{categoryLabel}の頻出論点を先に整理</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[var(--muted)]">
               問題をただ読むだけでなく、出題パターン・間違えやすい語句・本番での判断軸も合わせて確認できるようにしました。
             </p>
           </div>
-          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/10">
+          <div className="rounded-2xl bg-white/70 px-4 py-3 text-sm shadow-sm dark:bg-black/20">
             <p className="text-xs text-[var(--muted)]">おすすめの使い方</p>
             <p className="mt-1 font-medium">要点確認 → 各問題の解説 → クイズで再確認</p>
           </div>
@@ -1833,7 +1833,7 @@ function StudyContent() {
           {categoryExamTips.map((section) => (
             <section
               key={section.title}
-              className="rounded-2xl border border-amber-200/70 bg-white/80 p-5 dark:border-amber-400/20 dark:bg-black/10"
+              className="rounded-2xl border border-amber-200/70 bg-white/80 p-5 dark:border-amber-400/20 dark:bg-black/20"
             >
               <h3 className="font-semibold">{section.title}</h3>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-[var(--muted)]">
@@ -1918,17 +1918,17 @@ function StudyContent() {
                   </div>
 
 {questionCoaching && (
-                    <div className="mb-4 grid gap-3 rounded-xl border border-sky-200/80 bg-sky-50/80 p-4 text-sm shadow-sm dark:border-sky-400/20 dark:bg-sky-500/10">
+                    <div className="mb-4 grid gap-3 rounded-xl border border-sky-200/80 bg-sky-50 p-4 text-sm shadow-sm dark:border-sky-400/20 dark:bg-sky-500/20">
                       <div>
                         <p className="font-semibold text-sky-900 dark:text-sky-100">この問題の学習ポイント</p>
                         <p className="mt-1 text-[var(--muted)]">{questionCoaching.takeaway}</p>
                       </div>
                       <div className="grid gap-3 md:grid-cols-2">
-                        <div className="rounded-lg bg-white/80 p-3 dark:bg-black/10">
+                        <div className="rounded-lg bg-white/80 p-3 dark:bg-black/20">
                           <p className="font-medium">ひっかけポイント</p>
                           <p className="mt-1 text-[var(--muted)]">{questionCoaching.trap}</p>
                         </div>
-                        <div className="rounded-lg bg-white/80 p-3 dark:bg-black/10">
+                        <div className="rounded-lg bg-white/80 p-3 dark:bg-black/20">
                           <p className="font-medium">確認のひとこと</p>
                           <p className="mt-1 text-[var(--muted)]">{questionCoaching.checkpoint}</p>
                         </div>
@@ -2117,7 +2117,7 @@ function StudyContent() {
             </ul>
           </div>
 
-          <div className="rounded-2xl border border-violet-200/70 bg-violet-50/70 p-5 shadow-sm dark:border-violet-400/20 dark:bg-violet-500/10">
+          <div className="rounded-2xl border border-violet-200/70 bg-violet-50 p-5 shadow-sm dark:border-violet-400/20 dark:bg-violet-500/10">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="font-semibold">AIで補足ノートを生成</h2>
@@ -2125,7 +2125,7 @@ function StudyContent() {
                   Settingsで保存したAPIキーとモデルを使って、現在の問題にひもづく追加学習ノートを生成します。Web検索を使った最新補足も含められます。
                 </p>
               </div>
-              <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-violet-700 dark:bg-black/10 dark:text-violet-100">{aiSettings.model || "model未設定"}</span>
+              <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-violet-700 dark:bg-black/20 dark:text-violet-100">{aiSettings.model || "model未設定"}</span>
             </div>
             <div className="mt-4 space-y-3">
               <button
@@ -2137,13 +2137,13 @@ function StudyContent() {
               </button>
               <button
                 onClick={() => router.push("/settings")}
-                className="w-full rounded-xl bg-white/80 px-4 py-3 text-sm font-medium transition-colors hover:bg-white dark:bg-black/10 dark:hover:bg-black/20"
+                className="w-full rounded-xl bg-white/80 px-4 py-3 text-sm font-medium transition-colors hover:bg-white dark:bg-black/20 dark:hover:bg-black/20"
               >
                 Settingsを開く
               </button>
               {aiError ? <p className="text-sm text-rose-600">{aiError}</p> : null}
               {aiNote ? (
-                <div className="rounded-xl border border-violet-200/80 bg-white/90 p-4 text-sm leading-relaxed whitespace-pre-wrap dark:border-violet-400/20 dark:bg-black/10">
+                <div className="rounded-xl border border-violet-200/80 bg-white/90 p-4 text-sm leading-relaxed whitespace-pre-wrap dark:border-violet-400/20 dark:bg-black/20">
                   {aiNote}
                 </div>
               ) : null}
