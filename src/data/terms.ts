@@ -230,4 +230,16 @@ export const termPairs: TermPair[] = [
   { term: "文字コード", description: "文字と数値の対応を定めた規則（ASCII・Shift_JIS・Unicode等）", category: "technology" },
   { term: "標本化", description: "アナログ信号を一定間隔で測定して離散値にするA/D変換の最初の処理", category: "technology" },
   { term: "A/D変換", description: "アナログ信号を標本化→量子化→符号化してデジタルデータに変換する処理", category: "technology" },
+  // --- 財務諸表・経営フレームワーク ---
+  { term: "貸借対照表（B/S）", description: "ある時点の資産・負債・純資産の状況を示す財務諸表", category: "strategy" },
+  { term: "損益計算書（P/L）", description: "一定期間の収益と費用を対比して利益を算出する財務諸表", category: "strategy" },
+  { term: "キャッシュフロー計算書", description: "現金の流れを営業・投資・財務活動に分類して示す財務諸表", category: "strategy" },
+  { term: "売上総利益", description: "売上高から売上原価を差し引いた商品自体の収益性を示す利益（粗利）", category: "strategy" },
+  { term: "営業利益", description: "売上総利益から販売費及び一般管理費を差し引いた本業の収益力を示す利益", category: "strategy" },
+  { term: "アンゾフの成長マトリクス", description: "製品×市場の新旧で市場浸透・市場開拓・新製品開発・多角化に分類する成長戦略", category: "strategy" },
+  { term: "ブルーオーシャン戦略", description: "競争のない未開拓の市場空間を創造し競争を無意味にする戦略", category: "strategy" },
+  { term: "コアコンピタンス", description: "他社に模倣されにくい企業固有の中核的な強み・能力", category: "strategy" },
+  { term: "VRIO分析", description: "価値・希少性・模倣困難性・組織の4視点で経営資源の競争優位を評価する手法", category: "strategy" },
+  { term: "プロダクトライフサイクル", description: "製品の導入期→成長期→成熟期→衰退期の4段階で市場推移を捉えるモデル", category: "strategy" },
+  { term: "ニッチ戦略", description: "大企業が参入しにくい隙間市場に特化して競争優位を築く戦略", category: "strategy" },
 ];
