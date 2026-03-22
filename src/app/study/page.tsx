@@ -8,7 +8,7 @@ import { categoryLabels, Category } from "@/lib/types";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-const termLookup = new Map(termPairs.map((t) => [t.term, t.description]));
+const termLookup = new Map(termPairs.map((t) => [t.term, { description: t.description, english: t.english }]));
 
 function TermHighlighter({ text }: { text: string }) {
   const segments = useMemo(() => {
@@ -41,7 +41,9 @@ function TermHighlighter({ text }: { text: string }) {
             <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] shadow-lg opacity-0 transition-opacity group-hover/term:opacity-100 w-56 text-center">
               <span className="font-semibold">{seg.text}</span>
               <br />
-              {termLookup.get(seg.text)}
+              <span className="text-[0.65rem] opacity-70">{termLookup.get(seg.text)?.english}</span>
+              <br />
+              {termLookup.get(seg.text)?.description}
             </span>
           </span>
         ) : (
@@ -1672,7 +1674,7 @@ function StudyContent() {
                       {topic}
                       {termLookup.has(topic) && (
                         <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] shadow-lg opacity-0 transition-opacity group-hover/term:opacity-100 w-52 text-center font-normal">
-                          <span className="font-semibold">{topic}</span><br />{termLookup.get(topic)}
+                          <span className="font-semibold">{topic}</span><br /><span className="text-[0.65rem] opacity-70">{termLookup.get(topic)?.english}</span><br />{termLookup.get(topic)?.description}
                         </span>
                       )}
                     </span>
