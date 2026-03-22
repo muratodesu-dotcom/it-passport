@@ -2,6 +2,7 @@ import { Category } from "@/lib/types";
 
 export interface TermPair {
   term: string;
+  english: string;
   description: string;
   category: Category;
 }
