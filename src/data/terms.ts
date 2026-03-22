@@ -1052,4 +1052,25 @@ export const termPairs: TermPair[] = [
   { term: "第一正規形", english: "First Normal Form (1NF)", description: "全ての属性が繰り返し項目を含まない原子値であるデータベースの正規形", category: "technology" },
   { term: "第二正規形", english: "Second Normal Form (2NF)", description: "第一正規形かつ部分関数従属が排除された正規形", category: "technology" },
   { term: "第三正規形", english: "Third Normal Form (3NF)", description: "第二正規形かつ推移的関数従属が排除された正規形", category: "technology" },
+
+  // ===== 追加用語 =====
+  // --- セキュリティ ---
+  { term: "クリックジャッキング", english: "Clickjacking", description: "透明なレイヤを重ねて利用者に意図しない操作をさせる攻撃手法", category: "technology" },
+  { term: "バッファオーバフロー", english: "Buffer Overflow", description: "プログラムのバッファ領域を超えるデータを送り込み不正な動作を引き起こす攻撃", category: "technology" },
+  { term: "ディレクトリトラバーサル", english: "Directory Traversal", description: "パス指定を悪用して本来アクセスできないファイルを読み書きする攻撃", category: "technology" },
+  { term: "脆弱性診断", english: "Vulnerability Assessment", description: "システムやネットワークの脆弱性を発見・評価するためのセキュリティ検査", category: "technology" },
+  // --- 最新トレンド ---
+  { term: "生成AI", english: "Generative AI", description: "テキスト・画像・音声などの新しいコンテンツを自動生成する人工知能技術", category: "technology" },
+  { term: "LLM", english: "Large Language Model", description: "大量のテキストデータで訓練された大規模な自然言語処理モデル", category: "technology" },
+  { term: "ノーコード", english: "No-Code", description: "プログラミング不要でアプリケーションを開発できる手法・ツール", category: "technology" },
+  { term: "ローコード", english: "Low-Code", description: "最小限のコーディングでアプリケーションを開発できる手法・プラットフォーム", category: "technology" },
+  { term: "メタバース", english: "Metaverse", description: "インターネット上に構築された三次元の仮想空間・仮想世界", category: "strategy" },
+  { term: "NFT", english: "Non-Fungible Token", description: "ブロックチェーン上でデジタル資産の唯一性を証明する非代替性トークン", category: "strategy" },
+  { term: "DAO", english: "Decentralized Autonomous Organization", description: "ブロックチェーンを活用し中央管理者なしに運営される分散型自律組織", category: "strategy" },
+  { term: "Web3", english: "Web3", description: "ブロックチェーン技術を基盤とした分散型の次世代インターネットの概念", category: "strategy" },
+  { term: "データサイエンティスト", english: "Data Scientist", description: "大量のデータから有益な知見を導き出しビジネスに活用する専門家", category: "strategy" },
+  // --- マネジメント/開発 ---
+  { term: "アジャイル", english: "Agile", description: "短い反復サイクルで開発と改善を繰り返す柔軟なソフトウェア開発手法の総称", category: "management" },
+  // --- ストラテジ系 ---
+  { term: "マトリックス図法", english: "Matrix Diagram", description: "行と列に要素を配置し交点で関連性を評価する品質管理の手法", category: "strategy" },
 ];
