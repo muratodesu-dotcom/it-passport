@@ -242,4 +242,15 @@ export const termPairs: TermPair[] = [
   { term: "VRIO分析", description: "価値・希少性・模倣困難性・組織の4視点で経営資源の競争優位を評価する手法", category: "strategy" },
   { term: "プロダクトライフサイクル", description: "製品の導入期→成長期→成熟期→衰退期の4段階で市場推移を捉えるモデル", category: "strategy" },
   { term: "ニッチ戦略", description: "大企業が参入しにくい隙間市場に特化して競争優位を築く戦略", category: "strategy" },
+  // --- ISMS・ITガバナンス ---
+  { term: "ISMS", description: "情報セキュリティを体系的に管理する仕組み（ISO/IEC 27001で規定）", category: "management" },
+  { term: "情報セキュリティポリシ", description: "基本方針→対策基準→実施手順の3階層で構成される組織のセキュリティ方針", category: "management" },
+  { term: "リスクアセスメント", description: "リスク特定→リスク分析→リスク評価の順で行うリスク評価プロセス", category: "management" },
+  { term: "リスク回避", description: "リスクの原因となる活動自体を中止・断念するリスク対応策", category: "management" },
+  { term: "リスク移転", description: "保険加入等によりリスクの影響を第三者に転嫁するリスク対応策", category: "management" },
+  { term: "ITガバナンス", description: "経営陣がIT戦略の策定・実行を統制しIT投資の価値を最大化する仕組み", category: "management" },
+  { term: "ISO/IEC 20000", description: "ITサービスマネジメントシステムの要求事項を定めた国際規格", category: "management" },
+  { term: "デジタルフォレンジックス", description: "サイバー攻撃等の証拠となるデジタルデータを収集・分析・保全する手法", category: "management" },
+  { term: "CSIRT", description: "情報セキュリティインシデントに対応・調査・復旧を行う専門チーム", category: "management" },
+  { term: "RTO", description: "災害発生後に業務を復旧させるまでの目標時間（Recovery Time Objective）", category: "management" },
 ];
