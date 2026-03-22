@@ -184,4 +184,15 @@ export const termPairs: TermPair[] = [
   { term: "OSS", description: "ソースコードが公開され自由に利用・改変・再配布できるソフトウェア", category: "technology" },
   { term: "ディープラーニング", description: "多層ニューラルネットワークで大量データからパターンを自動学習する技術", category: "technology" },
   { term: "バイオメトリクス認証", description: "指紋・虹彩・静脈など身体的特徴を利用する認証方式", category: "technology" },
+  // --- ハードウェア・OS基礎 ---
+  { term: "RAM", description: "電源を切るとデータが消える揮発性の主記憶装置", category: "technology" },
+  { term: "ROM", description: "電源を切ってもデータが保持される不揮発性の読み出し専用メモリ", category: "technology" },
+  { term: "キャッシュメモリ", description: "CPUと主記憶の速度差を埋めるために配置される高速小容量メモリ", category: "technology" },
+  { term: "SSD", description: "フラッシュメモリを使用した高速で耐衝撃性に優れる補助記憶装置", category: "technology" },
+  { term: "HDD", description: "磁気ディスクを回転させてデータを読み書きする補助記憶装置", category: "technology" },
+  { term: "GPU", description: "画像・映像の描画処理やAI学習に使われる並列計算に優れたプロセッサ", category: "technology" },
+  { term: "ファームウェア", description: "ハードウェアに組み込まれたROM上の制御用ソフトウェア", category: "technology" },
+  { term: "ミドルウェア", description: "OSとアプリケーションの間でDB管理やWebサーバ等の共通機能を提供するソフトウェア", category: "technology" },
+  { term: "デバイスドライバ", description: "OSが周辺機器を認識・制御するためのソフトウェア", category: "technology" },
+  { term: "プラグアンドプレイ", description: "周辺機器を接続するだけでOSが自動認識・設定する仕組み", category: "technology" },
 ];
