@@ -34,7 +34,7 @@ export default function GamesHub() {
         <p className="mb-3 inline-flex rounded-full bg-[var(--badge-bg)] px-3 py-1 text-sm font-medium text-[var(--primary)]">
           楽しく学ぶ
         </p>
-        <h1 className="text-3xl font-bold mb-3 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+        <h1 className="text-3xl font-bold mb-3 bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))` }}>
           ゲームモード
         </h1>
         <p className="text-[var(--muted)] max-w-lg mx-auto">

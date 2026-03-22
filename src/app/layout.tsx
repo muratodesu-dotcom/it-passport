@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import DarkModeToggle from "@/components/DarkModeToggle";
+import ThemeSelector from "@/components/ThemeSelector";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-screen">
-        <DarkModeToggle />
+        <ThemeSelector />
         <div className="sticky top-0 z-40 border-b border-[var(--card-border)] bg-[color:color-mix(in_srgb,var(--background)_88%,transparent)] backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
             <Link href="/" className="text-sm font-semibold tracking-wide text-[var(--foreground)]">IT Passport</Link>

@@ -145,8 +145,8 @@ function QuizContent() {
       {/* Progress bar */}
       <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
         <div
-          className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%` }}
+          className="h-full rounded-full transition-all duration-500"
+          style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${progress}%` }}
         />
       </div>
 

@@ -71,7 +71,7 @@ export default function Home() {
             <p className="mb-3 inline-flex rounded-full bg-[var(--badge-bg)] px-3 py-1 text-sm font-medium text-[var(--primary)]">
               ITパスポート対策をもっと楽しく、もっと濃く
             </p>
-            <h1 className="mb-4 text-4xl font-bold leading-tight bg-gradient-to-r from-blue-600 via-cyan-500 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="mb-4 text-4xl font-bold leading-tight bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))` }}>
               ITパスポート試験 学習＆模擬テストアプリ
             </h1>
             <p className="max-w-2xl text-lg leading-relaxed text-[var(--muted)]">
