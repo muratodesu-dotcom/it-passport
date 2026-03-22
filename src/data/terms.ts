@@ -206,4 +206,17 @@ export const termPairs: TermPair[] = [
   { term: "CSS", description: "Webページのレイアウト・色・フォントなどの見た目を指定するスタイルシート言語", category: "technology" },
   { term: "コンパイラ", description: "ソースコード全体を一括して機械語に翻訳するソフトウェア", category: "technology" },
   { term: "インタプリタ", description: "ソースコードを1命令ずつ逐次解釈・実行するソフトウェア", category: "technology" },
+  // --- ネットワーク・マルチメディア ---
+  { term: "HTTPS", description: "HTTPにSSL/TLS暗号化を加えてWebの通信を安全に行うプロトコル", category: "technology" },
+  { term: "POP3", description: "メールサーバからメールをダウンロードして受信するプロトコル", category: "technology" },
+  { term: "IMAP", description: "メールをサーバ上に残したまま複数端末から閲覧できるメール受信プロトコル", category: "technology" },
+  { term: "FTP", description: "ネットワーク上でファイルを転送するためのプロトコル", category: "technology" },
+  { term: "Wi-Fi", description: "IEEE 802.11規格に基づく無線LANの通信技術・ブランド名", category: "technology" },
+  { term: "Bluetooth", description: "数メートル〜数十メートルの近距離で機器同士を無線接続する通信規格", category: "technology" },
+  { term: "NFC", description: "数センチの至近距離でデータ通信を行う近距離無線通信技術（Suica等）", category: "technology" },
+  { term: "MACアドレス", description: "ネットワーク機器に製造時に割り当てられる48ビットの固有の物理アドレス", category: "technology" },
+  { term: "JPEG", description: "非可逆圧縮で写真に適した画像形式（圧縮するたびに画質が劣化）", category: "technology" },
+  { term: "PNG", description: "可逆圧縮で透過表示に対応した画質劣化のない画像形式", category: "technology" },
+  { term: "可逆圧縮", description: "圧縮前のデータを完全に復元できる圧縮方式（ZIP・PNG等）", category: "technology" },
+  { term: "テザリング", description: "スマートフォンの通信回線を使って他の機器をインターネット接続する機能", category: "technology" },
 ];
