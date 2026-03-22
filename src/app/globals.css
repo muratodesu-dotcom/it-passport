@@ -91,7 +91,7 @@
   --danger: #dc2626;
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
-  --muted: #78716c;
+  --muted: #6b5e5e;
   --progress-bg: #fce7f3;
   --option-hover-border: #f9a8d4;
   --option-hover-bg: #fdf2f8;
@@ -128,7 +128,7 @@
   --danger: #ef4444;
   --danger-bg: #450a0a;
   --danger-border: #7f1d1d;
-  --muted: #a8a29e;
+  --muted: #d4b5c9;
   --progress-bg: #4a1942;
   --option-hover-border: #f472b6;
   --option-hover-bg: #3d1a36;
@@ -138,7 +138,7 @@
   --explanation-bg: #3d1a36;
   --explanation-border: #9d174d;
   --explanation-title: #f9a8d4;
-  --explanation-text: #fbcfe8;
+  --explanation-text: #fce7f3;
   --secondary-btn-bg: #4a1942;
   --secondary-btn-hover: #5c2152;
   --accent: #d946ef;
@@ -202,7 +202,7 @@
   --danger: #ef4444;
   --danger-bg: #450a0a;
   --danger-border: #7f1d1d;
-  --muted: #86efac;
+  --muted: #9cc5ab;
   --progress-bg: #166534;
   --option-hover-border: #4ade80;
   --option-hover-bg: #14532d;
@@ -211,8 +211,8 @@
   --badge-bg: #166534;
   --explanation-bg: #14532d;
   --explanation-border: #15803d;
-  --explanation-title: #86efac;
-  --explanation-text: #bbf7d0;
+  --explanation-title: #96e8b4;
+  --explanation-text: #c2f5d4;
   --secondary-btn-bg: #166534;
   --secondary-btn-hover: #14532d;
   --accent: #2dd4bf;
@@ -239,7 +239,7 @@
   --danger: #dc2626;
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
-  --muted: #78716c;
+  --muted: #6b5e57;
   --progress-bg: #fde68a;
   --option-hover-border: #fbbf24;
   --option-hover-bg: #fef9e7;
@@ -350,7 +350,7 @@
   --danger: #ef4444;
   --danger-bg: #450a0a;
   --danger-border: #7f1d1d;
-  --muted: #99f6e4;
+  --muted: #a0d4cb;
   --progress-bg: #115e59;
   --option-hover-border: #5eead4;
   --option-hover-bg: #134e4a;
@@ -359,8 +359,8 @@
   --badge-bg: #115e59;
   --explanation-bg: #134e4a;
   --explanation-border: #0e7490;
-  --explanation-title: #67e8f9;
-  --explanation-text: #a5f3fc;
+  --explanation-title: #7eedf9;
+  --explanation-text: #b8f4fa;
   --secondary-btn-bg: #115e59;
   --secondary-btn-hover: #134e4a;
   --accent: #2dd4bf;
@@ -433,8 +433,8 @@
   --badge-bg: #3b0f6e;
   --explanation-bg: #2e0d55;
   --explanation-border: #6d28d9;
-  --explanation-title: #c4b5fd;
-  --explanation-text: #ddd6fe;
+  --explanation-title: #d0c4fd;
+  --explanation-text: #e5dffe;
   --secondary-btn-bg: #3b0f6e;
   --secondary-btn-hover: #4c1d95;
   --accent: #d946ef;
