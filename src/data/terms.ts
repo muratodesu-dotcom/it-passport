@@ -195,4 +195,15 @@ export const termPairs: TermPair[] = [
   { term: "ミドルウェア", description: "OSとアプリケーションの間でDB管理やWebサーバ等の共通機能を提供するソフトウェア", category: "technology" },
   { term: "デバイスドライバ", description: "OSが周辺機器を認識・制御するためのソフトウェア", category: "technology" },
   { term: "プラグアンドプレイ", description: "周辺機器を接続するだけでOSが自動認識・設定する仕組み", category: "technology" },
+  // --- アルゴリズム・プログラミング概念 ---
+  { term: "アルゴリズム", description: "問題を解決するための計算手順や処理手順を明確に定義したもの", category: "technology" },
+  { term: "フローチャート", description: "処理の流れを図形記号で表現した図（ひし形=分岐、長方形=処理）", category: "technology" },
+  { term: "2分探索法", description: "整列済みデータの中央値と比較して探索範囲を半分に絞る高速な探索法", category: "technology" },
+  { term: "バブルソート", description: "隣り合う要素を比較・交換して整列するシンプルなソートアルゴリズム", category: "technology" },
+  { term: "オブジェクト指向", description: "カプセル化・継承・ポリモーフィズムを柱とするプログラミングの考え方", category: "technology" },
+  { term: "API", description: "ソフトウェア同士が機能やデータをやり取りするためのインタフェース", category: "technology" },
+  { term: "HTML", description: "Webページの文書構造をタグで記述するマークアップ言語", category: "technology" },
+  { term: "CSS", description: "Webページのレイアウト・色・フォントなどの見た目を指定するスタイルシート言語", category: "technology" },
+  { term: "コンパイラ", description: "ソースコード全体を一括して機械語に翻訳するソフトウェア", category: "technology" },
+  { term: "インタプリタ", description: "ソースコードを1命令ずつ逐次解釈・実行するソフトウェア", category: "technology" },
 ];
