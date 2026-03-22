@@ -1447,8 +1447,8 @@ function StudyContent() {
 
         <div className="mt-3 h-1.5 w-full rounded-full bg-[var(--progress-bg)] overflow-hidden">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-500 to-blue-500 transition-all duration-500"
-            style={{ width: `${mastery}%` }}
+            className="h-full rounded-full transition-all duration-500"
+            style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${mastery}%` }}
           />
         </div>
         {doomScrollMode && (
@@ -1740,10 +1740,8 @@ function StudyContent() {
             <>
               <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
                 <div
-                  className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${((currentIndex + 1) / questions.length) * 100}%`,
-                  }}
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${((currentIndex + 1) / questions.length) * 100}%` }}
                 />
               </div>
 
