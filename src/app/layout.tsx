@@ -24,6 +24,7 @@ export default function RootLayout({
               <Link href="/study?category=strategy" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Study</Link>
               <Link href="/games" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Games</Link>
               <Link href="/history" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">History</Link>
+              <Link href="/chizai" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">知財3級</Link>
               <Link href="/settings" className="rounded-full border border-[var(--card-border)] px-3 py-1.5 font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--card)]">Settings</Link>
             </nav>
           </div>

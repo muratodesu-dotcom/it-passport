@@ -209,6 +209,35 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="mb-12">
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="text-xl font-semibold">他の試験対策</h2>
+          <p className="text-sm text-[var(--muted)]">ITパスポート以外の検定にもチャレンジ。</p>
+        </div>
+        <Link
+          href="/chizai"
+          className="group block rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-all hover:shadow-lg hover:-translate-y-0.5"
+        >
+          <div className="flex items-start gap-4">
+            <span className="text-3xl">⚖️</span>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-bold text-lg group-hover:text-[var(--primary)]">
+                  知的財産管理技能検定 3級
+                </h3>
+                <span className="text-xs text-white px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-rose-500">
+                  NEW
+                </span>
+              </div>
+              <p className="text-sm text-[var(--muted)] mb-2">
+                特許・意匠・商標・著作権の基礎を一問一答で確認。サンプル問題から始められます。
+              </p>
+              <span className="text-sm font-medium text-[var(--primary)]">セクションへ →</span>
+            </div>
+          </div>
+        </Link>
+      </section>
+
       <section className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
         <div>
           <h2 className="text-xl font-semibold mb-2">履歴を見て、伸びを確認</h2>
