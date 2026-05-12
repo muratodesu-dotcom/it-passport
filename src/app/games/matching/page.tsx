@@ -117,12 +117,12 @@ export default function MatchingGame() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <div className="flex items-center gap-3 mb-6">
-        <Link href="/games" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">&larr; ゲーム一覧</Link>
+      <div className="mb-4">
+        <Link href="/games" className="text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">&larr; ゲーム一覧</Link>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2">用語マッチング</h1>
-      <p className="text-[var(--muted)] mb-6">左の用語と右の説明をクリックしてペアを見つけよう</p>
+      <h1 className="text-2xl font-bold mb-1">用語マッチング</h1>
+      <p className="text-sm text-[var(--muted)] mb-6">用語と説明をクリックでペアにしよう</p>
 
       {/* Category selector */}
       <div className="flex flex-wrap gap-2 mb-6">
@@ -130,7 +130,7 @@ export default function MatchingGame() {
           <button
             key={cat}
             onClick={() => { setCategory(cat); setGameStarted(false); setRound([]); }}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
               category === cat
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
@@ -142,10 +142,10 @@ export default function MatchingGame() {
       </div>
 
       {round.length === 0 && (
-        <div className="text-center py-16">
-          <div className="text-6xl mb-4">🔗</div>
-          <p className="text-lg mb-6 text-[var(--muted)]">
-            {pool.length}個の用語ペアから{Math.min(ROUND_SIZE, pool.length)}問を出題
+        <div className="text-center py-12">
+          <div className="text-5xl mb-4">🔗</div>
+          <p className="text-sm mb-6 text-[var(--muted)]">
+            {Math.min(ROUND_SIZE, pool.length)}ペアを出題（プール {pool.length}）
           </p>
           <button
             onClick={startNewRound}
@@ -158,37 +158,37 @@ export default function MatchingGame() {
 
       {round.length > 0 && !isComplete && (
         <>
-          <div className="flex items-center justify-between mb-4 text-sm text-[var(--muted)]">
-            <span>ラウンド {roundNum} — {matched.size}/{round.length} マッチ</span>
-            <span>{elapsed}秒</span>
+          <div className="flex items-center justify-between mb-3 text-sm text-[var(--muted)]">
+            <span>{matched.size}/{round.length} ペア</span>
+            <span className="tabular-nums">{elapsed}秒</span>
           </div>
-          <div className="w-full h-2 rounded-full bg-[var(--progress-bg)] mb-6">
+          <div className="w-full h-1.5 rounded-full bg-[var(--progress-bg)] mb-5">
             <div
               className="h-full rounded-full bg-[var(--primary)] transition-all duration-300"
               style={{ width: `${(matched.size / round.length) * 100}%` }}
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-3">
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-2">用語</p>
+              <p className="text-[0.65rem] font-semibold text-[var(--muted)] uppercase tracking-wider mb-1">用語</p>
               {items.terms.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleClick(item)}
-                  className={`w-full text-left rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all duration-200 ${getItemClass(item)}`}
+                  className={`w-full text-left rounded-xl border px-4 py-2.5 text-sm font-medium transition-all duration-200 ${getItemClass(item)}`}
                 >
                   {item.text}
                 </button>
               ))}
             </div>
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider mb-2">説明</p>
+              <p className="text-[0.65rem] font-semibold text-[var(--muted)] uppercase tracking-wider mb-1">説明</p>
               {items.descs.map((item) => (
                 <button
                   key={item.id}
                   onClick={() => handleClick(item)}
-                  className={`w-full text-left rounded-xl border-2 px-4 py-3 text-sm leading-relaxed transition-all duration-200 ${getItemClass(item)}`}
+                  className={`w-full text-left rounded-xl border px-4 py-2.5 text-sm leading-relaxed transition-all duration-200 ${getItemClass(item)}`}
                 >
                   {item.text}
                 </button>

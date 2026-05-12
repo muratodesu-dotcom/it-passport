@@ -183,27 +183,25 @@ export default function Home() {
       </section>
 
       <section className="mb-12">
-        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+        <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
           <h2 className="text-xl font-semibold">ゲームモードで楽しく学ぶ</h2>
           <Link href="/games" className="text-sm font-medium text-[var(--primary)]">すべて見る →</Link>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {[
-            { id: "matching", title: "用語マッチング", desc: "用語と説明をペアにしよう", icon: "🔗", color: "from-cyan-500 to-blue-600" },
-            { id: "flashcards", title: "フラッシュカード", desc: "めくって覚えて仕分けする", icon: "🃏", color: "from-violet-500 to-purple-600" },
-            { id: "speed", title: "スピードチャレンジ", desc: "60秒で何問解ける？", icon: "⚡", color: "from-orange-500 to-red-500" },
+            { id: "term-quiz", title: "用語クイズ", icon: "📝" },
+            { id: "memory", title: "メモリーマッチ", icon: "🧠" },
+            { id: "matching", title: "用語マッチング", icon: "🔗" },
+            { id: "flashcards", title: "フラッシュカード", icon: "🃏" },
+            { id: "speed", title: "スピードチャレンジ", icon: "⚡" },
           ].map((game) => (
             <Link
               key={game.id}
               href={`/games/${game.id}`}
-              className="group block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 transition-all hover:shadow-lg hover:-translate-y-0.5"
+              className="group flex flex-col items-center gap-2 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 text-center transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-2xl">{game.icon}</span>
-                <span className={`text-xs text-white px-2 py-0.5 rounded-full bg-gradient-to-r ${game.color}`}>NEW</span>
-              </div>
-              <h3 className="font-semibold mb-1 group-hover:text-[var(--primary)]">{game.title}</h3>
-              <p className="text-xs text-[var(--muted)]">{game.desc}</p>
+              <span className="text-3xl">{game.icon}</span>
+              <span className="text-sm font-medium leading-tight group-hover:text-[var(--primary)]">{game.title}</span>
             </Link>
           ))}
         </div>
