@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getHistory, clearHistory } from "@/lib/history";
-import { QuizResult, categoryLabels, Category, examLabels, Exam } from "@/lib/types";
+import { getHistory, clearHistory, getStudyStreak } from "@/lib/history";
+import { QuizResult, categoryLabels, Category, examLabels, Exam, categoryByExam } from "@/lib/types";
 import { useExam } from "@/lib/examContext";
+import { getQuestions } from "@/data";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -35,6 +37,39 @@ export default function HistoryPage() {
   const passRate = filtered.length > 0
     ? Math.round((filtered.filter((h) => h.passed).length / filtered.length) * 100)
     : 0;
+
+  const streak = useMemo(() => getStudyStreak(), [history]);
+  const examQuestions = useMemo(() => getQuestions(exam), [exam]);
+  const questionById = useMemo(() => new Map(examQuestions.map((q) => [q.id, q])), [examQuestions]);
+
+  const mastery = useMemo(() => {
+    const buckets = new Map<string, { correct: number; total: number }>();
+    // Initialize all categories so weak ones show as 0
+    categoryByExam[exam].forEach((c) => buckets.set(c, { correct: 0, total: 0 }));
+
+    for (const result of history) {
+      if (result.exam !== exam) continue;
+      if (!result.questionIds || !result.answers) continue;
+      result.questionIds.forEach((qid, i) => {
+        const q = questionById.get(qid);
+        if (!q) return;
+        const ans = result.answers![i];
+        if (ans === null || ans === undefined) return;
+        const b = buckets.get(q.category) ?? { correct: 0, total: 0 };
+        b.total += 1;
+        if (ans === q.correctIndex) b.correct += 1;
+        buckets.set(q.category, b);
+      });
+    }
+    return Array.from(buckets.entries()).map(([category, { correct, total }]) => ({
+      category,
+      correct,
+      total,
+      percentage: total > 0 ? Math.round((correct / total) * 100) : 0,
+    }));
+  }, [history, exam, questionById]);
+
+  const hasMasteryData = mastery.some((m) => m.total > 0);
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 fade-in">
@@ -81,7 +116,11 @@ export default function HistoryPage() {
       ) : (
         <>
           {/* Stats summary */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-4 text-center">
+              <p className="text-2xl font-bold text-orange-500">🔥 {streak.current}</p>
+              <p className="text-xs text-[var(--muted)]">連続学習日数</p>
+            </div>
             <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-4 text-center">
               <p className="text-2xl font-bold text-[var(--primary)]">{bestScore}%</p>
               <p className="text-xs text-[var(--muted)]">最高スコア</p>
@@ -95,6 +134,43 @@ export default function HistoryPage() {
               <p className="text-xs text-[var(--muted)]">合格率</p>
             </div>
           </div>
+
+          {/* Per-category mastery */}
+          {hasMasteryData && (
+            <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-5 mb-6 shadow-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-semibold">分野別正答率（{examLabels[exam]}）</h2>
+                <Link href="/review" className="text-xs text-[var(--primary)] font-medium">復習 →</Link>
+              </div>
+              <div className="space-y-2.5">
+                {mastery.map(({ category, correct, total, percentage }) => {
+                  const label = categoryLabels[category as Category] ?? category;
+                  const barColor =
+                    total === 0 ? "bg-[var(--card-border)]" :
+                    percentage >= 80 ? "bg-[var(--success)]" :
+                    percentage >= 60 ? "bg-[var(--primary)]" :
+                    percentage >= 40 ? "bg-orange-500" :
+                    "bg-[var(--danger)]";
+                  return (
+                    <div key={category}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium">{label}</span>
+                        <span className="text-[var(--muted)] tabular-nums">
+                          {total > 0 ? `${correct}/${total} (${percentage}%)` : "未挑戦"}
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[var(--progress-bg)] rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ${barColor}`}
+                          style={{ width: `${total > 0 ? percentage : 0}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* History list */}
           <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm">
