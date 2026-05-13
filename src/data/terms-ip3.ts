@@ -221,4 +221,25 @@ export const ip3TermPairs: RawTermPair[] = [
   { term: "ライセンスポリシー", english: "Licensing Policy", description: "企業が保有する知的財産の活用方針。クロスライセンス・パテントプール・標準必須特許等を含む", category: "treaty" },
   { term: "標準必須特許（SEP）", english: "Standard Essential Patent", description: "標準規格を実施するために不可避な特許。FRAND条件（公正・合理的・非差別的）でのライセンスが求められる", category: "treaty" },
   { term: "オープンソースライセンス", english: "Open Source License", description: "ソフトウェアのソースコードを公開し、一定条件下での自由な利用・改変・再配布を許諾するライセンス", category: "treaty" },
+
+  // ===== 追加: 手続詳細・著作権制限規定 =====
+  // --- 特許手続 ---
+  { term: "意見書", english: "Written Argument", description: "拒絶理由通知に対し、出願人が拒絶理由に反論する書面。補正書と共に提出されることが多い", category: "patent" },
+  { term: "審決取消訴訟", english: "Suit Against Trial Decision", description: "特許庁の審決に不服がある者が、知的財産高等裁判所に提起できる訴訟。審決の取消しを求める", category: "patent" },
+  { term: "特許庁長官", english: "Commissioner of JPO", description: "特許庁の長。特許・実用新案・意匠・商標の各登録手続を統括する", category: "patent" },
+  { term: "特許審判官", english: "Patent Trial Examiner", description: "特許庁の審判を担当する官吏。拒絶査定不服審判等を合議体で審理する", category: "patent" },
+  { term: "出願人", english: "Applicant", description: "特許等の出願を行う者。発明者と異なる場合もあり、複数人による共同出願も可能", category: "patent" },
+  // --- 著作権制限規定 ---
+  { term: "報道のための利用", english: "Use for News Reporting", description: "時事の事件の報道のため、当該事件を構成する著作物等を正当な範囲内で利用できる制限規定", category: "copyright" },
+  { term: "政治上の演説等の利用", english: "Use of Political Speech", description: "公開の場で行われた政治上の演説や陳述等は、原則として誰でも自由に利用できる", category: "copyright" },
+  { term: "美術品所有者による展示", english: "Owner's Exhibition", description: "美術または写真の著作物の原作品の所有者は、これを公に展示できる（一定例外あり）", category: "copyright" },
+  { term: "図書館等における複製", english: "Reproduction in Libraries", description: "国立国会図書館や政令で定める図書館等が、利用者の調査研究目的に応じて行う複製が認められる", category: "copyright" },
+  { term: "視覚障害者等のための利用", english: "Use for Visually Impaired", description: "視覚障害者等の福祉に関する事業等のために、著作物を点字化・音声化等して利用できる制限規定", category: "copyright" },
+  { term: "翻訳・翻案の自由", english: "Free Translation/Adaptation", description: "著作権制限規定により著作物を利用できる場合は、原則として翻訳・翻案して利用することもできる", category: "copyright" },
+  // --- 不競法・最新改正 ---
+  { term: "限定提供データ侵害", english: "Limited Shared Data Infringement", description: "限定提供データを不正手段で取得・使用・開示する行為。2018年改正で不正競争行為として追加", category: "unfair-competition" },
+  { term: "デジタル空間における模倣品", english: "Digital Imitation", description: "メタバース等デジタル空間での商品形態模倣も規制対象とする2023年改正の動向", category: "unfair-competition" },
+  // --- 改正・最新 ---
+  { term: "コンセント制度", english: "Consent System", description: "先行登録商標権者の同意があれば類似商標でも登録を認める制度。2024年改正で日本でも導入", category: "trademark" },
+  { term: "著作権法改正の流れ", english: "Copyright Law Trends", description: "保護期間70年化（2018）, 30条の4 (AI学習) 等のデジタル対応改正が継続的に行われている", category: "copyright" },
 ];
