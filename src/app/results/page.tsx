@@ -2,8 +2,9 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
-import { questions as allQuestions } from "@/data/questions";
+import { allQuestions } from "@/data";
 import { categoryLabels, Category } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 import { saveResult } from "@/lib/history";
 import ScoreRing from "@/components/ScoreRing";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -12,6 +13,7 @@ function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const saved = useRef(false);
+  const { exam } = useExam();
 
   const category = searchParams.get("category") || "all";
   const answersParam = searchParams.get("answers") || "";
@@ -47,6 +49,7 @@ function ResultsContent() {
     saveResult({
       id: Date.now().toString(),
       date: new Date().toISOString(),
+      exam,
       category,
       score: correctCount,
       total,
@@ -54,7 +57,7 @@ function ResultsContent() {
       timeSeconds: timeParam,
       passed,
     });
-  }, [category, correctCount, total, percentage, timeParam, passed]);
+  }, [exam, category, correctCount, total, percentage, timeParam, passed]);
 
   // Category breakdown
   const breakdown: Record<string, { correct: number; total: number }> = {};

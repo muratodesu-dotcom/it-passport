@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { termPairs, TermPair } from "@/data/terms";
-import { Category, categoryLabels } from "@/lib/types";
+import { getTermPairs } from "@/data";
+import { Category, categoryLabels, TermPair, categoryByExam } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 
 type Direction = "desc-to-term" | "term-to-desc";
 
@@ -35,6 +36,7 @@ function buildRoundFromTargets(targets: TermPair[], distractorPool: TermPair[]) 
 }
 
 export default function TermQuizGame() {
+  const { exam } = useExam();
   const [category, setCategory] = useState<Category | "all">("all");
   const [direction, setDirection] = useState<Direction>("desc-to-term");
   const [length, setLength] = useState(10);
@@ -47,10 +49,16 @@ export default function TermQuizGame() {
   const [missed, setMissed] = useState<TermPair[]>([]);
   const [gameState, setGameState] = useState<"idle" | "playing" | "done">("idle");
 
+  const allPairs = useMemo(() => getTermPairs(exam), [exam]);
   const pool = useMemo(
-    () => (category === "all" ? termPairs : termPairs.filter((t) => t.category === category)),
-    [category]
+    () => (category === "all" ? allPairs : allPairs.filter((t) => t.category === category)),
+    [category, allPairs]
   );
+
+  useEffect(() => {
+    setCategory("all");
+    setGameState("idle");
+  }, [exam]);
 
   const startGame = useCallback(() => {
     setRound(buildRound(pool, Math.min(length, pool.length)));
@@ -137,17 +145,17 @@ export default function TermQuizGame() {
           <div>
             <p className="text-xs text-[var(--muted)] mb-2">分野</p>
             <div className="flex flex-wrap gap-2">
-              {(["all", "strategy", "management", "technology"] as const).map((cat) => (
+              {(["all", ...categoryByExam[exam]] as const).map((cat) => (
                 <button
                   key={cat}
-                  onClick={() => setCategory(cat)}
+                  onClick={() => setCategory(cat as Category | "all")}
                   className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
                     category === cat
                       ? "bg-[var(--primary)] text-white"
                       : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
                   }`}
                 >
-                  {cat === "all" ? "全分野" : categoryLabels[cat]}
+                  {cat === "all" ? "全分野" : categoryLabels[cat as Category]}
                 </button>
               ))}
             </div>

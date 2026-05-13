@@ -2,13 +2,13 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense, useMemo, useRef, useCallback } from "react";
-import { getQuestionsByCategory } from "@/data/questions";
-import { termPairs } from "@/data/terms";
-import { categoryLabels, Category } from "@/lib/types";
+import { getQuestionsByCategory, allTermPairs } from "@/data";
+import { categoryLabels, Category, categoryByExam } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-const termLookup = new Map(termPairs.map((t) => [t.term, { description: t.description, english: t.english }]));
+const termLookup = new Map(allTermPairs.map((t) => [t.term, { description: t.description, english: t.english }]));
 
 function TermHighlighter({ text }: { text: string }) {
   const segments = useMemo(() => {
@@ -107,7 +107,7 @@ type DeepDiveModule = {
   finalCheck: string[];
 };
 
-const examTipMap: Record<Category, ExamTipSection[]> = {
+const examTipMap: Partial<Record<Category, ExamTipSection[]>> = {
   strategy: [
     {
       title: "頻出キーワードのつながり",
@@ -188,7 +188,7 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
   ],
 };
 
-const lessonBlocksMap: Record<Category, LessonBlock[]> = {
+const lessonBlocksMap: Partial<Record<Category, LessonBlock[]>> = {
   strategy: [
     {
       title: "経営戦略の基本フレーム",
@@ -821,7 +821,7 @@ const lessonBlocksMap: Record<Category, LessonBlock[]> = {
   ],
 };
 
-const coverageFocusMap: Record<Category, CoverageFocus[]> = {
+const coverageFocusMap: Partial<Record<Category, CoverageFocus[]>> = {
   strategy: [
     {
       title: "会計・指標の計算問題",
@@ -911,7 +911,7 @@ const coverageFocusMap: Record<Category, CoverageFocus[]> = {
   ],
 };
 
-const readinessAuditMap: Record<Category, ReadinessAudit[]> = {
+const readinessAuditMap: Partial<Record<Category, ReadinessAudit[]>> = {
   strategy: [
     {
       area: "経営戦略とフレームワーク",
@@ -1037,7 +1037,7 @@ const readinessAuditMap: Record<Category, ReadinessAudit[]> = {
   ],
 };
 
-const deepDiveModulesMap: Record<Category, DeepDiveModule[]> = {
+const deepDiveModulesMap: Partial<Record<Category, DeepDiveModule[]>> = {
   strategy: [
     {
       title: "会計指標を一気につなぐ",
@@ -1172,7 +1172,7 @@ const deepDiveModulesMap: Record<Category, DeepDiveModule[]> = {
   ],
 };
 
-const questionCoachingMap: Record<Category, QuestionCoaching[]> = {
+const questionCoachingMap: Partial<Record<Category, QuestionCoaching[]>> = {
   strategy: [
     { takeaway: "経営理念は数値目標ではなく、企業の存在意義を示す言葉です。", trap: "売上目標や制度の説明が出たら、理念ではなく個別施策の可能性があります。", checkpoint: "その選択肢は『なぜその会社が存在するか』に答えているかを確認しましょう。" },
     { takeaway: "SWOTのSはStrengthで、内部環境の強みを指します。", trap: "StrategyやSystemのような英単語の印象に引っぱられないことが大切です。", checkpoint: "4語を順番に口に出して言えるか確認しましょう。" },
@@ -1212,9 +1212,12 @@ const commonExamTips = [
 function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const category = searchParams.get("category") || "strategy";
+  const { exam } = useExam();
+  const validCategories = categoryByExam[exam];
+  const rawCategory = searchParams.get("category") || validCategories[0];
+  const category = (validCategories as string[]).includes(rawCategory) ? rawCategory : validCategories[0];
 
-  const questions = useMemo(() => getQuestionsByCategory(category), [category]);
+  const questions = useMemo(() => getQuestionsByCategory(exam, category), [exam, category]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [doomScrollMode, setDoomScrollMode] = useState(true);

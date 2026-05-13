@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { termPairs, TermPair } from "@/data/terms";
-import { Category, categoryLabels } from "@/lib/types";
+import { getTermPairs } from "@/data";
+import { Category, categoryLabels, TermPair, categoryByExam } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 
 type MatchItem = {
   id: string;
@@ -28,6 +29,7 @@ function pickRound(pool: TermPair[], count: number): TermPair[] {
 const ROUND_SIZE = 6;
 
 export default function MatchingGame() {
+  const { exam } = useExam();
   const [category, setCategory] = useState<Category | "all">("all");
   const [round, setRound] = useState<TermPair[]>([]);
   const [items, setItems] = useState<{ terms: MatchItem[]; descs: MatchItem[] }>({ terms: [], descs: [] });
@@ -41,7 +43,17 @@ export default function MatchingGame() {
   const [startTime, setStartTime] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
-  const pool = category === "all" ? termPairs : termPairs.filter((t) => t.category === category);
+  const allPairs = useMemo(() => getTermPairs(exam), [exam]);
+  const pool = useMemo(
+    () => (category === "all" ? allPairs : allPairs.filter((t) => t.category === category)),
+    [category, allPairs]
+  );
+
+  useEffect(() => {
+    setCategory("all");
+    setRound([]);
+    setGameStarted(false);
+  }, [exam]);
 
   const startNewRound = useCallback(() => {
     const picked = pickRound(pool, Math.min(ROUND_SIZE, pool.length));
@@ -126,17 +138,17 @@ export default function MatchingGame() {
 
       {/* Category selector */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {(["all", "strategy", "management", "technology"] as const).map((cat) => (
+        {(["all", ...categoryByExam[exam]] as const).map((cat) => (
           <button
             key={cat}
-            onClick={() => { setCategory(cat); setGameStarted(false); setRound([]); }}
+            onClick={() => { setCategory(cat as Category | "all"); setGameStarted(false); setRound([]); }}
             className={`rounded-full px-3.5 py-1.5 text-sm transition-colors ${
               category === cat
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
-            {cat === "all" ? "全分野" : categoryLabels[cat]}
+            {cat === "all" ? "全分野" : categoryLabels[cat as Category]}
           </button>
         ))}
       </div>

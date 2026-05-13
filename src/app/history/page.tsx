@@ -1,31 +1,39 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { getHistory, clearHistory } from "@/lib/history";
-import { QuizResult, categoryLabels, Category } from "@/lib/types";
+import { QuizResult, categoryLabels, Category, examLabels, Exam } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 
 export default function HistoryPage() {
   const router = useRouter();
+  const { exam } = useExam();
   const [history, setHistory] = useState<QuizResult[]>([]);
+  const [showAllExams, setShowAllExams] = useState(false);
 
   useEffect(() => {
     setHistory(getHistory());
   }, []);
+
+  const filtered = useMemo(
+    () => (showAllExams ? history : history.filter((h) => !h.exam || h.exam === exam)),
+    [history, showAllExams, exam]
+  );
 
   const handleClear = () => {
     clearHistory();
     setHistory([]);
   };
 
-  const bestScore = history.length > 0
-    ? Math.max(...history.map((h) => h.percentage))
+  const bestScore = filtered.length > 0
+    ? Math.max(...filtered.map((h) => h.percentage))
     : 0;
-  const avgScore = history.length > 0
-    ? Math.round(history.reduce((s, h) => s + h.percentage, 0) / history.length)
+  const avgScore = filtered.length > 0
+    ? Math.round(filtered.reduce((s, h) => s + h.percentage, 0) / filtered.length)
     : 0;
-  const passRate = history.length > 0
-    ? Math.round((history.filter((h) => h.passed).length / history.length) * 100)
+  const passRate = filtered.length > 0
+    ? Math.round((filtered.filter((h) => h.passed).length / filtered.length) * 100)
     : 0;
 
   return (
@@ -41,7 +49,22 @@ export default function HistoryPage() {
         <div className="w-12" />
       </div>
 
-      {history.length === 0 ? (
+      <div className="mb-4 flex items-center gap-2">
+        <button
+          onClick={() => setShowAllExams(false)}
+          className={`rounded-full px-3 py-1 text-xs transition-colors ${!showAllExams ? "bg-[var(--primary)] text-white" : "bg-[var(--badge-bg)] text-[var(--muted)]"}`}
+        >
+          {examLabels[exam]}のみ
+        </button>
+        <button
+          onClick={() => setShowAllExams(true)}
+          className={`rounded-full px-3 py-1 text-xs transition-colors ${showAllExams ? "bg-[var(--primary)] text-white" : "bg-[var(--badge-bg)] text-[var(--muted)]"}`}
+        >
+          すべて
+        </button>
+      </div>
+
+      {filtered.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-4">📊</p>
           <p className="text-lg font-medium mb-2">まだ履歴がありません</p>
@@ -75,9 +98,9 @@ export default function HistoryPage() {
 
           {/* History list */}
           <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm">
-            <h2 className="font-semibold mb-4">過去の結果（最新{history.length}件）</h2>
+            <h2 className="font-semibold mb-4">過去の結果（最新{filtered.length}件）</h2>
             <div className="space-y-3">
-              {history.map((result) => {
+              {filtered.map((result) => {
                 const catLabel = result.category === "all"
                   ? "全分野"
                   : categoryLabels[result.category as Category] || result.category;
@@ -85,16 +108,22 @@ export default function HistoryPage() {
                 const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, "0")}`;
                 const mins = Math.floor(result.timeSeconds / 60);
                 const secs = result.timeSeconds % 60;
+                const resultExam = result.exam as Exam | undefined;
 
                 return (
                   <div
                     key={result.id}
                     className={`p-3 rounded-lg border ${result.passed ? "border-[var(--success-border)] bg-[var(--success-bg)]" : "border-[var(--danger-border)] bg-[var(--danger-bg)]"}`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {showAllExams && resultExam && (
+                          <span className="rounded-full bg-[var(--badge-bg)] px-2 py-0.5 text-[0.65rem] text-[var(--muted)]">
+                            {examLabels[resultExam]}
+                          </span>
+                        )}
                         <span className="font-medium text-sm">{catLabel}</span>
-                        <span className="text-xs text-[var(--muted)] ml-2">{dateStr}</span>
+                        <span className="text-xs text-[var(--muted)]">{dateStr}</span>
                       </div>
                       <div className="text-right">
                         <span className={`font-bold ${result.passed ? "text-[var(--success)]" : "text-[var(--danger)]"}`}>

@@ -1,13 +1,6 @@
-import { Category } from "@/lib/types";
+import { RawTermPair } from "@/lib/types";
 
-export interface TermPair {
-  term: string;
-  english: string;
-  description: string;
-  category: Category;
-}
-
-export const termPairs: TermPair[] = [
+export const termPairs: RawTermPair[] = [
   // ===== ストラテジ系 =====
   { term: "経営理念", english: "Management Philosophy", description: "企業が目指す将来像や存在意義を示したもの", category: "strategy" },
   { term: "SWOT分析", english: "SWOT Analysis", description: "強み・弱み・機会・脅威で内部/外部環境を分析する手法", category: "strategy" },

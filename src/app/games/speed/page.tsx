@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import Link from "next/link";
-import { questions } from "@/data/questions";
-import { Category, categoryLabels } from "@/lib/types";
-import { Question } from "@/lib/types";
+import { getQuestions } from "@/data";
+import { Category, categoryLabels, Question, categoryByExam } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -18,6 +18,7 @@ function shuffle<T>(arr: T[]): T[] {
 const TIME_LIMIT = 60;
 
 export default function SpeedChallenge() {
+  const { exam } = useExam();
   const [category, setCategory] = useState<Category | "all">("all");
   const [pool, setPool] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
@@ -31,8 +32,14 @@ export default function SpeedChallenge() {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const filteredPool = category === "all" ? questions : questions.filter((q) => q.category === category);
+  const allQs = useMemo(() => getQuestions(exam), [exam]);
+  const filteredPool = category === "all" ? allQs : allQs.filter((q) => q.category === category);
   const current = pool[index];
+
+  useEffect(() => {
+    setCategory("all");
+    setGameState("idle");
+  }, [exam]);
 
   const startGame = useCallback(() => {
     setPool(shuffle(filteredPool));
@@ -118,17 +125,17 @@ export default function SpeedChallenge() {
 
       {/* Category selector */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {(["all", "strategy", "management", "technology"] as const).map((cat) => (
+        {(["all", ...categoryByExam[exam]] as const).map((cat) => (
           <button
             key={cat}
-            onClick={() => { setCategory(cat); if (gameState !== "playing") setGameState("idle"); }}
+            onClick={() => { setCategory(cat as Category | "all"); if (gameState !== "playing") setGameState("idle"); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               category === cat
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
-            {cat === "all" ? "全分野" : categoryLabels[cat]}
+            {cat === "all" ? "全分野" : categoryLabels[cat as Category]}
           </button>
         ))}
       </div>

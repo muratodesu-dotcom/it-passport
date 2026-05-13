@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
-import { termPairs } from "@/data/terms";
-import { Category, categoryLabels } from "@/lib/types";
+import { getTermPairs } from "@/data";
+import { Category, categoryLabels, categoryByExam } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -15,8 +16,10 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function FlashcardsGame() {
+  const { exam } = useExam();
   const [category, setCategory] = useState<Category | "all">("all");
-  const [cards, setCards] = useState(shuffle(termPairs));
+  const allPairs = useMemo(() => getTermPairs(exam), [exam]);
+  const [cards, setCards] = useState(() => shuffle(allPairs));
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<Set<number>>(new Set());
@@ -24,7 +27,13 @@ export default function FlashcardsGame() {
   const [gameStarted, setGameStarted] = useState(false);
   const [showFront, setShowFront] = useState<"term" | "description">("term");
 
-  const pool = category === "all" ? termPairs : termPairs.filter((t) => t.category === category);
+  const pool = category === "all" ? allPairs : allPairs.filter((t) => t.category === category);
+
+  useEffect(() => {
+    setCategory("all");
+    setGameStarted(false);
+    setCards(shuffle(allPairs));
+  }, [exam, allPairs]);
 
   const startGame = useCallback(() => {
     const shuffled = shuffle(pool);
@@ -84,17 +93,17 @@ export default function FlashcardsGame() {
 
       {/* Settings */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {(["all", "strategy", "management", "technology"] as const).map((cat) => (
+        {(["all", ...categoryByExam[exam]] as const).map((cat) => (
           <button
             key={cat}
-            onClick={() => { setCategory(cat); setGameStarted(false); }}
+            onClick={() => { setCategory(cat as Category | "all"); setGameStarted(false); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               category === cat
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
-            {cat === "all" ? "全分野" : categoryLabels[cat]}
+            {cat === "all" ? "全分野" : categoryLabels[cat as Category]}
           </button>
         ))}
       </div>
@@ -145,11 +154,7 @@ export default function FlashcardsGame() {
             >
               {/* Front */}
               <div className={`absolute inset-0 rounded-2xl border-2 border-[var(--card-border)] bg-[var(--card)] p-8 flex flex-col items-center justify-center text-center backface-hidden shadow-lg ${flipped ? "invisible" : ""}`}>
-                <span className={`inline-block rounded-full px-3 py-1 text-xs mb-4 ${
-                  current.category === "strategy" ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" :
-                  current.category === "management" ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" :
-                  "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                }`}>
+                <span className="inline-block rounded-full bg-[var(--badge-bg)] px-3 py-1 text-xs mb-4 text-[var(--muted)]">
                   {categoryLabels[current.category]}
                 </span>
                 <p className="text-xl font-bold leading-relaxed">

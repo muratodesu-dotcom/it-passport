@@ -2,14 +2,17 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense } from "react";
-import { getQuestionsByCategory, shuffleQuestions } from "@/data/questions";
+import { getQuestionsByCategory } from "@/data";
+import { shuffleQuestions } from "@/data/questions";
 import { Question, categoryLabels, Category } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 function QuizContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = searchParams.get("category") || "all";
+  const { exam } = useExam();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,7 +23,7 @@ function QuizContent() {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
-    const qs = shuffleQuestions(getQuestionsByCategory(category));
+    const qs = shuffleQuestions(getQuestionsByCategory(exam, category));
     const nextStartTime = Date.now();
 
     setQuestions(qs);
@@ -30,7 +33,7 @@ function QuizContent() {
     setAnswers(new Array(qs.length).fill(null));
     setStartTime(nextStartTime);
     setElapsed(0);
-  }, [category]);
+  }, [category, exam]);
 
   // Live timer
   useEffect(() => {
