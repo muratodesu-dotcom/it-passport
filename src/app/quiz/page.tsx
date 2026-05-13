@@ -2,14 +2,19 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense } from "react";
-import { getQuestionsByCategory, shuffleQuestions } from "@/data/questions";
+import { getQuestionsByCategory } from "@/data";
+import { shuffleQuestions } from "@/data/questions";
 import { Question, categoryLabels, Category } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 function QuizContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = searchParams.get("category") || "all";
+  const lengthParam = searchParams.get("length");
+  const requestedLength = lengthParam === "all" ? null : (parseInt(lengthParam ?? "20", 10) || 20);
+  const { exam } = useExam();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -20,7 +25,8 @@ function QuizContent() {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
-    const qs = shuffleQuestions(getQuestionsByCategory(category));
+    const pool = shuffleQuestions(getQuestionsByCategory(exam, category));
+    const qs = requestedLength === null ? pool : pool.slice(0, Math.min(requestedLength, pool.length));
     const nextStartTime = Date.now();
 
     setQuestions(qs);
@@ -30,7 +36,13 @@ function QuizContent() {
     setAnswers(new Array(qs.length).fill(null));
     setStartTime(nextStartTime);
     setElapsed(0);
-  }, [category]);
+  }, [category, exam, requestedLength]);
+
+  const setLength = (n: number | "all") => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("length", n === "all" ? "all" : String(n));
+    router.replace(`/quiz?${params.toString()}`);
+  };
 
   // Live timer
   useEffect(() => {
@@ -63,15 +75,17 @@ function QuizContent() {
       setShowExplanation(false);
     } else {
       const totalTime = Math.floor((Date.now() - startTime) / 1000);
+      const finalAnswers = [...answers];
+      finalAnswers[currentIndex] = selectedAnswer;
       const params = new URLSearchParams({
         category,
-        answers: answers.join(","),
+        answers: finalAnswers.join(","),
         questions: questions.map((q) => q.id).join(","),
         time: totalTime.toString(),
       });
       router.push(`/results?${params.toString()}`);
     }
-  }, [currentIndex, questions, answers, category, startTime, router]);
+  }, [currentIndex, questions, answers, selectedAnswer, category, startTime, router]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -142,6 +156,30 @@ function QuizContent() {
         </div>
       </div>
 
+      {/* Length picker - only before first answer */}
+      {currentIndex === 0 && selectedAnswer === null && !showExplanation && (
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          <span className="text-xs text-[var(--muted)]">問題数:</span>
+          {([10, 20, 30, "all"] as const).map((n) => {
+            const isActive = n === "all" ? requestedLength === null : requestedLength === n;
+            const display = n === "all" ? "すべて" : `${n}問`;
+            return (
+              <button
+                key={n}
+                onClick={() => setLength(n)}
+                className={`rounded-full px-3 py-1 text-xs transition-colors ${
+                  isActive
+                    ? "bg-[var(--primary)] text-white"
+                    : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
+                }`}
+              >
+                {display}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* Progress bar */}
       <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
         <div
@@ -196,7 +234,7 @@ function QuizContent() {
               </span>
               {option}
               {!showExplanation && (
-                <span className="float-right text-xs text-[var(--muted)] mt-1">
+                <span className="float-right text-xs text-[var(--muted)] mt-1 hidden md:inline">
                   {index + 1}
                 </span>
               )}
@@ -207,7 +245,7 @@ function QuizContent() {
 
       {/* Keyboard hint */}
       {!showExplanation && (
-        <p className="text-center text-xs text-[var(--muted)] mb-4">
+        <p className="hidden md:block text-center text-xs text-[var(--muted)] mb-4">
           キーボード: 1〜4で選択
         </p>
       )}
@@ -233,7 +271,7 @@ function QuizContent() {
           className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors fade-in"
         >
           {currentIndex < questions.length - 1 ? "次の問題へ →" : "結果を見る →"}
-          <span className="text-xs opacity-60 ml-2">(Enter)</span>
+          <span className="hidden md:inline text-xs opacity-60 ml-2">(Enter)</span>
         </button>
       )}
     </div>

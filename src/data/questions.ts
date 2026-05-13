@@ -1,6 +1,6 @@
-import { Question } from "@/lib/types";
+import { RawQuestion } from "@/lib/types";
 
-export const questions: Question[] = [
+export const questions: RawQuestion[] = [
   // ===== ストラテジ系 (Strategy) =====
   {
     id: 1,
@@ -4319,12 +4319,7 @@ export const questions: Question[] = [
 
 ];
 
-export function getQuestionsByCategory(category: string): Question[] {
-  if (category === "all") return questions;
-  return questions.filter((q) => q.category === category);
-}
-
-export function shuffleQuestions(qs: Question[]): Question[] {
+export function shuffleQuestions<T>(qs: T[]): T[] {
   const shuffled = [...qs];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

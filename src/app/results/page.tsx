@@ -1,9 +1,10 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef } from "react";
-import { questions as allQuestions } from "@/data/questions";
+import { Suspense, useEffect, useMemo, useRef } from "react";
+import { getQuestions } from "@/data";
 import { categoryLabels, Category } from "@/lib/types";
+import { useExam } from "@/lib/examContext";
 import { saveResult } from "@/lib/history";
 import ScoreRing from "@/components/ScoreRing";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -12,6 +13,7 @@ function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const saved = useRef(false);
+  const { exam } = useExam();
 
   const category = searchParams.get("category") || "all";
   const answersParam = searchParams.get("answers") || "";
@@ -20,8 +22,9 @@ function ResultsContent() {
 
   const answerList = answersParam ? answersParam.split(",").map((value) => Number.parseInt(value, 10)) : [];
   const questionIds = questionsParam ? questionsParam.split(",").map((value) => Number.parseInt(value, 10)).filter((value) => Number.isFinite(value)) : [];
+  const examQuestions = useMemo(() => getQuestions(exam), [exam]);
   const questions = questionIds
-    .map((id) => allQuestions.find((q) => q.id === id))
+    .map((id) => examQuestions.find((q) => q.id === id))
     .filter(Boolean);
 
   const correctCount = questions.reduce((count, q, i) => {
@@ -47,14 +50,17 @@ function ResultsContent() {
     saveResult({
       id: Date.now().toString(),
       date: new Date().toISOString(),
+      exam,
       category,
       score: correctCount,
       total,
       percentage,
       timeSeconds: timeParam,
       passed,
+      questionIds: questionIds,
+      answers: answerList,
     });
-  }, [category, correctCount, total, percentage, timeParam, passed]);
+  }, [exam, category, correctCount, total, percentage, timeParam, passed, questionIds, answerList]);
 
   // Category breakdown
   const breakdown: Record<string, { correct: number; total: number }> = {};
