@@ -1,13 +1,32 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import ThemeSelector from "@/components/ThemeSelector";
 import ExamSelector from "@/components/ExamSelector";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { ExamProvider } from "@/lib/examContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "資格学習アプリ — ITパスポート / 知財3級",
   description: "ITパスポート試験と知的財産管理技能検定3級に対応した学習・クイズアプリ",
+  applicationName: "資格学習",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "資格学習",
+  },
+  icons: {
+    apple: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#2563eb" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f172a" },
+  ],
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -18,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <body className="min-h-screen">
+        <ServiceWorkerRegister />
         <ExamProvider>
           <ThemeSelector />
           <div className="sticky top-0 z-40 border-b border-[var(--card-border)] bg-[color:color-mix(in_srgb,var(--background)_88%,transparent)] backdrop-blur">
