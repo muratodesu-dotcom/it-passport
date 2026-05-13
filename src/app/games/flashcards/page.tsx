@@ -160,7 +160,7 @@ export default function FlashcardsGame() {
                 <p className="text-xl font-bold leading-relaxed">
                   {showFront === "term" ? current.term : current.description}
                 </p>
-                <p className="mt-4 text-xs text-[var(--muted)]">クリックでめくる（Space/Enter）</p>
+                <p className="mt-4 text-xs text-[var(--muted)]">タップで<span className="hidden md:inline">、または Space/Enter で</span>めくる</p>
               </div>
 
               {/* Back */}
@@ -180,13 +180,13 @@ export default function FlashcardsGame() {
                 onClick={() => handleMark("unknown")}
                 className="flex-1 max-w-[200px] rounded-xl border-2 border-[var(--danger-border)] bg-[var(--danger-bg)] px-6 py-3 font-medium text-[var(--danger)] transition-all hover:-translate-y-0.5"
               >
-                もう一度 (&larr;)
+                もう一度<span className="hidden md:inline"> (&larr;)</span>
               </button>
               <button
                 onClick={() => handleMark("known")}
                 className="flex-1 max-w-[200px] rounded-xl border-2 border-[var(--success-border)] bg-[var(--success-bg)] px-6 py-3 font-medium text-[var(--success)] transition-all hover:-translate-y-0.5"
               >
-                覚えた (&rarr;)
+                覚えた<span className="hidden md:inline"> (&rarr;)</span>
               </button>
             </div>
           )}

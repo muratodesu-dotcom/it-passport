@@ -192,7 +192,7 @@ export default function MemoryGame() {
             />
           </div>
 
-          <div className={`grid ${gridCols} gap-2 sm:gap-3`}>
+          <div className={`grid ${gridCols} gap-1.5 sm:gap-3`}>
             {cards.map((card) => {
               const isFlipped = flipped.includes(card.id) || matched.has(card.pairId) || peeking;
               const isMatched = matched.has(card.pairId);
@@ -201,7 +201,7 @@ export default function MemoryGame() {
                   key={card.id}
                   onClick={() => handleClick(card)}
                   disabled={isMatched || peeking}
-                  className={`relative aspect-[3/4] rounded-xl border transition-all duration-200 text-xs sm:text-sm leading-tight ${
+                  className={`relative aspect-[3/4] rounded-lg sm:rounded-xl border transition-all duration-200 text-[0.65rem] leading-snug sm:text-sm sm:leading-tight ${
                     isFlipped
                       ? isMatched
                         ? "border-[var(--success-border)] bg-[var(--success-bg)] opacity-70"
@@ -210,18 +210,18 @@ export default function MemoryGame() {
                   }`}
                 >
                   {isFlipped ? (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-2 text-center overflow-hidden">
-                      <span className={`absolute top-1 left-1 text-[0.55rem] uppercase tracking-wider font-semibold ${
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-1.5 sm:p-2 text-center overflow-hidden">
+                      <span className={`absolute top-0.5 left-1 text-[0.5rem] sm:text-[0.55rem] uppercase tracking-wider font-semibold ${
                         card.type === "term" ? "text-[var(--primary)]" : "text-[var(--muted)]"
                       }`}>
                         {card.type === "term" ? "用語" : "説明"}
                       </span>
-                      <span className={`${card.type === "term" ? "font-bold" : "font-normal"} line-clamp-5`}>
+                      <span className={`${card.type === "term" ? "font-bold" : "font-normal"} line-clamp-5 sm:line-clamp-6`}>
                         {card.text}
                       </span>
                     </div>
                   ) : (
-                    <span className="absolute inset-0 flex items-center justify-center text-2xl opacity-30">?</span>
+                    <span className="absolute inset-0 flex items-center justify-center text-xl sm:text-2xl opacity-30">?</span>
                   )}
                 </button>
               );

@@ -234,7 +234,7 @@ function QuizContent() {
               </span>
               {option}
               {!showExplanation && (
-                <span className="float-right text-xs text-[var(--muted)] mt-1">
+                <span className="float-right text-xs text-[var(--muted)] mt-1 hidden md:inline">
                   {index + 1}
                 </span>
               )}
@@ -245,7 +245,7 @@ function QuizContent() {
 
       {/* Keyboard hint */}
       {!showExplanation && (
-        <p className="text-center text-xs text-[var(--muted)] mb-4">
+        <p className="hidden md:block text-center text-xs text-[var(--muted)] mb-4">
           キーボード: 1〜4で選択
         </p>
       )}
@@ -271,7 +271,7 @@ function QuizContent() {
           className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors fade-in"
         >
           {currentIndex < questions.length - 1 ? "次の問題へ →" : "結果を見る →"}
-          <span className="text-xs opacity-60 ml-2">(Enter)</span>
+          <span className="hidden md:inline text-xs opacity-60 ml-2">(Enter)</span>
         </button>
       )}
     </div>

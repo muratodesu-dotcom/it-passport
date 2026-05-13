@@ -144,7 +144,7 @@ export default function SpeedChallenge() {
         <div className="text-center py-16">
           <div className="text-6xl mb-4">⚡</div>
           <p className="text-lg mb-2 text-[var(--muted)]">60秒間のスピードクイズ</p>
-          <p className="text-sm mb-6 text-[var(--muted)]">キーボード(1-4)で素早く回答できます</p>
+          <p className="hidden md:block text-sm mb-6 text-[var(--muted)]">キーボード(1-4)で素早く回答できます</p>
           <button
             onClick={startGame}
             className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"

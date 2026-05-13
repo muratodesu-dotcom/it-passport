@@ -209,7 +209,7 @@ export default function TermQuizGame() {
             >
               スタート
             </button>
-            <p className="mt-3 text-xs text-[var(--muted)]">数字キー 1-4 で素早く回答、スペース/Enter で次へ</p>
+            <p className="hidden md:block mt-3 text-xs text-[var(--muted)]">数字キー 1-4 で素早く回答、スペース/Enter で次へ</p>
           </div>
         </div>
       )}
