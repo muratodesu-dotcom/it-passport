@@ -1,8 +1,8 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef } from "react";
-import { allQuestions } from "@/data";
+import { Suspense, useEffect, useMemo, useRef } from "react";
+import { getQuestions } from "@/data";
 import { categoryLabels, Category } from "@/lib/types";
 import { useExam } from "@/lib/examContext";
 import { saveResult } from "@/lib/history";
@@ -22,8 +22,9 @@ function ResultsContent() {
 
   const answerList = answersParam ? answersParam.split(",").map((value) => Number.parseInt(value, 10)) : [];
   const questionIds = questionsParam ? questionsParam.split(",").map((value) => Number.parseInt(value, 10)).filter((value) => Number.isFinite(value)) : [];
+  const examQuestions = useMemo(() => getQuestions(exam), [exam]);
   const questions = questionIds
-    .map((id) => allQuestions.find((q) => q.id === id))
+    .map((id) => examQuestions.find((q) => q.id === id))
     .filter(Boolean);
 
   const correctCount = questions.reduce((count, q, i) => {
