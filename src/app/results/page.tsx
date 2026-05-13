@@ -57,8 +57,10 @@ function ResultsContent() {
       percentage,
       timeSeconds: timeParam,
       passed,
+      questionIds: questionIds,
+      answers: answerList,
     });
-  }, [exam, category, correctCount, total, percentage, timeParam, passed]);
+  }, [exam, category, correctCount, total, percentage, timeParam, passed, questionIds, answerList]);
 
   // Category breakdown
   const breakdown: Record<string, { correct: number; total: number }> = {};

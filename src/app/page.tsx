@@ -96,6 +96,12 @@ export default function Home() {
                 まずは総合クイズへ
               </Link>
               <Link
+                href="/review"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+              >
+                🎯 間違えた問題を復習
+              </Link>
+              <Link
                 href={`/study?category=${firstCategory}`}
                 className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >

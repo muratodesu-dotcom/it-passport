@@ -44,6 +44,9 @@ export interface QuizResult {
   percentage: number;
   timeSeconds: number;
   passed: boolean;
+  // Per-question outcomes; older entries may not have these.
+  questionIds?: number[];
+  answers?: (number | null)[];
 }
 
 export const examLabels: Record<Exam, string> = {
