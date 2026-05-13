@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useExam } from "@/lib/examContext";
 import { getQuestions } from "@/data";
-import { categoryByExam, categoryLabels, examLongLabels } from "@/lib/types";
+import { categoryByExam, categoryLabels, examLongLabels, Category } from "@/lib/types";
+import { getHistory, getStudyStreak } from "@/lib/history";
 
 const categoryIcons: Record<string, string> = {
   strategy: "💼",
@@ -44,8 +45,50 @@ const categoryDescriptions: Record<string, string> = {
 
 export default function Home() {
   const { exam } = useExam();
+  const [history, setHistory] = useState<ReturnType<typeof getHistory>>([]);
+  const [streak, setStreak] = useState({ current: 0, longest: 0, lastStudyDate: null as string | null });
+
+  useEffect(() => {
+    setHistory(getHistory());
+    setStreak(getStudyStreak());
+  }, []);
 
   const questions = useMemo(() => getQuestions(exam), [exam]);
+  const questionById = useMemo(() => new Map(questions.map((q) => [q.id, q])), [questions]);
+
+  // Determine the weakest category for today's recommended drill
+  const todayTarget = useMemo(() => {
+    const buckets = new Map<Category, { correct: number; total: number }>();
+    categoryByExam[exam].forEach((c) => buckets.set(c, { correct: 0, total: 0 }));
+    for (const result of history) {
+      if (result.exam !== exam) continue;
+      if (!result.questionIds || !result.answers) continue;
+      result.questionIds.forEach((qid, i) => {
+        const q = questionById.get(qid);
+        if (!q) return;
+        const ans = result.answers![i];
+        if (ans === null || ans === undefined) return;
+        const b = buckets.get(q.category as Category)!;
+        b.total += 1;
+        if (ans === q.correctIndex) b.correct += 1;
+      });
+    }
+    let weakestCat: Category | null = null;
+    let weakestScore = 101;
+    let hasAnyData = false;
+    buckets.forEach((b, cat) => {
+      if (b.total === 0) return;
+      hasAnyData = true;
+      const pct = (b.correct / b.total) * 100;
+      if (pct < weakestScore) {
+        weakestScore = pct;
+        weakestCat = cat;
+      }
+    });
+    // If no data yet, pick the first category as a starting point
+    if (!hasAnyData) return { category: categoryByExam[exam][0], reason: "first" as const, percentage: null };
+    return { category: weakestCat!, reason: "weakest" as const, percentage: Math.round(weakestScore) };
+  }, [history, exam, questionById]);
   const categories = useMemo(() => {
     const cats = categoryByExam[exam];
     return [
@@ -88,12 +131,37 @@ export default function Home() {
               分野別クイズ・解説付き学習・ゲームモード・履歴トラッキングを搭載。試験はナビゲーション右上から切り替えできます。
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            {/* Today's recommendation */}
+            <div className="mt-6 rounded-xl border border-[var(--card-border)] bg-[var(--badge-bg)] p-4 mb-4">
+              <div className="flex items-start justify-between gap-3 flex-wrap">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    {streak.current > 0 && (
+                      <span className="text-sm font-bold text-orange-500">🔥 {streak.current}日連続</span>
+                    )}
+                    <span className="text-xs font-semibold text-[var(--muted)] uppercase tracking-wider">今日の20問</span>
+                  </div>
+                  <p className="text-sm leading-relaxed">
+                    {todayTarget.reason === "first"
+                      ? "まずは「" + categoryLabels[todayTarget.category] + "」から始めてみましょう。"
+                      : `現在の弱点分野「${categoryLabels[todayTarget.category]}」（${todayTarget.percentage}%）を補強しましょう。`}
+                  </p>
+                </div>
+                <Link
+                  href={`/quiz?category=${todayTarget.category}&length=20`}
+                  className="rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)] whitespace-nowrap"
+                >
+                  挑戦する →
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
               <Link
-                href="/quiz?category=all"
+                href="/quiz?category=all&length=20"
                 className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
               >
-                まずは総合クイズへ
+                総合クイズ（20問）
               </Link>
               <Link
                 href="/review"
