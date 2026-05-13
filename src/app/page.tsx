@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { questions } from "@/data/questions";
+import StudyPulse from "@/components/StudyPulse";
 
 const categoryDefinitions = [
   {
@@ -86,6 +87,12 @@ export default function Home() {
                 まずは総合クイズへ
               </Link>
               <Link
+                href="/quiz?category=all&mode=exam"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+              >
+                🎯 本番試験モード
+              </Link>
+              <Link
                 href="/study?category=strategy"
                 className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >
@@ -111,6 +118,8 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      <StudyPulse />
 
       <section className="mb-12 grid gap-4 md:grid-cols-3">
         {featureCards.map((feature) => (
@@ -207,6 +216,22 @@ export default function Home() {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section className="mb-12 grid gap-4 md:grid-cols-[1fr_auto] md:items-center rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">用語集を引く</h2>
+          <p className="text-sm leading-relaxed text-[var(--muted)]">
+            出題範囲の頻出用語をカテゴリ別に一覧。和英対応つきで、調べたい言葉をすばやく確認できます。
+          </p>
+        </div>
+        <Link
+          href="/glossary"
+          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--background)] hover:shadow-md transition-all hover:-translate-y-0.5"
+        >
+          <span>📖</span>
+          <span className="font-medium">用語集を開く</span>
+        </Link>
       </section>
 
       <section className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">

@@ -1,69 +1,122 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { questions as allQuestions } from "@/data/questions";
-import { categoryLabels, Category } from "@/lib/types";
-import { saveResult } from "@/lib/history";
+import { categoryLabels, Category, Question, QuestionOutcome } from "@/lib/types";
+import { isBookmarked, saveResult, toggleBookmark } from "@/lib/history";
+import { clearQuizSession, loadQuizSession, QuizSessionPayload } from "@/lib/quizSession";
 import ScoreRing from "@/components/ScoreRing";
-import LoadingSpinner from "@/components/LoadingSpinner";
 
-function ResultsContent() {
-  const searchParams = useSearchParams();
+export default function ResultsPage() {
   const router = useRouter();
   const saved = useRef(false);
+  const [session, setSession] = useState<QuizSessionPayload | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+  const [bookmarkTick, setBookmarkTick] = useState(0);
 
-  const category = searchParams.get("category") || "all";
-  const answersParam = searchParams.get("answers") || "";
-  const questionsParam = searchParams.get("questions") || "";
-  const timeParam = parseInt(searchParams.get("time") || "0", 10);
-
-  const answerList = answersParam ? answersParam.split(",").map((value) => Number.parseInt(value, 10)) : [];
-  const questionIds = questionsParam ? questionsParam.split(",").map((value) => Number.parseInt(value, 10)).filter((value) => Number.isFinite(value)) : [];
-  const questions = questionIds
-    .map((id) => allQuestions.find((q) => q.id === id))
-    .filter(Boolean);
-
-  const correctCount = questions.reduce((count, q, i) => {
-    return count + (q && answerList[i] === q.correctIndex ? 1 : 0);
-  }, 0);
-
-  const total = questions.length;
-  const percentage = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-  const passed = percentage >= 60;
-
-  const minutes = Math.floor(timeParam / 60);
-  const seconds = timeParam % 60;
-
-  const categoryLabel =
-    category === "all"
-      ? "全分野"
-      : categoryLabels[category as Category] || category;
-
-  // Save result to history
   useEffect(() => {
-    if (saved.current || total === 0) return;
+    setSession(loadQuizSession());
+    setHydrated(true);
+  }, []);
+
+  const { questions, outcomes, correctCount, total, percentage, passed, breakdown, wrongIds } = useMemo(() => {
+    if (!session) {
+      return {
+        questions: [] as Question[],
+        outcomes: [] as QuestionOutcome[],
+        correctCount: 0,
+        total: 0,
+        percentage: 0,
+        passed: false,
+        breakdown: {} as Record<string, { correct: number; total: number }>,
+        wrongIds: [] as number[],
+      };
+    }
+    const qs = session.questionIds
+      .map((id) => allQuestions.find((q) => q.id === id))
+      .filter((q): q is Question => Boolean(q));
+    const oc: QuestionOutcome[] = qs.map((q, i) => {
+      const answeredIndex = session.answers[i] ?? null;
+      return {
+        id: q.id,
+        answeredIndex,
+        correctIndex: q.correctIndex,
+        isCorrect: answeredIndex === q.correctIndex,
+      };
+    });
+    const correct = oc.reduce((c, o) => c + (o.isCorrect ? 1 : 0), 0);
+    const totalCount = qs.length;
+    const pct = totalCount > 0 ? Math.round((correct / totalCount) * 100) : 0;
+    const bd: Record<string, { correct: number; total: number }> = {};
+    qs.forEach((q, i) => {
+      if (!bd[q.category]) bd[q.category] = { correct: 0, total: 0 };
+      bd[q.category].total++;
+      if (oc[i].isCorrect) bd[q.category].correct++;
+    });
+    const wrong = oc.filter((o) => !o.isCorrect).map((o) => o.id);
+    return {
+      questions: qs,
+      outcomes: oc,
+      correctCount: correct,
+      total: totalCount,
+      percentage: pct,
+      passed: pct >= 60,
+      breakdown: bd,
+      wrongIds: wrong,
+    };
+  }, [session]);
+
+  useEffect(() => {
+    if (!session || saved.current || total === 0) return;
     saved.current = true;
     saveResult({
       id: Date.now().toString(),
       date: new Date().toISOString(),
-      category,
+      category: session.category,
       score: correctCount,
       total,
       percentage,
-      timeSeconds: timeParam,
+      timeSeconds: session.timeSeconds,
       passed,
+      mode: session.mode,
+      outcomes,
     });
-  }, [category, correctCount, total, percentage, timeParam, passed]);
+    return () => {
+      clearQuizSession();
+    };
+  }, [session, correctCount, total, percentage, passed, outcomes]);
 
-  // Category breakdown
-  const breakdown: Record<string, { correct: number; total: number }> = {};
-  questions.forEach((q, i) => {
-    if (!q) return;
-    if (!breakdown[q.category]) breakdown[q.category] = { correct: 0, total: 0 };
-    breakdown[q.category].total++;
-    if (answerList[i] === q.correctIndex) breakdown[q.category].correct++;
-  });
+  if (hydrated && !session) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-8 fade-in">
+        <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 text-center shadow-sm">
+          <p className="text-lg font-medium mb-3">結果データが見つかりません。</p>
+          <p className="text-sm text-[var(--muted)] mb-4">クイズを最初からやり直してください。</p>
+          <button
+            onClick={() => router.push("/")}
+            className="rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+          >
+            ホームに戻る
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session) return null;
+
+  const minutes = Math.floor(session.timeSeconds / 60);
+  const seconds = session.timeSeconds % 60;
+
+  const categoryLabel = session.source === "wrong"
+    ? "間違えた問題のみ"
+    : session.source === "bookmarks"
+      ? "ブックマーク"
+      : session.category === "all"
+        ? "全分野"
+        : categoryLabels[session.category as Category] || session.category;
 
   const encouragement = percentage === 100
     ? "パーフェクト！素晴らしい！🎉"
@@ -75,14 +128,21 @@ function ResultsContent() {
           ? "もう少しで合格ラインです。復習して再挑戦しましょう！"
           : "基礎からしっかり復習しましょう。学習モードがおすすめです。";
 
+  const handleToggleBookmark = (id: number) => {
+    toggleBookmark(id);
+    setBookmarkTick((t) => t + 1);
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 fade-in">
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold mb-2">テスト結果</h1>
-        <p className="text-[var(--muted)]">{categoryLabel}</p>
+        <p className="text-[var(--muted)]">
+          {categoryLabel}
+          {session.mode === "exam" ? " · 本番試験モード" : ""}
+        </p>
       </div>
 
-      {/* Score card */}
       <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-8 mb-6 text-center shadow-sm">
         <ScoreRing percentage={percentage} passed={passed} />
         <p className="text-lg mb-1 mt-4">
@@ -98,7 +158,6 @@ function ResultsContent() {
         </span>
       </div>
 
-      {/* Category breakdown */}
       {Object.keys(breakdown).length > 1 && (
         <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm">
           <h2 className="font-semibold mb-4">分野別正答率</h2>
@@ -126,30 +185,49 @@ function ResultsContent() {
         </div>
       )}
 
-      {/* Question review */}
       <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm">
-        <h2 className="font-semibold mb-4">回答一覧</h2>
+        <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
+          <h2 className="font-semibold">回答一覧</h2>
+          {wrongIds.length > 0 && (
+            <Link
+              href="/quiz?source=wrong"
+              className="text-xs font-medium text-[var(--primary)] hover:underline"
+            >
+              間違えた{wrongIds.length}問だけ復習 →
+            </Link>
+          )}
+        </div>
         <div className="space-y-3">
           {questions.map((q, i) => {
-            if (!q) return null;
-            const isCorrect = answerList[i] === q.correctIndex;
+            const outcome = outcomes[i];
+            const correct = outcome.isCorrect;
+            void bookmarkTick;
+            const starred = isBookmarked(q.id);
             return (
               <div
                 key={q.id}
-                className={`p-3 rounded-lg border ${isCorrect ? "border-[var(--success-border)] bg-[var(--success-bg)]" : "border-[var(--danger-border)] bg-[var(--danger-bg)]"}`}
+                className={`p-3 rounded-lg border ${correct ? "border-[var(--success-border)] bg-[var(--success-bg)]" : "border-[var(--danger-border)] bg-[var(--danger-bg)]"}`}
               >
                 <div className="flex items-start gap-2">
-                  <span className="mt-0.5">{isCorrect ? "⭕" : "❌"}</span>
+                  <span className="mt-0.5">{correct ? "⭕" : "❌"}</span>
                   <div className="flex-1 text-sm">
                     <p className="font-medium mb-1">
                       問{i + 1}: {q.question}
                     </p>
-                    {!isCorrect && (
+                    {!correct && (
                       <p className="text-[var(--muted)]">
                         正解: {q.options[q.correctIndex]}
                       </p>
                     )}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => handleToggleBookmark(q.id)}
+                    className={`shrink-0 rounded-full border px-2 py-1 text-xs transition-colors ${starred ? "border-amber-400 bg-amber-100 text-amber-900 dark:border-amber-300/40 dark:bg-amber-400/20 dark:text-amber-100" : "border-[var(--card-border)] text-[var(--muted)] hover:border-amber-400"}`}
+                    aria-label={starred ? "ブックマークを外す" : "ブックマークに追加"}
+                  >
+                    {starred ? "★" : "☆"}
+                  </button>
                 </div>
               </div>
             );
@@ -157,10 +235,15 @@ function ResultsContent() {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <button
-          onClick={() => router.push(`/quiz?category=${category}`)}
+          onClick={() => {
+            const params = new URLSearchParams();
+            if (session.source !== "category") params.set("source", session.source);
+            else params.set("category", session.category);
+            if (session.mode === "exam") params.set("mode", "exam");
+            router.push(`/quiz?${params.toString()}`);
+          }}
           className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
         >
           もう一度挑戦
@@ -173,13 +256,5 @@ function ResultsContent() {
         </button>
       </div>
     </div>
-  );
-}
-
-export default function ResultsPage() {
-  return (
-    <Suspense fallback={<LoadingSpinner />}>
-      <ResultsContent />
-    </Suspense>
   );
 }

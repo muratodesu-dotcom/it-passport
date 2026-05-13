@@ -1,5 +1,7 @@
 export type Category = "strategy" | "management" | "technology";
 
+export type QuizMode = "practice" | "exam";
+
 export interface Question {
   id: number;
   category: Category;
@@ -16,6 +18,13 @@ export interface QuizState {
   isFinished: boolean;
 }
 
+export interface QuestionOutcome {
+  id: number;
+  answeredIndex: number | null;
+  correctIndex: number;
+  isCorrect: boolean;
+}
+
 export interface QuizResult {
   id: string;
   date: string;
@@ -25,6 +34,8 @@ export interface QuizResult {
   percentage: number;
   timeSeconds: number;
   passed: boolean;
+  mode?: QuizMode;
+  outcomes?: QuestionOutcome[];
 }
 
 export const categoryLabels: Record<Category, string> = {
