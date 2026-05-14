@@ -78,6 +78,14 @@ export default function SettingsPage() {
             <span className="text-xs leading-relaxed text-[var(--muted)]">
               キーはこのブラウザのlocalStorageに保存されます。サーバーに恒久保存はしません。
             </span>
+            <div className="rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-300/30 dark:bg-amber-400/10 dark:text-amber-100">
+              <p className="font-semibold mb-1">⚠ セキュリティ上の注意</p>
+              <ul className="list-disc space-y-0.5 pl-4">
+                <li>localStorageは同じブラウザの他スクリプト（拡張機能含む）から参照できます。共用端末では使用しないでください。</li>
+                <li>キーはAI生成リクエストごとに自端末のAPI Routeを経由してOpenAIに送信されます。</li>
+                <li>不要になったら必ず「リセット」で削除し、OpenAIダッシュボードで利用上限を設定することを推奨します。</li>
+              </ul>
+            </div>
           </label>
 
           <label className="grid gap-2">
