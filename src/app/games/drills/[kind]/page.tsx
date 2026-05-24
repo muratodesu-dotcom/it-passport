@@ -15,9 +15,12 @@ import {
   genOddOneOut,
   genTermToDef,
   genTrueFalse,
+  prepareCurated,
 } from "@/lib/drills";
+import { chizaiDrillMap, curatedQuestionSets, flowSets } from "@/data/chizaiDrills";
 import { addMissedTerms, getMissedTerms, removeMissedTerms } from "@/lib/history";
 import DrillRunner from "@/components/DrillRunner";
+import OrderRunner from "@/components/OrderRunner";
 
 const DRILL_COUNT = 10;
 
@@ -27,6 +30,10 @@ function buildQuestions(kind: DrillKind, exam: ReturnType<typeof parseExam>, fie
       .filter((o) => o.id !== "all")
       .map((o) => ({ key: o.id, label: o.label, terms: allTerms.filter((t) => itemField(exam, t) === o.id) }));
     return genOddOneOut(groups, DRILL_COUNT);
+  }
+
+  if (curatedQuestionSets[kind]) {
+    return prepareCurated(curatedQuestionSets[kind], DRILL_COUNT);
   }
 
   let pool = allTerms;
@@ -57,7 +64,7 @@ function DrillContent() {
   const searchParams = useSearchParams();
   const kind = (Array.isArray(params.kind) ? params.kind[0] : params.kind) as DrillKind;
   const exam = parseExam(searchParams.get("exam"));
-  const def = drillMap[kind];
+  const def = drillMap[kind] ?? chizaiDrillMap[kind];
 
   const [field, setField] = useState<FieldId>("all");
   const [questions, setQuestions] = useState<DrillQuestion[]>([]);
@@ -105,7 +112,9 @@ function DrillContent() {
       </div>
       <p className="text-[var(--muted)] mb-6">{def.description}</p>
 
-      {def.usesField && (
+      {kind === "flow" && <OrderRunner sets={flowSets} />}
+
+      {kind !== "flow" && def.usesField && (
         <div className="flex flex-wrap gap-2 mb-6">
           {fieldOptions(exam).map((opt) => (
             <button
@@ -121,7 +130,7 @@ function DrillContent() {
         </div>
       )}
 
-      {!playing ? (
+      {kind !== "flow" && (!playing ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">{def.icon}</div>
           {def.source === "missed" && getMissedTerms().length === 0 ? (
@@ -141,7 +150,7 @@ function DrillContent() {
         </div>
       ) : (
         <DrillRunner key={nonce} questions={questions} onRestart={regenerate} onComplete={handleComplete} />
-      )}
+      ))}
     </div>
   );
 }

@@ -10,7 +10,17 @@ export interface DrillQuestion {
   termKey?: string;
 }
 
-export type DrillKind = "term-def" | "cloze" | "en-jp" | "truefalse" | "odd" | "review";
+export type DrillKind =
+  | "term-def"
+  | "cloze"
+  | "en-jp"
+  | "truefalse"
+  | "odd"
+  | "review"
+  | "duration"
+  | "classify"
+  | "treaty"
+  | "flow";
 
 export interface DrillDef {
   kind: DrillKind;
@@ -44,6 +54,18 @@ function shuffle<T>(arr: T[]): T[] {
 
 function distractors(terms: TermPair[], exclude: TermPair, n: number): TermPair[] {
   return shuffle(terms.filter((t) => t.term !== exclude.term)).slice(0, n);
+}
+
+// Shuffle option order (for curated questions whose correct answer is authored
+// at a fixed index) and pick a number of questions.
+export function prepareCurated(questions: DrillQuestion[], count: number): DrillQuestion[] {
+  return shuffle(questions)
+    .slice(0, count)
+    .map((q) => {
+      const correct = q.options[q.correctIndex];
+      const options = shuffle(q.options);
+      return { ...q, options, correctIndex: options.indexOf(correct) };
+    });
 }
 
 export function genTermToDef(terms: TermPair[], count: number): DrillQuestion[] {
