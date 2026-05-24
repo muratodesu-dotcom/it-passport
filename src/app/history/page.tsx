@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { clearHistory, getBookmarks, getHistory, getStreak, getWrongQuestionIds } from "@/lib/history";
-import { QuizResult, categoryLabels, Category } from "@/lib/types";
+import { QuizResult, categoryLabels, Category, examShortLabels } from "@/lib/types";
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -112,9 +112,11 @@ export default function HistoryPage() {
             <h2 className="font-semibold mb-4">過去の結果（最新{history.length}件）</h2>
             <div className="space-y-3">
               {history.map((result) => {
-                const catLabel = result.category === "all"
-                  ? "全分野"
-                  : categoryLabels[result.category as Category] || result.category;
+                const catLabel = result.mode === "exam" && result.examType
+                  ? examShortLabels[result.examType]
+                  : result.category === "all"
+                    ? "全分野"
+                    : categoryLabels[result.category as Category] || result.category;
                 const date = new Date(result.date);
                 const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, "0")}`;
                 const mins = Math.floor(result.timeSeconds / 60);

@@ -1,7 +1,7 @@
 {
-  "name": "ITパスポート試験 学習アプリ",
-  "short_name": "IT Passport",
-  "description": "ITパスポート試験対策のための学習・クイズアプリ",
+  "name": "ITパスポート＆知財3級 学習アプリ",
+  "short_name": "ITパス＆知財3級",
+  "description": "ITパスポート試験と知的財産管理技能検定3級に対応した学習・クイズアプリ",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { questions } from "@/data/questions";
+import { chizaiQuestions, itPassportQuestions } from "@/data/questions";
 import StudyPulse from "@/components/StudyPulse";
 
 const categoryDefinitions = [
   {
     id: "all",
     title: "全分野",
-    description: `ストラテジ・マネジメント・テクノロジの全${questions.length}問`,
+    description: `ストラテジ・マネジメント・テクノロジの全${itPassportQuestions.length}問`,
     color: "from-indigo-500 to-purple-600",
     icon: "📚",
   },
@@ -37,11 +37,12 @@ const categories = categoryDefinitions.map((category) => ({
   ...category,
   count:
     category.id === "all"
-      ? questions.length
-      : questions.filter((question) => question.category === category.id).length,
+      ? itPassportQuestions.length
+      : itPassportQuestions.filter((question) => question.category === category.id).length,
 }));
 
-const totalQuestions = questions.length;
+const totalQuestions = itPassportQuestions.length;
+const chizaiCount = chizaiQuestions.length;
 const totalCategories = categories.length - 1;
 const estimatedMinutes = Math.ceil(totalQuestions * 0.7);
 
@@ -70,13 +71,13 @@ export default function Home() {
         <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
           <div>
             <p className="mb-3 inline-flex rounded-full bg-[var(--badge-bg)] px-3 py-1 text-sm font-medium text-[var(--primary)]">
-              ITパスポート対策をもっと楽しく、もっと濃く
+              ITパスポート＆知財3級 対策をもっと楽しく、もっと濃く
             </p>
             <h1 className="mb-4 text-4xl font-bold leading-tight bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))` }}>
-              ITパスポート試験 学習＆模擬テストアプリ
+              ITパスポート＆知財3級 学習＆模擬テストアプリ
             </h1>
             <p className="max-w-2xl text-lg leading-relaxed text-[var(--muted)]">
-              分野別クイズ、解説付き学習、履歴トラッキングに加えて、流し見復習ができるDoom Scrollモードを追加しました。
+              ITパスポート試験と知的財産管理技能検定3級の両方に対応。分野別クイズ、解説付き学習、履歴トラッキングに加えて、各試験の合格基準で採点する本番試験モードを搭載しています。
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
@@ -87,10 +88,16 @@ export default function Home() {
                 まずは総合クイズへ
               </Link>
               <Link
-                href="/quiz?category=all&mode=exam"
+                href="/quiz?mode=exam&exam=it-passport"
                 className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >
-                🎯 本番試験モード
+                🎯 ITパスポート 本番試験
+              </Link>
+              <Link
+                href="/quiz?mode=exam&exam=chizai"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+              >
+                ⚖️ 知財3級 本番試験
               </Link>
               <Link
                 href="/study?category=strategy"
@@ -103,12 +110,12 @@ export default function Home() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-2xl bg-[var(--badge-bg)] p-5">
-              <p className="text-xs text-[var(--muted)] mb-2">収録問題数</p>
+              <p className="text-xs text-[var(--muted)] mb-2">ITパスポート問題数</p>
               <p className="text-3xl font-bold">{totalQuestions}</p>
             </div>
             <div className="rounded-2xl bg-[var(--badge-bg)] p-5">
-              <p className="text-xs text-[var(--muted)] mb-2">分野数</p>
-              <p className="text-3xl font-bold">{totalCategories}</p>
+              <p className="text-xs text-[var(--muted)] mb-2">知財3級問題数</p>
+              <p className="text-3xl font-bold">{chizaiCount}</p>
             </div>
             <div className="rounded-2xl bg-[var(--badge-bg)] p-5 col-span-2">
               <p className="text-xs text-[var(--muted)] mb-2">総合クイズ目安時間</p>
@@ -132,6 +139,39 @@ export default function Home() {
             <p className="text-sm leading-relaxed text-[var(--muted)]">{feature.description}</p>
           </div>
         ))}
+      </section>
+
+      <section className="mb-12">
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="text-xl font-semibold">本番試験モードで腕試し</h2>
+          <p className="text-sm text-[var(--muted)]">各試験の公式に近い形式・合格基準で採点します。</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link
+            href="/quiz?mode=exam&exam=it-passport"
+            className="group block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-all hover:shadow-lg hover:-translate-y-0.5"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🎯</span>
+              <h3 className="font-bold text-lg group-hover:text-[var(--primary)]">ITパスポート 本番試験</h3>
+            </div>
+            <p className="text-sm text-[var(--muted)]">
+              100問・120分。総合60%以上かつ各分野30%以上で合格判定（公式のIRT方式を正答率で近似）。
+            </p>
+          </Link>
+          <Link
+            href="/quiz?mode=exam&exam=chizai"
+            className="group block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-all hover:shadow-lg hover:-translate-y-0.5"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">⚖️</span>
+              <h3 className="font-bold text-lg group-hover:text-[var(--primary)]">知財3級 本番試験</h3>
+            </div>
+            <p className="text-sm text-[var(--muted)]">
+              学科形式30問・45分。満点の70%以上で合格判定。知的財産管理技能検定3級に対応。
+            </p>
+          </Link>
+        </div>
       </section>
 
       <section className="mb-12">

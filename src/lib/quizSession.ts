@@ -1,10 +1,11 @@
-import { QuizMode } from "./types";
+import { ExamType, QuizMode } from "./types";
 
 const SESSION_KEY = "it-passport-last-quiz";
 
 export interface QuizSessionPayload {
   category: string;
   mode: QuizMode;
+  examType?: ExamType;
   source: "category" | "wrong" | "bookmarks";
   questionIds: number[];
   answers: (number | null)[];

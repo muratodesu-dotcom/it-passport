@@ -1,4 +1,4 @@
-import { Question } from "@/lib/types";
+import { ExamType, Question } from "@/lib/types";
 
 export const questions: Question[] = [
   // ===== ストラテジ系 (Strategy) =====
@@ -98,6 +98,8 @@ export const questions: Question[] = [
     correctIndex: 0,
     explanation:
       "著作権法ではプログラム言語、規約（プロトコル）、解法（アルゴリズム）は保護の対象外です。ただし、プログラム自体は著作物として保護されます。",
+    exams: ["it-passport", "chizai"],
+    ipField: "copyright",
   },
   {
     id: 9,
@@ -452,6 +454,8 @@ export const questions: Question[] = [
     correctIndex: 0,
     explanation:
       "営業秘密の3要件は「秘密管理性」「有用性」「非公知性」です。「新規性」は特許の要件であり、営業秘密の要件ではありません。",
+    exams: ["it-passport", "chizai"],
+    ipField: "other",
   },
   {
     id: 36,
@@ -1261,6 +1265,8 @@ export const questions: Question[] = [
     correctIndex: 0,
     explanation:
       "特許権は、新規性・進歩性・産業上の利用可能性がある発明を保護する権利で、特許庁への出願と審査を経て登録されます。存続期間は出願から20年です。",
+    exams: ["it-passport", "chizai"],
+    ipField: "patent",
   },
   {
     id: 94,
@@ -1275,6 +1281,8 @@ export const questions: Question[] = [
     correctIndex: 0,
     explanation:
       "商標権は、商品やサービスに使用するマーク（文字・図形・記号など）を保護する権利です。登録から10年間有効で、更新が可能です。",
+    exams: ["it-passport", "chizai"],
+    ipField: "design-trademark",
   },
   {
     id: 95,
@@ -1289,6 +1297,8 @@ export const questions: Question[] = [
     correctIndex: 0,
     explanation:
       "意匠権は、工業製品の外観デザイン（形状・模様・色彩またはこれらの結合）を保護する権利で、登録から25年間存続します。",
+    exams: ["it-passport", "chizai"],
+    ipField: "design-trademark",
   },
   {
     id: 96,
@@ -1303,6 +1313,8 @@ export const questions: Question[] = [
     correctIndex: 0,
     explanation:
       "産業財産権は特許権・実用新案権・意匠権・商標権の4つです。著作権は産業財産権ではなく、著作権法で保護される知的財産権です。",
+    exams: ["it-passport", "chizai"],
+    ipField: "other",
   },
   {
     id: 97,
@@ -4317,11 +4329,465 @@ export const questions: Question[] = [
       "可用性（Availability）は、情報やシステムを必要なときに利用できる状態を維持することです。システムの冗長化（二重化）は、一部に障害が発生しても他の部分で稼働を継続できるため、可用性を高める対策として有効です。",
   },
 
+  // ===== 知的財産管理技能検定3級 専用問題（特許・実用新案） =====
+  {
+    id: 1001,
+    category: "strategy",
+    question: "特許権の存続期間として正しいものはどれか。",
+    options: [
+      "登録日から10年",
+      "出願日から20年",
+      "出願日から25年",
+      "著作者の死後70年",
+    ],
+    correctIndex: 1,
+    explanation:
+      "特許権の存続期間は、原則として特許出願の日から20年です（一定の場合に延長登録あり）。権利は設定登録によって発生しますが、期間の起算点は出願日である点に注意します。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 1002,
+    category: "strategy",
+    question: "同一の発明について異なる日に複数の特許出願があった場合、特許を受けることができる者に関する日本の原則はどれか。",
+    options: [
+      "最初に発明した者が受けられる（先発明主義）",
+      "最先の出願人が受けられる（先願主義）",
+      "最も早く実施した者が受けられる",
+      "全員が共有で受けられる",
+    ],
+    correctIndex: 1,
+    explanation:
+      "日本は先願主義を採用しており、同一発明について複数の出願があった場合は、最先の出願人のみが特許を受けることができます。発明の前後ではなく出願の前後で判断します。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 1003,
+    category: "strategy",
+    question: "従業者が職務上行った発明（職務発明）に関する説明として、最も適切なものはどれか。",
+    options: [
+      "発明はすべて自動的に会社のものになり、従業者に権利は一切ない",
+      "使用者は契約や勤務規則により権利を承継でき、従業者は相当の利益を受ける権利を持つ",
+      "従業者は使用者の許可なく自由に第三者へ譲渡できる",
+      "使用者は職務発明を実施することができない",
+    ],
+    correctIndex: 1,
+    explanation:
+      "職務発明では、契約・勤務規則等であらかじめ定めれば使用者が特許を受ける権利を承継できます。その場合、従業者は「相当の利益」を受ける権利を有します。また使用者は無償の通常実施権を持ちます。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 1004,
+    category: "strategy",
+    question: "特許を受けるための要件に含まれないものはどれか。",
+    options: [
+      "産業上の利用可能性があること",
+      "新規性があること",
+      "進歩性があること",
+      "美感を起こさせるものであること",
+    ],
+    correctIndex: 3,
+    explanation:
+      "特許の主な要件は産業上の利用可能性・新規性・進歩性です。「美感を起こさせること」は意匠の登録要件に関係する考え方で、特許の要件ではありません。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 1005,
+    category: "strategy",
+    question: "実用新案権の説明として最も適切なものはどれか。",
+    options: [
+      "物品の形状・構造・組合せに関する考案を保護し、無審査で登録される",
+      "発明を実体審査のうえ保護し、存続期間は出願から20年である",
+      "工業製品の美的なデザインを保護する",
+      "創作と同時に無方式で発生する",
+    ],
+    correctIndex: 0,
+    explanation:
+      "実用新案権は物品の形状・構造・組合せに係る考案を保護する権利で、実体審査を経ずに登録されます（基礎的要件のみ審査）。存続期間は出願から10年です。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 1006,
+    category: "strategy",
+    question: "特許出願は、原則として出願の日からどのくらいの期間を経過したときに出願公開されるか。",
+    options: [
+      "6か月",
+      "1年",
+      "1年6か月",
+      "3年",
+    ],
+    correctIndex: 2,
+    explanation:
+      "特許出願は、原則として出願日から1年6か月を経過すると出願公開されます。これにより技術内容が公開され、第三者は内容を知ることができます。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 1007,
+    category: "strategy",
+    question: "特許法上の「発明」の定義として最も適切なものはどれか。",
+    options: [
+      "自然法則を利用した技術的思想の創作のうち高度のもの",
+      "美的外観を有する物品のデザイン",
+      "商品の出所を示す標識",
+      "思想または感情を創作的に表現したもの",
+    ],
+    correctIndex: 0,
+    explanation:
+      "特許法上の発明は「自然法則を利用した技術的思想の創作のうち高度のもの」と定義されます。自然法則そのものや、単なる発見、人為的な取り決めは発明に当たりません。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+
+  // ===== 知財3級 専用問題（意匠・商標） =====
+  {
+    id: 1010,
+    category: "strategy",
+    question: "商標権の存続期間に関する説明として最も適切なものはどれか。",
+    options: [
+      "設定登録から10年だが、更新登録により半永久的に維持できる",
+      "出願から20年で必ず消滅する",
+      "創作の時から著作者の死後70年",
+      "更新は認められず10年で必ず消滅する",
+    ],
+    correctIndex: 0,
+    explanation:
+      "商標権の存続期間は設定登録の日から10年ですが、更新登録を繰り返すことで半永久的に維持できます。商標は使い続けるほど信用が蓄積するため、更新が認められています。",
+    exams: ["chizai"],
+    ipField: "design-trademark",
+  },
+  {
+    id: 1011,
+    category: "strategy",
+    question: "登録商標を継続して一定期間使用していない場合に、第三者の請求により取り消されることがある審判はどれか。その「一定期間」として正しいものを含む説明はどれか。",
+    options: [
+      "継続して3年以上使用していない場合、不使用取消審判の対象となる",
+      "継続して1年以上使用していない場合、自動的に権利が消滅する",
+      "使用の有無にかかわらず取り消されることはない",
+      "10年間使用していない場合のみ取り消される",
+    ],
+    correctIndex: 0,
+    explanation:
+      "登録商標を継続して3年以上、日本国内で使用していない場合、第三者は不使用取消審判を請求できます。使われていない商標を整理し、他者の登録機会を確保する趣旨です。",
+    exams: ["chizai"],
+    ipField: "design-trademark",
+  },
+  {
+    id: 1012,
+    category: "strategy",
+    question: "意匠権の存続期間として正しいものはどれか。",
+    options: [
+      "出願日から25年",
+      "登録から10年",
+      "出願から20年",
+      "著作者の死後70年",
+    ],
+    correctIndex: 0,
+    explanation:
+      "意匠権の存続期間は意匠登録出願の日から25年です（2020年施行の改正により、登録日からではなく出願日起算で25年となりました）。",
+    exams: ["chizai"],
+    ipField: "design-trademark",
+  },
+  {
+    id: 1013,
+    category: "strategy",
+    question: "商標の最も基本的な機能（働き）として適切なものはどれか。",
+    options: [
+      "自他商品・役務の識別機能",
+      "発明の技術内容を公開する機能",
+      "物品の美感を高める機能",
+      "創作物を複製から守る機能",
+    ],
+    correctIndex: 0,
+    explanation:
+      "商標は自己の商品・役務を他人のものと区別する「自他商品・役務の識別機能」を中心に、出所表示機能・品質保証機能・広告宣伝機能を持ちます。",
+    exams: ["chizai"],
+    ipField: "design-trademark",
+  },
+  {
+    id: 1014,
+    category: "strategy",
+    question: "商標登録を受けることが原則としてできないものはどれか。",
+    options: [
+      "商品の普通名称を普通に用いられる方法で表示する標章のみからなる商標",
+      "造語からなる独創的な商標",
+      "図形と文字を組み合わせた独自のロゴ",
+      "他社と区別できる識別力のある名称",
+    ],
+    correctIndex: 0,
+    explanation:
+      "商品の普通名称や、産地・品質などを普通に表示するにすぎない記述的商標は、識別力がないため原則として商標登録を受けられません。誰もが使う表示を独占させない趣旨です。",
+    exams: ["chizai"],
+    ipField: "design-trademark",
+  },
+  {
+    id: 1015,
+    category: "strategy",
+    question: "意匠制度に関する説明として最も適切なものはどれか。",
+    options: [
+      "物品等の形状・模様・色彩またはこれらの結合であって、視覚を通じて美感を起こさせるデザインを保護する",
+      "発明の技術的思想を保護する",
+      "商品の出所を示す標識を保護する",
+      "創作と同時に無方式で発生し登録を要しない",
+    ],
+    correctIndex: 0,
+    explanation:
+      "意匠は、物品等の形状・模様・色彩等であって視覚を通じて美感を起こさせるデザインを保護します。登録には特許庁への出願と審査が必要で、関連意匠・部分意匠などの制度もあります。",
+    exams: ["chizai"],
+    ipField: "design-trademark",
+  },
+
+  // ===== 知財3級 専用問題（著作権） =====
+  {
+    id: 1020,
+    category: "strategy",
+    question: "著作権（著作財産権）の原則的な保護期間として正しいものはどれか。",
+    options: [
+      "公表から10年",
+      "著作者の死後70年",
+      "創作から25年",
+      "登録から20年",
+    ],
+    correctIndex: 1,
+    explanation:
+      "著作権（著作財産権）の保護期間は、原則として著作者の死後70年までです（2018年の改正で50年から70年に延長）。法人著作や映画の著作物は公表後70年など例外があります。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 1021,
+    category: "strategy",
+    question: "著作権の発生に関する日本の原則はどれか。",
+    options: [
+      "創作した時点で自動的に発生し、登録や表示は不要（無方式主義）",
+      "文化庁への登録によって初めて発生する",
+      "©マークを付さなければ発生しない",
+      "出願し審査を経て登録されることで発生する",
+    ],
+    correctIndex: 0,
+    explanation:
+      "日本を含むベルヌ条約加盟国では無方式主義が採られ、著作物を創作した時点で自動的に著作権が発生します。登録や©表示は権利発生の要件ではありません。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 1022,
+    category: "strategy",
+    question: "著作者人格権に含まれないものはどれか。",
+    options: [
+      "公表権",
+      "氏名表示権",
+      "同一性保持権",
+      "複製権",
+    ],
+    correctIndex: 3,
+    explanation:
+      "著作者人格権は公表権・氏名表示権・同一性保持権の3つです。複製権は著作財産権に属します。著作者人格権は一身専属で、他人に譲渡できません。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 1023,
+    category: "strategy",
+    question: "著作隣接権が認められる者として適切でないものはどれか。",
+    options: [
+      "実演家",
+      "レコード製作者",
+      "放送事業者",
+      "小説の著作者",
+    ],
+    correctIndex: 3,
+    explanation:
+      "著作隣接権は、著作物の伝達に重要な役割を果たす実演家・レコード製作者・放送事業者・有線放送事業者に認められます。小説の著作者は著作隣接権ではなく著作権を持ちます。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 1024,
+    category: "strategy",
+    question: "公表された著作物の「引用」が適法と認められるための要件として、適切でないものはどれか。",
+    options: [
+      "公正な慣行に合致していること",
+      "報道・批評・研究など正当な範囲内であること",
+      "出所を明示すること",
+      "著作権者から事前に金銭の支払いを受けること",
+    ],
+    correctIndex: 3,
+    explanation:
+      "適法な引用には、公表された著作物であること、公正な慣行に合致すること、正当な範囲内であること、引用部分が明確に区別され主従関係があること、出所を明示することが必要です。金銭の授受は要件ではありません。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 1025,
+    category: "strategy",
+    question: "私的使用のための複製に関する説明として最も適切なものはどれか。",
+    options: [
+      "個人的または家庭内など限られた範囲で使用する目的なら、一定の条件下で複製できる",
+      "目的を問わず著作物は自由に複製できる",
+      "私的使用であっても一切複製できない",
+      "企業内で業務のために配布する複製も私的使用に当たる",
+    ],
+    correctIndex: 0,
+    explanation:
+      "私的使用のための複製は、個人的または家庭内その他これに準ずる限られた範囲内で使用する目的の場合に認められます。企業内の業務利用は私的使用に当たりません。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 1026,
+    category: "strategy",
+    question: "法人その他の使用者の発意に基づき、従業者が職務上作成し、法人名義で公表する著作物（職務著作）の著作者は、原則として誰か。",
+    options: [
+      "実際に作成した従業者個人",
+      "契約や勤務規則に別段の定めがない限り、その法人",
+      "従業者と法人の共有",
+      "公表を担当した広報部門の責任者",
+    ],
+    correctIndex: 1,
+    explanation:
+      "職務著作（法人著作）の要件を満たす場合、契約・勤務規則等に別段の定めがなければ、著作者は法人等の使用者となります。著作者人格権も法人に帰属する点が特徴です。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+
+  // ===== 知財3級 専用問題（不正競争防止法・契約・条約） =====
+  {
+    id: 1030,
+    category: "strategy",
+    question: "不正競争防止法が規制する行為として適切でないものはどれか。",
+    options: [
+      "他人の周知な商品等表示と混同を生じさせる行為",
+      "営業秘密を不正に取得・使用する行為",
+      "他人の商品の形態を模倣した商品を譲渡する行為",
+      "特許庁に出願して審査を受ける行為",
+    ],
+    correctIndex: 3,
+    explanation:
+      "不正競争防止法は、周知表示混同惹起行為、著名表示の冒用、営業秘密の不正取得・使用、商品形態模倣（デッドコピー）などを規制します。正規の特許出願は規制対象ではありません。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+  {
+    id: 1031,
+    category: "strategy",
+    question: "専用実施権に関する説明として最も適切なものはどれか。",
+    options: [
+      "設定した範囲では実施権者が独占的に実施でき、設定登録が効力発生の要件となる",
+      "複数の者に重ねて設定でき、登録は不要である",
+      "特許権者の許諾なく自由に第三者へ移転できる",
+      "通常実施権と同じく非独占的な権利である",
+    ],
+    correctIndex: 0,
+    explanation:
+      "専用実施権は、設定した範囲で実施権者が独占的に実施できる強い権利で、その範囲では特許権者自身も実施できなくなります。専用実施権の設定・移転は登録が効力発生要件です。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+  {
+    id: 1032,
+    category: "strategy",
+    question: "パリ条約に定められている基本原則として適切でないものはどれか。",
+    options: [
+      "内国民待遇の原則",
+      "優先権制度",
+      "各国の特許は相互に独立とする特許独立の原則",
+      "一つの出願で全加盟国の特許権が同時に発生する原則",
+    ],
+    correctIndex: 3,
+    explanation:
+      "パリ条約の三原則は内国民待遇・優先権・特許独立です。各国の権利は独立しており（属地主義）、一つの出願で全加盟国の権利が一括発生することはありません。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+  {
+    id: 1033,
+    category: "strategy",
+    question: "知的財産権の効力が及ぶ範囲に関する「属地主義」の説明として最も適切なものはどれか。",
+    options: [
+      "権利は登録した国の領域内でのみ効力を持ち、各国ごとに権利を取得する必要がある",
+      "一国で取得した権利は世界中で当然に有効である",
+      "権利者の国籍がある国でのみ効力を持つ",
+      "権利は出願人が指定した一国に限り効力を持つ",
+    ],
+    correctIndex: 0,
+    explanation:
+      "属地主義により、知的財産権の効力は権利を取得した国の領域内に限られます。外国でも保護を受けたい場合は、その国で別途権利を取得する必要があります。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+  {
+    id: 1034,
+    category: "strategy",
+    question: "日本において特許・実用新案・意匠・商標の産業財産権を所管する官庁はどれか。",
+    options: [
+      "特許庁",
+      "文化庁",
+      "経済産業省消費者庁",
+      "総務省",
+    ],
+    correctIndex: 0,
+    explanation:
+      "産業財産権（特許・実用新案・意匠・商標）は特許庁が所管します。一方、著作権は文化庁が所管しており、所管官庁の違いも整理しておくとよいでしょう。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+  {
+    id: 1035,
+    category: "strategy",
+    question: "営業秘密として不正競争防止法で保護されるための3要件として、正しい組合せはどれか。",
+    options: [
+      "秘密管理性・有用性・非公知性",
+      "新規性・進歩性・産業上利用可能性",
+      "創作性・固定性・公表性",
+      "識別性・周知性・著名性",
+    ],
+    correctIndex: 0,
+    explanation:
+      "営業秘密の3要件は、秘密として管理されていること（秘密管理性）、有用性、公然と知られていないこと（非公知性）です。新規性・進歩性は特許の要件であり混同しないようにします。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+  {
+    id: 1036,
+    category: "strategy",
+    question: "著作権分野の国際的な保護に関する条約はどれか。",
+    options: [
+      "ベルヌ条約",
+      "特許協力条約（PCT）",
+      "マドリッド協定議定書",
+      "意匠の国際登録に関するハーグ協定",
+    ],
+    correctIndex: 0,
+    explanation:
+      "ベルヌ条約は著作権の国際的保護に関する基本条約で、無方式主義や内国民待遇を定めています。PCTは特許、マドプロは商標、ハーグ協定は意匠の国際出願・登録に関する条約です。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+
 ];
 
+function effectiveExams(q: Question): ExamType[] {
+  return q.exams ?? ["it-passport"];
+}
+
+export function getQuestionsByExam(exam: ExamType): Question[] {
+  return questions.filter((q) => effectiveExams(q).includes(exam));
+}
+
+// ITパスポートの収録問題（知財3級専用問題を除く）。
+export const itPassportQuestions = getQuestionsByExam("it-passport");
+// 知財3級の収録問題（ITパスポートと共通の知財問題を含む）。
+export const chizaiQuestions = getQuestionsByExam("chizai");
+
+// 分野別の練習・学習はITパスポート向けの導線なので、知財3級専用問題は除外する。
 export function getQuestionsByCategory(category: string): Question[] {
-  if (category === "all") return questions;
-  return questions.filter((q) => q.category === category);
+  if (category === "all") return itPassportQuestions;
+  return itPassportQuestions.filter((q) => q.category === category);
 }
 
 export function shuffleQuestions(qs: Question[]): Question[] {
