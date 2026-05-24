@@ -5,8 +5,8 @@ import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ITパスポート試験 学習アプリ",
-  description: "ITパスポート試験対策のための学習・クイズアプリ",
+  title: "ITパスポート＆知財3級 学習アプリ",
+  description: "ITパスポート試験と知的財産管理技能検定3級に対応した学習・クイズアプリ",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icon.svg",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "IT Passport",
+    title: "ITパス＆知財3級",
     statusBarStyle: "default",
   },
 };
@@ -37,7 +37,7 @@ export default function RootLayout({
         <ThemeSelector />
         <div className="sticky top-0 z-40 border-b border-[var(--card-border)] bg-[color:color-mix(in_srgb,var(--background)_88%,transparent)] backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-            <Link href="/" className="text-sm font-semibold tracking-wide text-[var(--foreground)]">IT Passport</Link>
+            <Link href="/" className="text-sm font-semibold tracking-wide text-[var(--foreground)]">ITパス＆知財3級</Link>
             <nav className="flex items-center gap-3 text-sm">
               <Link href="/study?category=strategy" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Study</Link>
               <Link href="/games" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Games</Link>

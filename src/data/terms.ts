@@ -1,10 +1,14 @@
-import { Category } from "@/lib/types";
+import { Category, ExamType, IpField } from "@/lib/types";
 
 export interface TermPair {
   term: string;
   english: string;
   description: string;
   category: Category;
+  // Which exams this term belongs to. Absent means ITパスポート only.
+  exams?: ExamType[];
+  // 知財3級 sub-field, used to group 知財 terms in the glossary and drills.
+  ipField?: IpField;
 }
 
 export const termPairs: TermPair[] = [
@@ -23,16 +27,16 @@ export const termPairs: TermPair[] = [
   { term: "SLA", english: "Service Level Agreement", description: "サービスの品質水準を数値で定めた合意文書", category: "strategy" },
   { term: "BPR", english: "Business Process Reengineering", description: "業務プロセスを根本的に見直し再設計する手法", category: "strategy" },
   { term: "マーケティングミックス", english: "Marketing Mix", description: "Product・Price・Place・Promotionの4Pで構成される戦略", category: "strategy" },
-  { term: "著作権", english: "Copyright", description: "創作物の著作者に自動的に発生する知的財産権", category: "strategy" },
+  { term: "著作権", english: "Copyright", description: "創作物の著作者に自動的に発生する知的財産権", category: "strategy", exams: ["it-passport", "chizai"], ipField: "copyright" },
   { term: "個人情報保護法", english: "Personal Information Protection Act", description: "個人情報の適切な取扱いを事業者に義務付ける法律", category: "strategy" },
   { term: "STP", english: "Segmentation, Targeting, Positioning", description: "市場細分化・標的市場の選定・ポジショニングで市場戦略を整理する手法", category: "strategy" },
   { term: "KPI", english: "Key Performance Indicator", description: "目標達成に向けた進捗を測るための重要業績評価指標", category: "strategy" },
   { term: "KGI", english: "Key Goal Indicator", description: "最終的に達成すべきゴールを示す指標", category: "strategy" },
   { term: "CSR", english: "Corporate Social Responsibility", description: "企業が環境や社会などに対して果たす社会的責任", category: "strategy" },
   { term: "コーポレートガバナンス", english: "Corporate Governance", description: "企業経営の健全性・透明性を高めるための統治の仕組み", category: "strategy" },
-  { term: "特許権", english: "Patent Right", description: "発明を独占的に利用できる産業財産権で、出願から20年間存続する", category: "strategy" },
-  { term: "商標権", english: "Trademark Right", description: "商品やサービスを識別するマークを保護する権利で、更新可能", category: "strategy" },
-  { term: "意匠権", english: "Design Right", description: "工業製品のデザイン（形状・模様・色彩）を保護する権利", category: "strategy" },
+  { term: "特許権", english: "Patent Right", description: "発明を独占的に利用できる産業財産権で、出願から20年間存続する", category: "strategy", exams: ["it-passport", "chizai"], ipField: "patent" },
+  { term: "商標権", english: "Trademark Right", description: "商品やサービスを識別するマークを保護する権利で、更新可能", category: "strategy", exams: ["it-passport", "chizai"], ipField: "design-trademark" },
+  { term: "意匠権", english: "Design Right", description: "工業製品のデザイン（形状・模様・色彩）を保護する権利", category: "strategy", exams: ["it-passport", "chizai"], ipField: "design-trademark" },
   { term: "RFP", english: "Request for Proposal", description: "ベンダに対してシステム要件を示し提案を求める提案依頼書", category: "strategy" },
   { term: "RFI", english: "Request for Information", description: "ベンダの技術力や製品情報を事前に収集するための情報提供依頼書", category: "strategy" },
   { term: "ファイブフォース分析", english: "Five Forces Analysis", description: "業界の競争・新規参入・代替品・買い手・売り手の5つの力で競争環境を分析する手法", category: "strategy" },
@@ -257,7 +261,7 @@ export const termPairs: TermPair[] = [
   { term: "OJT", english: "On-the-Job Training", description: "実際の業務を通じて上司や先輩が指導する教育訓練手法", category: "strategy" },
   { term: "Off-JT", english: "Off-the-Job Training", description: "職場を離れて研修やセミナー等で行う教育訓練手法", category: "strategy" },
   { term: "メンタリング", english: "Mentoring", description: "経験豊富な先輩が後輩の成長を継続的に支援する人材育成手法", category: "strategy" },
-  { term: "不正競争防止法", english: "Unfair Competition Prevention Act", description: "営業秘密の不正取得や模倣品販売などの不正行為を規制する法律", category: "strategy" },
+  { term: "不正競争防止法", english: "Unfair Competition Prevention Act", description: "営業秘密の不正取得や模倣品販売などの不正行為を規制する法律", category: "strategy", exams: ["it-passport", "chizai"], ipField: "other" },
   { term: "労働者派遣法", english: "Worker Dispatching Act", description: "派遣労働者の保護と適正な派遣事業の運営を定めた法律", category: "strategy" },
   { term: "BtoC", english: "Business to Consumer", description: "企業から一般消費者に対して行われる電子商取引の形態", category: "strategy" },
   { term: "CtoC", english: "Consumer to Consumer", description: "消費者同士がインターネットを介して取引する電子商取引の形態", category: "strategy" },
@@ -323,8 +327,8 @@ export const termPairs: TermPair[] = [
   { term: "データマイニング", english: "Data Mining", description: "大量データから統計的手法やAIで有用なパターンや相関を発見する手法", category: "strategy" },
   { term: "データウェアハウス", english: "Data Warehouse", description: "意思決定支援のためにデータを時系列で蓄積した統合型データベース", category: "strategy" },
   { term: "OLAP", english: "Online Analytical Processing", description: "多次元データベースから多角的にデータを分析するための処理方式", category: "strategy" },
-  { term: "実用新案権", english: "Utility Model Right", description: "物品の形状・構造・組合せに関する考案を保護する知的財産権", category: "strategy" },
-  { term: "営業秘密", english: "Trade Secret", description: "秘密管理・有用性・非公知性の3要件を満たす事業上の情報", category: "strategy" },
+  { term: "実用新案権", english: "Utility Model Right", description: "物品の形状・構造・組合せに関する考案を保護する知的財産権", category: "strategy", exams: ["it-passport", "chizai"], ipField: "patent" },
+  { term: "営業秘密", english: "Trade Secret", description: "秘密管理・有用性・非公知性の3要件を満たす事業上の情報", category: "strategy", exams: ["it-passport", "chizai"], ipField: "other" },
   { term: "クリエイティブ・コモンズ", english: "Creative Commons", description: "著作者が利用条件を明示して作品の共有を促進するライセンスの仕組み", category: "strategy" },
   { term: "ゲーム理論", english: "Game Theory", description: "競合する意思決定者間の戦略的相互作用を数理的に分析する理論", category: "strategy" },
   { term: "限界利益", english: "Marginal Profit", description: "売上高から変動費を差し引いた利益で固定費の回収に充てられる", category: "strategy" },
@@ -638,8 +642,8 @@ export const termPairs: TermPair[] = [
   { term: "エンジェル投資家", english: "Angel Investor", description: "創業間もない企業に個人で資金を提供する投資家", category: "strategy" },
   { term: "ベンチャーキャピタル", english: "Venture Capital", description: "成長が期待されるスタートアップに出資して上場益を狙う投資会社", category: "strategy" },
   { term: "IPO", english: "Initial Public Offering", description: "未上場企業が株式を証券取引所に新規上場すること", category: "strategy" },
-  { term: "クロスライセンス", english: "Cross-License", description: "複数企業が互いの特許を相互に利用許諾する契約形態", category: "strategy" },
-  { term: "パテントプール", english: "Patent Pool", description: "複数の特許権者が特許をまとめて相互にライセンスする仕組み", category: "strategy" },
+  { term: "クロスライセンス", english: "Cross-License", description: "複数企業が互いの特許を相互に利用許諾する契約形態", category: "strategy", exams: ["it-passport", "chizai"], ipField: "other" },
+  { term: "パテントプール", english: "Patent Pool", description: "複数の特許権者が特許をまとめて相互にライセンスする仕組み", category: "strategy", exams: ["it-passport", "chizai"], ipField: "other" },
   { term: "ブランド戦略", english: "Brand Strategy", description: "ブランドの価値を高め市場での認知度と信頼を構築する戦略", category: "strategy" },
   { term: "損益分岐点分析", english: "Break-Even Analysis", description: "売上高・変動費・固定費から利益がゼロになる売上高を算出する分析手法", category: "strategy" },
   { term: "財務レバレッジ", english: "Financial Leverage", description: "他人資本（借入金）を活用して自己資本利益率を高める効果", category: "strategy" },
@@ -1073,4 +1077,87 @@ export const termPairs: TermPair[] = [
   { term: "アジャイル", english: "Agile", description: "短い反復サイクルで開発と改善を繰り返す柔軟なソフトウェア開発手法の総称", category: "management" },
   // --- ストラテジ系 ---
   { term: "マトリックス図法", english: "Matrix Diagram", description: "行と列に要素を配置し交点で関連性を評価する品質管理の手法", category: "strategy" },
+
+  // ===== 知財3級 用語（特許・実用新案） =====
+  { term: "発明", english: "Invention", description: "自然法則を利用した技術的思想の創作のうち高度のもの", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "新規性", english: "Novelty", description: "出願前に公然と知られていないという特許の登録要件", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "進歩性", english: "Inventive Step", description: "当業者が容易に発明できないという特許の登録要件", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "産業上の利用可能性", english: "Industrial Applicability", description: "産業として利用できるという特許の登録要件", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "先願主義", english: "First-to-File", description: "同一発明は最先の出願人が権利を得るという原則", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "職務発明", english: "Employee Invention", description: "従業者が職務上行った発明。使用者は無償の通常実施権を持つ", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "出願審査請求", english: "Request for Examination", description: "出願日から3年以内に行う必要がある審査開始の請求", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "出願公開", english: "Patent Publication", description: "出願日から1年6か月経過後に出願内容が公開される制度", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "特許請求の範囲", english: "Claims", description: "保護を求める発明を特定する、権利範囲の基礎となる記載", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "明細書", english: "Specification", description: "発明の内容を当業者が実施できる程度に記載する書類", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "分割出願", english: "Divisional Application", description: "二以上の発明を含む出願の一部を新たな出願とする手続", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "国内優先権", english: "Domestic Priority", description: "先の自己の出願に基づき1年以内に優先権を主張する制度", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "PCT国際出願", english: "PCT Application", description: "一つの出願で全加盟国に出願した効果を得る国際出願制度", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "先使用権", english: "Prior User Right", description: "他人の出願時に実施・準備していた者に認められる通常実施権", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "補償金請求権", english: "Right to Compensation", description: "出願公開後の実施に対し登録後に実施料相当額を請求できる権利", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "実用新案技術評価書", english: "Utility Model Technical Opinion", description: "無審査の実用新案権の権利行使前に提示が必要な評価書", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "拒絶査定不服審判", english: "Appeal Against Refusal", description: "拒絶査定に不服がある出願人が請求できる審判", category: "strategy", exams: ["chizai"], ipField: "patent" },
+
+  // ===== 知財3級 用語（意匠・商標） =====
+  { term: "意匠", english: "Design", description: "視覚を通じて美感を起こさせる物品等のデザイン", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "部分意匠", english: "Partial Design", description: "物品の部分のデザインについて登録できる制度", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "関連意匠", english: "Related Design", description: "本意匠に類似する意匠をまとめて登録できる制度", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "秘密意匠", english: "Secret Design", description: "登録日から3年以内、意匠を秘密にしておける制度", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "組物の意匠", english: "Set of Articles Design", description: "同時に使用する複数物品を一つの意匠として登録する制度", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "創作非容易性", english: "Non-obviousness (Design)", description: "容易に創作できたものでないという意匠の登録要件", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "商標", english: "Trademark", description: "自他商品・役務を識別するための標章", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "役務商標", english: "Service Mark", description: "サービス（役務）について使用する商標（サービスマーク）", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "地域団体商標", english: "Regional Collective Trademark", description: "地域名＋商品名からなる地域ブランド保護の商標", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "団体商標", english: "Collective Trademark", description: "団体が構成員に使用させることを目的とする商標", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "立体商標", english: "Three-dimensional Trademark", description: "立体的形状そのものを保護対象とする商標", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "識別力", english: "Distinctiveness", description: "自他商品を区別できる力。欠くと商標登録を受けられない", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "不使用取消審判", english: "Cancellation for Non-use", description: "継続3年以上不使用の登録商標を取り消すための審判", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "商標の更新", english: "Trademark Renewal", description: "存続期間満了前の更新登録で半永久的に維持できる制度", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+  { term: "マドリッド協定議定書", english: "Madrid Protocol", description: "商標の国際登録を一括して出願できる制度", category: "strategy", exams: ["chizai"], ipField: "design-trademark" },
+
+  // ===== 知財3級 用語（著作権） =====
+  { term: "著作物", english: "Work", description: "思想・感情を創作的に表現した文芸・学術・美術・音楽の範囲のもの", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "著作者", english: "Author", description: "著作物を創作した者", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "著作者人格権", english: "Moral Rights", description: "公表権・氏名表示権・同一性保持権からなる一身専属の権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "著作財産権", english: "Economic Rights", description: "複製権・公衆送信権など、譲渡可能な財産的権利の総称", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "公表権", english: "Right of Disclosure", description: "未公表の著作物を公表するか決定する著作者人格権", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "氏名表示権", english: "Right of Attribution", description: "著作者名の表示・非表示を決定する著作者人格権", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "同一性保持権", english: "Right of Integrity", description: "著作物を意に反して改変されない著作者人格権", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "複製権", english: "Right of Reproduction", description: "著作物を複製する権利（著作財産権の代表）", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "公衆送信権", english: "Right of Public Transmission", description: "著作物を公衆に送信する権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "翻案権", english: "Right of Adaptation", description: "著作物を翻訳・編曲・翻案する権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "二次的著作物", english: "Derivative Work", description: "原著作物を翻訳・翻案などして創作した著作物", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "編集著作物", english: "Compilation", description: "素材の選択・配列に創作性がある著作物", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "データベースの著作物", english: "Database Work", description: "情報の選択・体系的構成に創作性がある著作物", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "著作隣接権", english: "Neighboring Rights", description: "実演家・レコード製作者・放送事業者に認められる権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "無方式主義", english: "No-formality Principle", description: "登録なしに創作と同時に著作権が発生する原則", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "私的使用のための複製", english: "Reproduction for Private Use", description: "個人的・家庭内など限られた範囲で認められる複製", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "引用", english: "Quotation", description: "公正な慣行・正当な範囲・出所明示で認められる利用", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+
+  // ===== 知財3級 用語（不競法・契約・条約・その他） =====
+  { term: "産業財産権", english: "Industrial Property Rights", description: "特許権・実用新案権・意匠権・商標権の総称", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "知的財産権", english: "Intellectual Property Rights", description: "知的創作物や営業上の標識に関する権利の総称", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "周知表示混同惹起行為", english: "Confusion with Well-known Indication", description: "周知な他人の表示と混同を生じさせる不正競争行為", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "著名表示冒用行為", english: "Misuse of Famous Indication", description: "著名な他人の表示を無断使用する不正競争行為", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "商品形態模倣", english: "Dead Copy", description: "他人の商品形態を模倣する行為。最初の販売から3年規制", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "限定提供データ", english: "Shared Data with Limited Access", description: "相当量蓄積・管理され特定者に提供されるデータの保護", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "種苗法", english: "Plant Variety Protection Act", description: "植物の新品種を育成者権として保護する法律", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "育成者権", english: "Breeder's Right", description: "登録品種の種苗等を業として独占利用できる権利", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "パリ条約", english: "Paris Convention", description: "内国民待遇・優先権・特許独立を定める産業財産権の条約", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "ベルヌ条約", english: "Berne Convention", description: "無方式主義・内国民待遇を定める著作権の条約", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "TRIPS協定", english: "TRIPS Agreement", description: "WTOで知的財産保護の最低基準を定めた協定", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "ハーグ協定", english: "Hague Agreement", description: "意匠の国際登録を行うための制度", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "専用実施権", english: "Exclusive License", description: "登録により独占的に実施できる物権的な実施権", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "通常実施権", english: "Non-exclusive License", description: "非独占的に実施できる実施権", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "弁理士", english: "Patent Attorney", description: "特許等の出願手続の代理を行う知的財産の専門家", category: "strategy", exams: ["chizai"], ipField: "other" },
 ];
+
+function termExams(t: TermPair): ExamType[] {
+  return t.exams ?? ["it-passport"];
+}
+
+export function getTermsByExam(exam: ExamType): TermPair[] {
+  return termPairs.filter((t) => termExams(t).includes(exam));
+}
+
+export const itPassportTerms = getTermsByExam("it-passport");
+export const chizaiTerms = getTermsByExam("chizai");

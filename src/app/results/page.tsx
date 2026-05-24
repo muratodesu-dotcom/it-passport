@@ -4,7 +4,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { questions as allQuestions } from "@/data/questions";
-import { categoryLabels, Category, Question, QuestionOutcome } from "@/lib/types";
+import { categoryLabels, Category, examLabels, Question, QuestionOutcome } from "@/lib/types";
+import {
+  buildGradeItems,
+  DomainResult,
+  ExamEvaluation,
+  examRules,
+  gradeExam,
+  PRACTICE_PASS_PERCENT,
+} from "@/lib/scoring";
 import { isBookmarked, saveResult, toggleBookmark } from "@/lib/history";
 import { clearQuizSession, loadQuizSession, QuizSessionPayload } from "@/lib/quizSession";
 import ScoreRing from "@/components/ScoreRing";
@@ -21,19 +29,20 @@ export default function ResultsPage() {
     setHydrated(true);
   }, []);
 
-  const { questions, outcomes, correctCount, total, percentage, passed, breakdown, wrongIds } = useMemo(() => {
-    if (!session) {
-      return {
-        questions: [] as Question[],
-        outcomes: [] as QuestionOutcome[],
-        correctCount: 0,
-        total: 0,
-        percentage: 0,
-        passed: false,
-        breakdown: {} as Record<string, { correct: number; total: number }>,
-        wrongIds: [] as number[],
-      };
-    }
+  const { questions, outcomes, correctCount, total, percentage, passed, domainResults, evaluation, wrongIds } = useMemo(() => {
+    const empty = {
+      questions: [] as Question[],
+      outcomes: [] as QuestionOutcome[],
+      correctCount: 0,
+      total: 0,
+      percentage: 0,
+      passed: false,
+      domainResults: [] as DomainResult[],
+      evaluation: null as ExamEvaluation | null,
+      wrongIds: [] as number[],
+    };
+    if (!session) return empty;
+
     const qs = session.questionIds
       .map((id) => allQuestions.find((q) => q.id === id))
       .filter((q): q is Question => Boolean(q));
@@ -48,22 +57,50 @@ export default function ResultsPage() {
     });
     const correct = oc.reduce((c, o) => c + (o.isCorrect ? 1 : 0), 0);
     const totalCount = qs.length;
-    const pct = totalCount > 0 ? Math.round((correct / totalCount) * 100) : 0;
-    const bd: Record<string, { correct: number; total: number }> = {};
-    qs.forEach((q, i) => {
-      if (!bd[q.category]) bd[q.category] = { correct: 0, total: 0 };
-      bd[q.category].total++;
-      if (oc[i].isCorrect) bd[q.category].correct++;
-    });
     const wrong = oc.filter((o) => !o.isCorrect).map((o) => o.id);
+
+    // 本番試験モードは試験種別ごとの合格基準で判定する。
+    if (session.mode === "exam" && session.examType) {
+      const evalResult = gradeExam(session.examType, buildGradeItems(session.examType, qs, oc));
+      return {
+        questions: qs,
+        outcomes: oc,
+        correctCount: correct,
+        total: totalCount,
+        percentage: evalResult.percentage,
+        passed: evalResult.passed,
+        domainResults: evalResult.domainResults,
+        evaluation: evalResult,
+        wrongIds: wrong,
+      };
+    }
+
+    // 練習モードは分野別正答率を参考表示し、汎用の合格ラインで判定する。
+    const pct = totalCount > 0 ? Math.round((correct / totalCount) * 100) : 0;
+    const buckets = new Map<string, { correct: number; total: number }>();
+    qs.forEach((q, i) => {
+      const b = buckets.get(q.category) ?? { correct: 0, total: 0 };
+      b.total++;
+      if (oc[i].isCorrect) b.correct++;
+      buckets.set(q.category, b);
+    });
+    const domains: DomainResult[] = Array.from(buckets.entries()).map(([key, v]) => ({
+      key,
+      label: categoryLabels[key as Category] ?? key,
+      correct: v.correct,
+      total: v.total,
+      percentage: v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0,
+      passed: true,
+    }));
     return {
       questions: qs,
       outcomes: oc,
       correctCount: correct,
       total: totalCount,
       percentage: pct,
-      passed: pct >= 60,
-      breakdown: bd,
+      passed: pct >= PRACTICE_PASS_PERCENT,
+      domainResults: domains,
+      evaluation: null,
       wrongIds: wrong,
     };
   }, [session]);
@@ -81,6 +118,7 @@ export default function ResultsPage() {
       timeSeconds: session.timeSeconds,
       passed,
       mode: session.mode,
+      examType: session.examType,
       outcomes,
     });
     return () => {
@@ -109,14 +147,18 @@ export default function ResultsPage() {
 
   const minutes = Math.floor(session.timeSeconds / 60);
   const seconds = session.timeSeconds % 60;
+  const examRule = session.examType ? examRules[session.examType] : null;
+  const domainThreshold = examRule?.domainPassPercent;
 
-  const categoryLabel = session.source === "wrong"
-    ? "間違えた問題のみ"
-    : session.source === "bookmarks"
-      ? "ブックマーク"
-      : session.category === "all"
-        ? "全分野"
-        : categoryLabels[session.category as Category] || session.category;
+  const categoryLabel = session.mode === "exam" && session.examType
+    ? examLabels[session.examType]
+    : session.source === "wrong"
+      ? "間違えた問題のみ"
+      : session.source === "bookmarks"
+        ? "ブックマーク"
+        : session.category === "all"
+          ? "全分野"
+          : categoryLabels[session.category as Category] || session.category;
 
   const encouragement = percentage === 100
     ? "パーフェクト！素晴らしい！🎉"
@@ -158,24 +200,56 @@ export default function ResultsPage() {
         </span>
       </div>
 
-      {Object.keys(breakdown).length > 1 && (
+      {evaluation && examRule && (
+        <div
+          className={`rounded-xl border p-5 mb-6 shadow-sm ${passed ? "border-[var(--success-border)] bg-[var(--success-bg)]" : "border-[var(--danger-border)] bg-[var(--danger-bg)]"}`}
+        >
+          <p className="font-semibold mb-1">
+            {passed ? "✅ 合格基準を満たしています" : "⚠ 合格基準に届きませんでした"}
+          </p>
+          <p className="text-sm leading-relaxed text-[var(--muted)]">{examRule.criteriaNote}</p>
+          {!passed && evaluation.failReasons.length > 0 && (
+            <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm">
+              {evaluation.failReasons.map((reason, i) => (
+                <li key={i}>{reason}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {domainResults.length > 1 && (
         <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm">
-          <h2 className="font-semibold mb-4">分野別正答率</h2>
+          <h2 className="font-semibold mb-4">
+            分野別正答率
+            {domainThreshold !== undefined && (
+              <span className="ml-2 text-xs font-normal text-[var(--muted)]">（各分野{domainThreshold}%以上が必要）</span>
+            )}
+          </h2>
           <div className="space-y-3">
-            {Object.entries(breakdown).map(([cat, data]) => {
-              const pct = Math.round((data.correct / data.total) * 100);
+            {domainResults.map((d) => {
+              const barColor = domainThreshold !== undefined
+                ? d.passed
+                  ? "bg-[var(--success)]"
+                  : "bg-[var(--danger)]"
+                : "bg-[var(--primary)]";
               return (
-                <div key={cat}>
+                <div key={d.key}>
                   <div className="flex justify-between text-sm mb-1">
-                    <span>{categoryLabels[cat as Category]}</span>
                     <span>
-                      {data.correct}/{data.total} ({pct}%)
+                      {domainThreshold !== undefined && (
+                        <span className="mr-1">{d.passed ? "⭕" : "❌"}</span>
+                      )}
+                      {d.label}
+                    </span>
+                    <span>
+                      {d.correct}/{d.total} ({d.percentage}%)
                     </span>
                   </div>
                   <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${pct >= 60 ? "bg-[var(--success)]" : "bg-[var(--danger)]"}`}
-                      style={{ width: `${pct}%` }}
+                      className={`h-full rounded-full transition-all duration-700 ${barColor}`}
+                      style={{ width: `${d.percentage}%` }}
                     />
                   </div>
                 </div>
@@ -239,9 +313,14 @@ export default function ResultsPage() {
         <button
           onClick={() => {
             const params = new URLSearchParams();
-            if (session.source !== "category") params.set("source", session.source);
-            else params.set("category", session.category);
-            if (session.mode === "exam") params.set("mode", "exam");
+            if (session.mode === "exam") {
+              params.set("mode", "exam");
+              params.set("exam", session.examType ?? "it-passport");
+            } else if (session.source !== "category") {
+              params.set("source", session.source);
+            } else {
+              params.set("category", session.category);
+            }
             router.push(`/quiz?${params.toString()}`);
           }}
           className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"

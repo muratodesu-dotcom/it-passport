@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { questions } from "@/data/questions";
-import { Category, categoryLabels } from "@/lib/types";
-import { Question } from "@/lib/types";
+import { getQuestionsByExam } from "@/data/questions";
+import { Question, examShortLabels } from "@/lib/types";
+import { FieldId, fieldOptions, itemField, parseExam } from "@/lib/examFields";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -17,8 +18,10 @@ function shuffle<T>(arr: T[]): T[] {
 
 const TIME_LIMIT = 60;
 
-export default function SpeedChallenge() {
-  const [category, setCategory] = useState<Category | "all">("all");
+function SpeedChallenge() {
+  const searchParams = useSearchParams();
+  const exam = parseExam(searchParams.get("exam"));
+  const [field, setField] = useState<FieldId>("all");
   const [pool, setPool] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [correct, setCorrect] = useState(0);
@@ -31,7 +34,10 @@ export default function SpeedChallenge() {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const filteredPool = category === "all" ? questions : questions.filter((q) => q.category === category);
+  const filteredPool = useMemo(() => {
+    const base = getQuestionsByExam(exam);
+    return field === "all" ? base : base.filter((q) => itemField(exam, q) === field);
+  }, [exam, field]);
   const current = pool[index];
 
   const startGame = useCallback(() => {
@@ -113,22 +119,25 @@ export default function SpeedChallenge() {
         <Link href="/games" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">&larr; ゲーム一覧</Link>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2">スピードチャレンジ</h1>
+      <div className="mb-2 flex items-center gap-2">
+        <h1 className="text-2xl font-bold">スピードチャレンジ</h1>
+        <span className="rounded-full bg-[var(--badge-bg)] px-2.5 py-0.5 text-xs font-medium text-[var(--primary)]">{examShortLabels[exam]}</span>
+      </div>
       <p className="text-[var(--muted)] mb-6">60秒以内にできるだけ多くの問題に正解しよう</p>
 
-      {/* Category selector */}
+      {/* Field selector */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {(["all", "strategy", "management", "technology"] as const).map((cat) => (
+        {fieldOptions(exam).map((opt) => (
           <button
-            key={cat}
-            onClick={() => { setCategory(cat); if (gameState !== "playing") setGameState("idle"); }}
+            key={opt.id}
+            onClick={() => { setField(opt.id); if (gameState !== "playing") setGameState("idle"); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              category === cat
+              field === opt.id
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
-            {cat === "all" ? "全分野" : categoryLabels[cat]}
+            {opt.label}
           </button>
         ))}
       </div>
@@ -252,5 +261,13 @@ export default function SpeedChallenge() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SpeedPage() {
+  return (
+    <Suspense fallback={null}>
+      <SpeedChallenge />
+    </Suspense>
   );
 }

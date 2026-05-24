@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
             content: [
               {
                 type: "input_text",
-                text: "You are a concise Japanese study coach for the IT Passport exam. Use web search when it helps. Give current, practical study notes with bullet points and clearly separate facts from tips.",
+                text: "You are a concise Japanese study coach for the IT Passport exam (ITパスポート) and the Intellectual Property Management Skills Test Grade 3 (知的財産管理技能検定3級). Use web search when it helps. Give current, practical study notes with bullet points and clearly separate facts from tips.",
               },
             ],
           },

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { termPairs, TermPair } from "@/data/terms";
-import { Category, categoryLabels } from "@/lib/types";
+import { getTermsByExam, TermPair } from "@/data/terms";
+import { examShortLabels } from "@/lib/types";
+import { FieldId, fieldOptions, itemField, parseExam } from "@/lib/examFields";
 
 type MatchItem = {
   id: string;
@@ -27,8 +29,10 @@ function pickRound(pool: TermPair[], count: number): TermPair[] {
 
 const ROUND_SIZE = 6;
 
-export default function MatchingGame() {
-  const [category, setCategory] = useState<Category | "all">("all");
+function MatchingGame() {
+  const searchParams = useSearchParams();
+  const exam = parseExam(searchParams.get("exam"));
+  const [field, setField] = useState<FieldId>("all");
   const [round, setRound] = useState<TermPair[]>([]);
   const [items, setItems] = useState<{ terms: MatchItem[]; descs: MatchItem[] }>({ terms: [], descs: [] });
   const [selected, setSelected] = useState<MatchItem | null>(null);
@@ -41,7 +45,10 @@ export default function MatchingGame() {
   const [startTime, setStartTime] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
-  const pool = category === "all" ? termPairs : termPairs.filter((t) => t.category === category);
+  const pool = useMemo(() => {
+    const base = getTermsByExam(exam);
+    return field === "all" ? base : base.filter((t) => itemField(exam, t) === field);
+  }, [exam, field]);
 
   const startNewRound = useCallback(() => {
     const picked = pickRound(pool, Math.min(ROUND_SIZE, pool.length));
@@ -121,22 +128,25 @@ export default function MatchingGame() {
         <Link href="/games" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">&larr; ゲーム一覧</Link>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2">用語マッチング</h1>
+      <div className="mb-2 flex items-center gap-2">
+        <h1 className="text-2xl font-bold">用語マッチング</h1>
+        <span className="rounded-full bg-[var(--badge-bg)] px-2.5 py-0.5 text-xs font-medium text-[var(--primary)]">{examShortLabels[exam]}</span>
+      </div>
       <p className="text-[var(--muted)] mb-6">左の用語と右の説明をクリックしてペアを見つけよう</p>
 
-      {/* Category selector */}
+      {/* Field selector */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {(["all", "strategy", "management", "technology"] as const).map((cat) => (
+        {fieldOptions(exam).map((opt) => (
           <button
-            key={cat}
-            onClick={() => { setCategory(cat); setGameStarted(false); setRound([]); }}
+            key={opt.id}
+            onClick={() => { setField(opt.id); setGameStarted(false); setRound([]); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              category === cat
+              field === opt.id
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
-            {cat === "all" ? "全分野" : categoryLabels[cat]}
+            {opt.label}
           </button>
         ))}
       </div>
@@ -227,5 +237,13 @@ export default function MatchingGame() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MatchingPage() {
+  return (
+    <Suspense fallback={null}>
+      <MatchingGame />
+    </Suspense>
   );
 }

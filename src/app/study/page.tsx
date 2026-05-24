@@ -37,8 +37,17 @@ function TermHighlighter({ text }: { text: string }) {
       {segments.map((seg, i) =>
         seg.term ? (
           <span key={i} className="relative inline-block group/term">
-            <span className="border-b border-dotted border-current cursor-help">{seg.text}</span>
-            <span className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] shadow-lg opacity-0 transition-opacity group-hover/term:opacity-100 w-56 text-center">
+            <button
+              type="button"
+              aria-label={`用語の説明: ${seg.text}`}
+              className="cursor-help rounded-sm border-b border-dotted border-current focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+            >
+              {seg.text}
+            </button>
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 whitespace-normal rounded-lg border border-[var(--card-border)] bg-[var(--card)] px-3 py-2 text-xs leading-relaxed text-[var(--foreground)] shadow-lg opacity-0 transition-opacity group-hover/term:opacity-100 group-focus-within/term:opacity-100 w-56 text-center"
+            >
               <span className="font-semibold">{seg.text}</span>
               <br />
               <span className="text-[0.65rem] opacity-70">{termLookup.get(seg.text)?.english}</span>
@@ -1432,6 +1441,15 @@ function StudyContent() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const feedCorrectCount = useMemo(() => {
+    return Object.entries(selectedFeedAnswers).reduce((count, [feedId, selected]) => {
+      const item = feedItems.find((fi) => fi.feedId === feedId);
+      if (!item) return count;
+      const q = questions[item.questionIndex];
+      return q && selected === q.correctIndex ? count + 1 : count;
+    }, 0);
+  }, [selectedFeedAnswers, feedItems, questions]);
+
   if (!question) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
@@ -1451,15 +1469,6 @@ function StudyContent() {
     "答えを見る前に、なぜその選択肢が正しいかを1文で説明すると記憶に残りやすくなります。",
     "不安な問題は後でクイズモードでもう一度解き、瞬発力を確認しましょう。",
   ];
-
-  const feedCorrectCount = useMemo(() => {
-    return Object.entries(selectedFeedAnswers).reduce((count, [feedId, selected]) => {
-      const item = feedItems.find((fi) => fi.feedId === feedId);
-      if (!item) return count;
-      const q = questions[item.questionIndex];
-      return q && selected === q.correctIndex ? count + 1 : count;
-    }, 0);
-  }, [selectedFeedAnswers, feedItems, questions]);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">

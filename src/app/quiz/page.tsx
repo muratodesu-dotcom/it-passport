@@ -2,16 +2,14 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
-import { getQuestionsByCategory, shuffleQuestions, questions as allQuestions } from "@/data/questions";
-import { Question, categoryLabels, Category, QuizMode } from "@/lib/types";
+import { getQuestionsByCategory, getQuestionsByExam, shuffleQuestions, questions as allQuestions } from "@/data/questions";
+import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels } from "@/lib/types";
+import { examRules } from "@/lib/scoring";
 import { getBookmarks, getWrongQuestionIds, isBookmarked, toggleBookmark } from "@/lib/history";
 import { saveQuizSession } from "@/lib/quizSession";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 type Source = "category" | "wrong" | "bookmarks";
-
-const EXAM_QUESTION_LIMIT = 100;
-const EXAM_TIME_LIMIT_SECONDS = 120 * 60;
 
 function buildQuestionPool(source: Source, category: string): Question[] {
   if (source === "wrong") {
@@ -30,6 +28,8 @@ function QuizContent() {
   const router = useRouter();
   const category = searchParams.get("category") || "all";
   const mode: QuizMode = searchParams.get("mode") === "exam" ? "exam" : "practice";
+  const examType: ExamType = searchParams.get("exam") === "chizai" ? "chizai" : "it-passport";
+  const examTimeLimitSeconds = examRules[examType].timeLimitSeconds;
   const sourceParam = searchParams.get("source");
   const source: Source = sourceParam === "wrong" || sourceParam === "bookmarks" ? sourceParam : "category";
 
@@ -44,10 +44,12 @@ function QuizContent() {
   const [emptyPool, setEmptyPool] = useState(false);
 
   useEffect(() => {
-    let pool = buildQuestionPool(source, category);
-    pool = shuffleQuestions(pool);
-    if (mode === "exam" && pool.length > EXAM_QUESTION_LIMIT) {
-      pool = pool.slice(0, EXAM_QUESTION_LIMIT);
+    let pool: Question[];
+    if (mode === "exam") {
+      // 本番試験モードは試験種別ごとの全問題から規定数を出題する。
+      pool = shuffleQuestions(getQuestionsByExam(examType)).slice(0, examRules[examType].questionCount);
+    } else {
+      pool = shuffleQuestions(buildQuestionPool(source, category));
     }
     const nextStartTime = Date.now();
     setQuestions(pool);
@@ -58,7 +60,7 @@ function QuizContent() {
     setAnswers(new Array(pool.length).fill(null));
     setStartTime(nextStartTime);
     setElapsed(0);
-  }, [category, mode, source]);
+  }, [category, mode, source, examType]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,6 +78,7 @@ function QuizContent() {
       saveQuizSession({
         category,
         mode,
+        examType: mode === "exam" ? examType : undefined,
         source,
         questionIds: questions.map((q) => q.id),
         answers: finalAnswers,
@@ -83,7 +86,7 @@ function QuizContent() {
       });
       router.push("/results");
     },
-    [category, mode, source, questions, startTime, router]
+    [category, mode, examType, source, questions, startTime, router]
   );
 
   const handleAnswer = useCallback(
@@ -131,10 +134,10 @@ function QuizContent() {
 
   useEffect(() => {
     if (mode !== "exam") return;
-    if (elapsed >= EXAM_TIME_LIMIT_SECONDS && questions.length > 0) {
+    if (elapsed >= examTimeLimitSeconds && questions.length > 0) {
       finishQuiz(answers);
     }
-  }, [mode, elapsed, answers, finishQuiz, questions.length]);
+  }, [mode, elapsed, examTimeLimitSeconds, answers, finishQuiz, questions.length]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -205,7 +208,7 @@ function QuizContent() {
 
   const minutes = Math.floor(elapsed / 60);
   const seconds = elapsed % 60;
-  const timeLeft = mode === "exam" ? Math.max(0, EXAM_TIME_LIMIT_SECONDS - elapsed) : null;
+  const timeLeft = mode === "exam" ? Math.max(0, examTimeLimitSeconds - elapsed) : null;
   const timeLeftMin = timeLeft !== null ? Math.floor(timeLeft / 60) : 0;
   const timeLeftSec = timeLeft !== null ? timeLeft % 60 : 0;
   const answeredCount = answers.filter((a) => a !== null).length;
@@ -220,7 +223,7 @@ function QuizContent() {
           ← 戻る
         </button>
         <span className="text-sm font-medium text-[var(--muted)]">
-          {mode === "exam" ? `本番試験モード · ${headerLabel}` : headerLabel}
+          {mode === "exam" ? `${examShortLabels[examType]} 本番試験モード` : headerLabel}
         </span>
         <div className="text-right">
           <span className="text-sm font-medium block">

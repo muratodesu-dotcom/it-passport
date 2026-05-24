@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { termPairs } from "@/data/terms";
-import { Category, categoryLabels } from "@/lib/types";
+import { getTermsByExam, TermPair } from "@/data/terms";
+import { examShortLabels } from "@/lib/types";
+import { FieldId, fieldLabel, fieldOptions, itemField, parseExam } from "@/lib/examFields";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -14,9 +16,11 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export default function FlashcardsGame() {
-  const [category, setCategory] = useState<Category | "all">("all");
-  const [cards, setCards] = useState(shuffle(termPairs));
+function FlashcardsGame() {
+  const searchParams = useSearchParams();
+  const exam = parseExam(searchParams.get("exam"));
+  const [field, setField] = useState<FieldId>("all");
+  const [cards, setCards] = useState<TermPair[]>([]);
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [known, setKnown] = useState<Set<number>>(new Set());
@@ -24,7 +28,10 @@ export default function FlashcardsGame() {
   const [gameStarted, setGameStarted] = useState(false);
   const [showFront, setShowFront] = useState<"term" | "description">("term");
 
-  const pool = category === "all" ? termPairs : termPairs.filter((t) => t.category === category);
+  const pool = useMemo(() => {
+    const base = getTermsByExam(exam);
+    return field === "all" ? base : base.filter((t) => itemField(exam, t) === field);
+  }, [exam, field]);
 
   const startGame = useCallback(() => {
     const shuffled = shuffle(pool);
@@ -79,22 +86,25 @@ export default function FlashcardsGame() {
         <Link href="/games" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors">&larr; ゲーム一覧</Link>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2">フラッシュカード</h1>
+      <div className="mb-2 flex items-center gap-2">
+        <h1 className="text-2xl font-bold">フラッシュカード</h1>
+        <span className="rounded-full bg-[var(--badge-bg)] px-2.5 py-0.5 text-xs font-medium text-[var(--primary)]">{examShortLabels[exam]}</span>
+      </div>
       <p className="text-[var(--muted)] mb-6">カードをめくって用語を覚えよう。知ってる/知らないで仕分け</p>
 
-      {/* Settings */}
+      {/* Field selector */}
       <div className="flex flex-wrap gap-2 mb-4">
-        {(["all", "strategy", "management", "technology"] as const).map((cat) => (
+        {fieldOptions(exam).map((opt) => (
           <button
-            key={cat}
-            onClick={() => { setCategory(cat); setGameStarted(false); }}
+            key={opt.id}
+            onClick={() => { setField(opt.id); setGameStarted(false); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              category === cat
+              field === opt.id
                 ? "bg-[var(--primary)] text-white"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
-            {cat === "all" ? "全分野" : categoryLabels[cat]}
+            {opt.label}
           </button>
         ))}
       </div>
@@ -145,12 +155,8 @@ export default function FlashcardsGame() {
             >
               {/* Front */}
               <div className={`absolute inset-0 rounded-2xl border-2 border-[var(--card-border)] bg-[var(--card)] p-8 flex flex-col items-center justify-center text-center backface-hidden shadow-lg ${flipped ? "invisible" : ""}`}>
-                <span className={`inline-block rounded-full px-3 py-1 text-xs mb-4 ${
-                  current.category === "strategy" ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300" :
-                  current.category === "management" ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300" :
-                  "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300"
-                }`}>
-                  {categoryLabels[current.category]}
+                <span className="inline-block rounded-full px-3 py-1 text-xs mb-4 bg-[var(--badge-bg)] text-[var(--muted)]">
+                  {fieldLabel(exam, itemField(exam, current))}
                 </span>
                 <p className="text-xl font-bold leading-relaxed">
                   {showFront === "term" ? current.term : current.description}
@@ -229,5 +235,13 @@ export default function FlashcardsGame() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function FlashcardsPage() {
+  return (
+    <Suspense fallback={null}>
+      <FlashcardsGame />
+    </Suspense>
   );
 }
