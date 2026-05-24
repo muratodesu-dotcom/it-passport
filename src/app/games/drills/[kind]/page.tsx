@@ -12,12 +12,17 @@ import {
   drillMap,
   genDefToTerm,
   genEnJp,
+  genAcronym,
+  genCategoryClassify,
   genOddOneOut,
   genTermToDef,
   genTrueFalse,
   prepareCurated,
 } from "@/lib/drills";
 import { chizaiDrillMap, curatedQuestionSets, flowSets } from "@/data/chizaiDrills";
+import { itCuratedSets, itPassportDrillMap } from "@/data/itDrills";
+
+const curatedSets: Record<string, DrillQuestion[]> = { ...curatedQuestionSets, ...itCuratedSets };
 import { addMissedTerms, getMissedTerms, removeMissedTerms } from "@/lib/history";
 import DrillRunner from "@/components/DrillRunner";
 import OrderRunner from "@/components/OrderRunner";
@@ -32,8 +37,11 @@ function buildQuestions(kind: DrillKind, exam: ReturnType<typeof parseExam>, fie
     return genOddOneOut(groups, DRILL_COUNT);
   }
 
-  if (curatedQuestionSets[kind]) {
-    return prepareCurated(curatedQuestionSets[kind], DRILL_COUNT);
+  if (curatedSets[kind]) {
+    return prepareCurated(curatedSets[kind], DRILL_COUNT);
+  }
+  if (kind === "cat3") {
+    return genCategoryClassify(allTerms, DRILL_COUNT);
   }
 
   let pool = allTerms;
@@ -54,6 +62,8 @@ function buildQuestions(kind: DrillKind, exam: ReturnType<typeof parseExam>, fie
       return genEnJp(pool, DRILL_COUNT);
     case "truefalse":
       return genTrueFalse(pool, DRILL_COUNT);
+    case "acronym":
+      return genAcronym(pool, DRILL_COUNT);
     default:
       return [];
   }
@@ -64,7 +74,7 @@ function DrillContent() {
   const searchParams = useSearchParams();
   const kind = (Array.isArray(params.kind) ? params.kind[0] : params.kind) as DrillKind;
   const exam = parseExam(searchParams.get("exam"));
-  const def = drillMap[kind] ?? chizaiDrillMap[kind];
+  const def = drillMap[kind] ?? chizaiDrillMap[kind] ?? itPassportDrillMap[kind];
 
   const [field, setField] = useState<FieldId>("all");
   const [questions, setQuestions] = useState<DrillQuestion[]>([]);

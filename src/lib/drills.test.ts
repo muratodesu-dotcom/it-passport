@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { chizaiTerms } from "@/data/terms";
-import { genDefToTerm, genEnJp, genOddOneOut, genTermToDef, genTrueFalse } from "./drills";
+import { chizaiTerms, itPassportTerms } from "@/data/terms";
+import { genAcronym, genCategoryClassify, genDefToTerm, genEnJp, genOddOneOut, genTermToDef, genTrueFalse } from "./drills";
 import { fieldOptions, itemField } from "./examFields";
 
 function assertValid(qs: ReturnType<typeof genTermToDef>) {
@@ -40,5 +40,16 @@ describe("drill generators", () => {
       .map((o) => ({ key: o.id, label: o.label, terms: chizaiTerms.filter((t) => itemField("chizai", t) === o.id) }));
     const qs = genOddOneOut(groups, 8);
     assertValid(qs);
+  });
+
+  it("3分野分類 produces 3-option questions", () => {
+    const qs = genCategoryClassify(itPassportTerms, 10);
+    expect(qs.length).toBe(10);
+    for (const q of qs) expect(q.options.length).toBe(3);
+    assertValid(qs);
+  });
+
+  it("acronym drill produces valid questions from ITパスポート terms", () => {
+    assertValid(genAcronym(itPassportTerms, 10));
   });
 });

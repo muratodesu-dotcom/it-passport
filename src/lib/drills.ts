@@ -1,4 +1,5 @@
 import { TermPair } from "@/data/terms";
+import { categoryLabels } from "./types";
 
 export interface DrillQuestion {
   id: string;
@@ -20,7 +21,10 @@ export type DrillKind =
   | "duration"
   | "classify"
   | "treaty"
-  | "flow";
+  | "flow"
+  | "calc"
+  | "cat3"
+  | "acronym";
 
 export interface DrillDef {
   kind: DrillKind;
@@ -143,6 +147,42 @@ export function genTrueFalse(terms: TermPair[], count: number): DrillQuestion[] 
       explanation: makeTrue
         ? `正しい説明です。${t.term} = ${t.description}`
         : `誤り。${t.term} = ${t.description}`,
+      termKey: t.term,
+    };
+  });
+}
+
+// ITパスポート: 用語を3分野（ストラテジ/マネジメント/テクノロジ）に分類する。
+export function genCategoryClassify(terms: TermPair[], count: number): DrillQuestion[] {
+  const labels = [categoryLabels.strategy, categoryLabels.management, categoryLabels.technology];
+  return shuffle(terms).slice(0, count).map((t, i) => {
+    const options = shuffle(labels);
+    const correctLabel = categoryLabels[t.category];
+    return {
+      id: `${i}`,
+      prompt: t.term,
+      promptHint: "この用語はどの分野？",
+      options,
+      correctIndex: options.indexOf(correctLabel),
+      explanation: `${t.term} は${correctLabel}（${t.description}）`,
+      termKey: t.term,
+    };
+  });
+}
+
+// 頭字語（CRM, ERP など）→ 正式名称（英語）を当てる。
+export function genAcronym(terms: TermPair[], count: number): DrillQuestion[] {
+  const pool = terms.filter((t) => /^[A-Za-z0-9&./+-]{2,14}$/.test(t.term));
+  if (pool.length < 4) return [];
+  return shuffle(pool).slice(0, count).map((t, i) => {
+    const opts = shuffle([t, ...shuffle(pool.filter((x) => x.term !== t.term)).slice(0, 3)]);
+    return {
+      id: `${i}`,
+      prompt: t.term,
+      promptHint: "この略語の正式名称は？",
+      options: opts.map((o) => o.english),
+      correctIndex: opts.findIndex((o) => o.term === t.term),
+      explanation: `${t.term} = ${t.english}（${t.description}）`,
       termKey: t.term,
     };
   });

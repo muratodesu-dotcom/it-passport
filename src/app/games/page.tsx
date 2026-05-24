@@ -2,6 +2,17 @@ import Link from "next/link";
 import { ExamType, examShortLabels } from "@/lib/types";
 import { drillList } from "@/lib/drills";
 import { chizaiDrillList } from "@/data/chizaiDrills";
+import { itPassportDrillList } from "@/data/itDrills";
+
+const specializedDrills: Record<ExamType, typeof drillList> = {
+  "it-passport": itPassportDrillList,
+  chizai: chizaiDrillList,
+};
+
+const specializedLabel: Record<ExamType, string> = {
+  "it-passport": "ITパスポート 特化ドリル",
+  chizai: "知財3級 特化ドリル",
+};
 
 const games = [
   {
@@ -102,26 +113,22 @@ export default function GamesHub() {
               ))}
             </div>
 
-            {exam.id === "chizai" && (
-              <>
-                <p className="mt-5 mb-3 text-sm font-semibold text-[var(--muted)]">知財3級 特化ドリル</p>
-                <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-                  {chizaiDrillList.map((drill) => (
-                    <Link
-                      key={`chizai-${drill.kind}`}
-                      href={`/games/drills/${drill.kind}?exam=chizai`}
-                      className="group flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
-                    >
-                      <span className="text-2xl">{drill.icon}</span>
-                      <span>
-                        <span className="block text-sm font-semibold group-hover:text-[var(--primary)]">{drill.title}</span>
-                        <span className="block text-xs text-[var(--muted)]">{drill.description}</span>
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </>
-            )}
+            <p className="mt-5 mb-3 text-sm font-semibold text-[var(--muted)]">{specializedLabel[exam.id]}</p>
+            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+              {specializedDrills[exam.id].map((drill) => (
+                <Link
+                  key={`${exam.id}-${drill.kind}`}
+                  href={`/games/drills/${drill.kind}?exam=${exam.id}`}
+                  className="group flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
+                >
+                  <span className="text-2xl">{drill.icon}</span>
+                  <span>
+                    <span className="block text-sm font-semibold group-hover:text-[var(--primary)]">{drill.title}</span>
+                    <span className="block text-xs text-[var(--muted)]">{drill.description}</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
           </section>
         ))}
       </div>
