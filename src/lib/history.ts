@@ -89,6 +89,41 @@ export function toggleBookmark(id: number): boolean {
   return idx < 0;
 }
 
+const MISSED_TERMS_KEY = "it-passport-missed-terms";
+
+export function getMissedTerms(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = localStorage.getItem(MISSED_TERMS_KEY);
+    if (!data) return [];
+    const parsed = JSON.parse(data);
+    return Array.isArray(parsed) ? parsed.filter((v) => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMissedTerms(keys: string[]): void {
+  try {
+    localStorage.setItem(MISSED_TERMS_KEY, JSON.stringify(keys));
+  } catch {
+    // ignore storage errors
+  }
+}
+
+export function addMissedTerms(keys: string[]): void {
+  if (typeof window === "undefined" || keys.length === 0) return;
+  const set = new Set(getMissedTerms());
+  for (const k of keys) set.add(k);
+  saveMissedTerms(Array.from(set));
+}
+
+export function removeMissedTerms(keys: string[]): void {
+  if (typeof window === "undefined" || keys.length === 0) return;
+  const remove = new Set(keys);
+  saveMissedTerms(getMissedTerms().filter((k) => !remove.has(k)));
+}
+
 function dateKey(d: Date): string {
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
 }
