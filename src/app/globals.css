@@ -697,3 +697,11 @@ body {
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
 }
+
+/* High-contrast: strengthen borders and de-mute secondary text. Works
+   across all themes by mixing toward the current foreground color. */
+.high-contrast {
+  --card-border: color-mix(in srgb, var(--foreground) 32%, var(--card));
+  --muted: color-mix(in srgb, var(--foreground) 70%, var(--muted));
+  --progress-bg: color-mix(in srgb, var(--foreground) 24%, var(--card));
+}

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
 import { themeBootScript } from "@/lib/theme";
+import { appearanceBootScript } from "@/lib/appearance";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -34,6 +35,7 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        <script dangerouslySetInnerHTML={{ __html: appearanceBootScript }} />
       </head>
       <body className="min-h-screen">
         <ServiceWorkerRegistrar />

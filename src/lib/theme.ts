@@ -73,6 +73,32 @@ export function saveDarkMode(dark: boolean) {
   window.localStorage.setItem(DARK_MODE_KEY, dark ? "dark" : "light");
 }
 
+export type ThemeMode = "light" | "dark" | "system";
+
+export function loadThemeMode(): ThemeMode {
+  if (typeof window === "undefined") return "system";
+  const saved = window.localStorage.getItem(DARK_MODE_KEY);
+  if (saved === "dark") return "dark";
+  if (saved === "light") return "light";
+  return "system";
+}
+
+export function resolveDark(mode: ThemeMode): boolean {
+  if (mode === "dark") return true;
+  if (mode === "light") return false;
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+export function saveThemeMode(mode: ThemeMode) {
+  if (typeof window === "undefined") return;
+  if (mode === "system") {
+    window.localStorage.removeItem(DARK_MODE_KEY);
+  } else {
+    window.localStorage.setItem(DARK_MODE_KEY, mode);
+  }
+}
+
 // Inline script (stringified) run before paint to avoid a flash of the
 // default theme on first load. Injected from the root layout.
 export const themeBootScript = `
