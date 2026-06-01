@@ -1,0 +1,85 @@
+// Shared theme + appearance logic used by the header controls and the
+// settings page. Keeping it in one place avoids duplicating the localStorage
+// keys and the class-application rules across components.
+
+export const COLOR_THEME_KEY = "color-theme";
+export const DARK_MODE_KEY = "theme";
+
+export type ThemeId =
+  | "default"
+  | "sakura"
+  | "forest"
+  | "sunset"
+  | "ocean"
+  | "lavender";
+
+export type ThemeDef = {
+  id: ThemeId;
+  label: string;
+  color: string;
+  icon: string;
+};
+
+export const THEMES: ThemeDef[] = [
+  { id: "default", label: "ブルー", color: "#3b82f6", icon: "💙" },
+  { id: "sakura", label: "さくら", color: "#ec4899", icon: "🌸" },
+  { id: "forest", label: "フォレスト", color: "#16a34a", icon: "🌿" },
+  { id: "sunset", label: "サンセット", color: "#f97316", icon: "🌅" },
+  { id: "ocean", label: "オーシャン", color: "#06b6d4", icon: "🌊" },
+  { id: "lavender", label: "ラベンダー", color: "#8b5cf6", icon: "💜" },
+];
+
+const THEME_IDS = THEMES.map((t) => t.id);
+
+export function isThemeId(value: string | null): value is ThemeId {
+  return value != null && (THEME_IDS as string[]).includes(value);
+}
+
+export function applyTheme(themeId: ThemeId, dark: boolean) {
+  if (typeof document === "undefined") return;
+  const html = document.documentElement;
+  THEMES.forEach((t) => {
+    if (t.id !== "default") html.classList.remove(`theme-${t.id}`);
+  });
+  html.classList.toggle("dark", dark);
+  if (themeId !== "default") html.classList.add(`theme-${themeId}`);
+}
+
+export function loadThemeId(): ThemeId {
+  if (typeof window === "undefined") return "default";
+  const saved = window.localStorage.getItem(COLOR_THEME_KEY);
+  return isThemeId(saved) ? saved : "default";
+}
+
+export function loadDarkMode(): boolean {
+  if (typeof window === "undefined") return false;
+  const saved = window.localStorage.getItem(DARK_MODE_KEY);
+  if (saved === "dark") return true;
+  if (saved === "light") return false;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
+export function saveThemeId(themeId: ThemeId) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(COLOR_THEME_KEY, themeId);
+}
+
+export function saveDarkMode(dark: boolean) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(DARK_MODE_KEY, dark ? "dark" : "light");
+}
+
+// Inline script (stringified) run before paint to avoid a flash of the
+// default theme on first load. Injected from the root layout.
+export const themeBootScript = `
+(function(){
+  try {
+    var t = localStorage.getItem('${COLOR_THEME_KEY}') || 'default';
+    var m = localStorage.getItem('${DARK_MODE_KEY}');
+    var dark = m === 'dark' || (!m && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var el = document.documentElement;
+    if (t && t !== 'default') el.classList.add('theme-' + t);
+    if (dark) el.classList.add('dark');
+  } catch (e) {}
+})();
+`;
