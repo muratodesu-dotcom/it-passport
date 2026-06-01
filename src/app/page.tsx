@@ -54,7 +54,7 @@ const featureCards = [
   },
   {
     title: "Doom Scroll学習",
-    description: "復習カードが無限に流れるような感覚で、テンポよく連続インプットできます。",
+    description: "問題も用語・解説も、無限に流れるフィードでテンポよく連続インプットできます。",
     icon: "🌀",
   },
   {
@@ -103,7 +103,13 @@ export default function Home() {
                 href="/study?category=strategy"
                 className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >
-                Doom Scroll学習を試す
+                問題をDoom Scroll
+              </Link>
+              <Link
+                href="/scroll"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+              >
+                🌀 用語をDoom Scroll
               </Link>
             </div>
           </div>
@@ -258,20 +264,37 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mb-12 grid gap-4 md:grid-cols-[1fr_auto] md:items-center rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
-        <div>
-          <h2 className="text-xl font-semibold mb-2">用語集を引く</h2>
-          <p className="text-sm leading-relaxed text-[var(--muted)]">
-            出題範囲の頻出用語をカテゴリ別に一覧。和英対応つきで、調べたい言葉をすばやく確認できます。
-          </p>
+      <section className="mb-12">
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="text-xl font-semibold">用語をインプット</h2>
+          <p className="text-sm text-[var(--muted)]">調べたいときは一覧、覚えたいときはフィードで。</p>
         </div>
-        <Link
-          href="/glossary"
-          className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--background)] hover:shadow-md transition-all hover:-translate-y-0.5"
-        >
-          <span>📖</span>
-          <span className="font-medium">用語集を開く</span>
-        </Link>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link
+            href="/scroll"
+            className="group block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-all hover:shadow-lg hover:-translate-y-0.5"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🌀</span>
+              <h3 className="font-bold text-lg group-hover:text-[var(--primary)]">用語フィード（Doom Scroll）</h3>
+            </div>
+            <p className="text-sm text-[var(--muted)]">
+              用語と解説が無限に流れてくる学習フィード。自己テストモードで説明を隠して思い出す練習もできます。
+            </p>
+          </Link>
+          <Link
+            href="/glossary"
+            className="group block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-all hover:shadow-lg hover:-translate-y-0.5"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">📖</span>
+              <h3 className="font-bold text-lg group-hover:text-[var(--primary)]">用語集を引く</h3>
+            </div>
+            <p className="text-sm text-[var(--muted)]">
+              出題範囲の頻出用語をカテゴリ別に一覧。和英対応つきで、調べたい言葉をすばやく確認できます。
+            </p>
+          </Link>
+        </div>
       </section>
 
       <section className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
