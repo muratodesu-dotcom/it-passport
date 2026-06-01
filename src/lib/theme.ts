@@ -11,7 +11,9 @@ export type ThemeId =
   | "forest"
   | "sunset"
   | "ocean"
-  | "lavender";
+  | "lavender"
+  | "midnight"
+  | "mono";
 
 export type ThemeDef = {
   id: ThemeId;
@@ -21,12 +23,14 @@ export type ThemeDef = {
 };
 
 export const THEMES: ThemeDef[] = [
-  { id: "default", label: "ブルー", color: "#3b82f6", icon: "💙" },
+  { id: "default", label: "インディゴ", color: "#4f46e5", icon: "💙" },
   { id: "sakura", label: "さくら", color: "#ec4899", icon: "🌸" },
-  { id: "forest", label: "フォレスト", color: "#16a34a", icon: "🌿" },
+  { id: "forest", label: "フォレスト", color: "#10b981", icon: "🌿" },
   { id: "sunset", label: "サンセット", color: "#f97316", icon: "🌅" },
   { id: "ocean", label: "オーシャン", color: "#06b6d4", icon: "🌊" },
   { id: "lavender", label: "ラベンダー", color: "#8b5cf6", icon: "💜" },
+  { id: "midnight", label: "ミッドナイト", color: "#6366f1", icon: "🌌" },
+  { id: "mono", label: "モノクロ", color: "#71717a", icon: "🩶" },
 ];
 
 const THEME_IDS = THEMES.map((t) => t.id);
