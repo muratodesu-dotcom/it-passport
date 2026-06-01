@@ -40,6 +40,7 @@ export default function RootLayout({
             <Link href="/" className="text-sm font-semibold tracking-wide text-[var(--foreground)]">ITパス＆知財3級</Link>
             <nav className="flex items-center gap-3 text-sm">
               <Link href="/study?category=strategy" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Study</Link>
+              <Link href="/scroll" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Feed</Link>
               <Link href="/games" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Games</Link>
               <Link href="/glossary" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">Glossary</Link>
               <Link href="/history" className="text-[var(--muted)] transition-colors hover:text-[var(--foreground)]">History</Link>

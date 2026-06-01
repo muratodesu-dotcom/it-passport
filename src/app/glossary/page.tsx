@@ -76,7 +76,9 @@ export default function GlossaryPage() {
           ← 戻る
         </Link>
         <h1 className="text-xl font-bold">用語集</h1>
-        <span className="text-xs text-[var(--muted)]">{totalCount}語</span>
+        <Link href="/scroll" className="text-sm text-[var(--primary)] transition-colors hover:underline">
+          🌀 フィードで学ぶ
+        </Link>
       </div>
 
       <div className="mb-6 flex gap-2">
