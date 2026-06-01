@@ -66,48 +66,48 @@ const featureCards = [
 
 export default function Home() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <header className="mb-12 rounded-[2rem] border border-[var(--card-border)] bg-[var(--card)] p-8 shadow-sm">
+    <div className="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+      <header className="mb-8 rounded-3xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm sm:mb-12 sm:p-8">
         <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
           <div>
-            <p className="mb-3 inline-flex rounded-full bg-[var(--badge-bg)] px-3 py-1 text-sm font-medium text-[var(--primary)]">
+            <p className="mb-3 inline-flex rounded-full bg-[var(--badge-bg)] px-3 py-1 text-xs font-medium text-[var(--primary)] sm:text-sm">
               ITパスポート＆知財3級 対策をもっと楽しく、もっと濃く
             </p>
-            <h1 className="mb-4 text-4xl font-bold leading-tight bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))` }}>
+            <h1 className="mb-4 text-2xl font-bold leading-tight bg-clip-text text-transparent sm:text-4xl" style={{ backgroundImage: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))` }}>
               ITパスポート＆知財3級 学習＆模擬テストアプリ
             </h1>
-            <p className="max-w-2xl text-lg leading-relaxed text-[var(--muted)]">
+            <p className="max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:text-lg">
               ITパスポート試験と知的財産管理技能検定3級の両方に対応。分野別クイズ、解説付き学習、履歴トラッキングに加えて、各試験の合格基準で採点する本番試験モードを搭載しています。
             </p>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
               <Link
                 href="/quiz?category=all"
-                className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+                className="rounded-xl bg-[var(--primary)] px-6 py-3 text-center font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
               >
                 まずは総合クイズへ
               </Link>
               <Link
                 href="/quiz?mode=exam&exam=it-passport"
-                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 text-center font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >
                 🎯 ITパスポート 本番試験
               </Link>
               <Link
                 href="/quiz?mode=exam&exam=chizai"
-                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 text-center font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >
                 ⚖️ 知財3級 本番試験
               </Link>
               <Link
                 href="/study?category=strategy"
-                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 text-center font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >
                 問題をDoom Scroll
               </Link>
               <Link
                 href="/scroll"
-                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 text-center font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
               >
                 🌀 用語をDoom Scroll
               </Link>
@@ -134,7 +134,7 @@ export default function Home() {
 
       <StudyPulse />
 
-      <section className="mb-12 grid gap-4 md:grid-cols-3">
+      <section className="mb-8 sm:mb-12 grid gap-4 md:grid-cols-3">
         {featureCards.map((feature) => (
           <div
             key={feature.title}
@@ -147,7 +147,7 @@ export default function Home() {
         ))}
       </section>
 
-      <section className="mb-12">
+      <section className="mb-8 sm:mb-12">
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h2 className="text-xl font-semibold">本番試験モードで腕試し</h2>
           <p className="text-sm text-[var(--muted)]">各試験の公式に近い形式・合格基準で採点します。</p>
@@ -180,7 +180,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mb-12">
+      <section className="mb-8 sm:mb-12">
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h2 className="text-xl font-semibold">クイズモードで挑戦</h2>
           <p className="text-sm text-[var(--muted)]">本番感覚でテンポよく回答。全分野・分野別の両方に対応。</p>
@@ -213,7 +213,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mb-12">
+      <section className="mb-8 sm:mb-12">
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h2 className="text-xl font-semibold">学習モードで復習</h2>
           <p className="text-sm text-[var(--muted)]">集中して理解する通常モードと、連続インプット向けのDoom Scrollモードを搭載。</p>
@@ -237,7 +237,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mb-12">
+      <section className="mb-8 sm:mb-12">
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h2 className="text-xl font-semibold">ゲームモードで楽しく学ぶ</h2>
           <Link href="/games" className="text-sm font-medium text-[var(--primary)]">すべて見る →</Link>
@@ -264,7 +264,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="mb-12">
+      <section className="mb-8 sm:mb-12">
         <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
           <h2 className="text-xl font-semibold">用語をインプット</h2>
           <p className="text-sm text-[var(--muted)]">調べたいときは一覧、覚えたいときはフィードで。</p>
