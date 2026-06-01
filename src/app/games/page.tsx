@@ -48,12 +48,12 @@ const exams: { id: ExamType; accent: string }[] = [
 
 export default function GamesHub() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <header className="mb-10 text-center">
+    <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+      <header className="mb-8 text-center sm:mb-10">
         <p className="mb-3 inline-flex rounded-full bg-[var(--badge-bg)] px-3 py-1 text-sm font-medium text-[var(--primary)]">
           楽しく学ぶ
         </p>
-        <h1 className="text-3xl font-bold mb-3 bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))` }}>
+        <h1 className="text-2xl font-bold mb-3 bg-clip-text text-transparent sm:text-3xl" style={{ backgroundImage: `linear-gradient(to right, var(--gradient-from), var(--gradient-via), var(--gradient-to))` }}>
           ゲームモード
         </h1>
         <p className="text-[var(--muted)] max-w-lg mx-auto">
