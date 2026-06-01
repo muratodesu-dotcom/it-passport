@@ -137,12 +137,12 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
               key={i}
               onClick={() => answer(i)}
               disabled={revealed}
-              className={`w-full text-left p-4 rounded-xl border-2 bg-[var(--card)] transition-all ${style}`}
+              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 bg-[var(--card)] transition-all ${style}`}
             >
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[var(--badge-bg)] text-sm font-medium mr-3">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
                 {i + 1}
               </span>
-              {opt}
+              <span className="flex-1 leading-relaxed">{opt}</span>
             </button>
           );
         })}
