@@ -162,7 +162,7 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
 
   return (
     <div>
-      <div className="sticky top-[57px] z-30 mb-4 rounded-2xl border border-[var(--card-border)] bg-[color:color-mix(in_srgb,var(--card)_92%,transparent)] px-4 py-3 shadow-sm backdrop-blur">
+      <div className="sticky top-14 z-30 mb-4 rounded-2xl border border-[var(--card-border)] bg-[color:color-mix(in_srgb,var(--card)_92%,transparent)] px-4 py-3 shadow-sm backdrop-blur">
         <div className="flex items-center justify-between gap-3 text-xs text-[var(--muted)]">
           <span>
             学習した用語 <span className="font-semibold text-[var(--foreground)]">{uniqueCount}</span> / {total}語
