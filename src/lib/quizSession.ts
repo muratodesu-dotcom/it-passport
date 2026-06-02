@@ -8,7 +8,7 @@ export interface QuizSessionPayload {
   field?: string;
   mode: QuizMode;
   examType?: ExamType;
-  source: "category" | "wrong" | "bookmarks";
+  source: "category" | "wrong" | "bookmarks" | "review";
   questionIds: number[];
   answers: (number | null)[];
   timeSeconds: number;

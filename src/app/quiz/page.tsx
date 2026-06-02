@@ -6,11 +6,12 @@ import { getChizaiQuestionsByField, getQuestionsByCategory, getQuestionsByExam, 
 import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels, ipFieldLabels, IpField } from "@/lib/types";
 import { examRules } from "@/lib/scoring";
 import { getBookmarks, getWrongQuestionIds, isBookmarked, toggleBookmark } from "@/lib/history";
+import { getDueQuestionIds } from "@/lib/srs";
 import { saveQuizSession } from "@/lib/quizSession";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ExplanationEn from "@/components/ExplanationEn";
 
-type Source = "category" | "wrong" | "bookmarks";
+type Source = "category" | "wrong" | "bookmarks" | "review";
 
 function buildQuestionPool(source: Source, category: string): Question[] {
   if (source === "wrong") {
@@ -20,6 +21,12 @@ function buildQuestionPool(source: Source, category: string): Question[] {
   if (source === "bookmarks") {
     const ids = new Set(getBookmarks());
     return allQuestions.filter((q) => ids.has(q.id));
+  }
+  if (source === "review") {
+    // Spaced-repetition: questions whose review is due, soonest first.
+    const due = getDueQuestionIds();
+    const byId = new Map(allQuestions.map((q) => [q.id, q]));
+    return due.map((id) => byId.get(id)).filter((q): q is Question => Boolean(q));
   }
   return getQuestionsByCategory(category);
 }
@@ -32,7 +39,10 @@ function QuizContent() {
   const examType: ExamType = searchParams.get("exam") === "chizai" ? "chizai" : "it-passport";
   const examTimeLimitSeconds = examRules[examType].timeLimitSeconds;
   const sourceParam = searchParams.get("source");
-  const source: Source = sourceParam === "wrong" || sourceParam === "bookmarks" ? sourceParam : "category";
+  const source: Source =
+    sourceParam === "wrong" || sourceParam === "bookmarks" || sourceParam === "review"
+      ? sourceParam
+      : "category";
   // 知財3級の分野別練習で出題範囲を絞る IpField（"all" 含む）。
   const field = searchParams.get("field") || "all";
 
@@ -187,7 +197,9 @@ function QuizContent() {
       ? "間違えた問題はまだありません。クイズに挑戦すると、ここに復習対象が溜まります。"
       : source === "bookmarks"
         ? "ブックマークされた問題がありません。問題画面の☆ボタンでブックマークできます。"
-        : "このカテゴリの問題が見つかりません。";
+        : source === "review"
+          ? "本日の復習対象はありません。クイズや練習を解くと、忘れた頃に復習カードが出題されます。"
+          : "このカテゴリの問題が見つかりません。";
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 text-center shadow-sm">
@@ -213,6 +225,8 @@ function QuizContent() {
     ? "間違えた問題のみ"
     : source === "bookmarks"
       ? "ブックマーク"
+      : source === "review"
+      ? "復習（間隔反復）"
       : examType === "chizai"
         ? field === "all"
           ? "知財3級 全分野"

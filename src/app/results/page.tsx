@@ -15,6 +15,7 @@ import {
   questionDomain,
 } from "@/lib/scoring";
 import { isBookmarked, saveResult, toggleBookmark } from "@/lib/history";
+import { recordOutcomes } from "@/lib/srs";
 import { clearQuizSession, loadQuizSession, QuizSessionPayload } from "@/lib/quizSession";
 import ScoreRing from "@/components/ScoreRing";
 
@@ -128,6 +129,8 @@ export default function ResultsPage() {
       examType: session.examType,
       outcomes,
     });
+    // Feed every answered question into the spaced-repetition scheduler.
+    recordOutcomes(outcomes.map((o) => ({ id: o.id, isCorrect: o.isCorrect })));
     return () => {
       clearQuizSession();
     };
