@@ -4,6 +4,8 @@ const SESSION_KEY = "it-passport-last-quiz";
 
 export interface QuizSessionPayload {
   category: string;
+  // 知財3級の分野別練習で選ばれた IpField（"all" 含む）。
+  field?: string;
   mode: QuizMode;
   examType?: ExamType;
   source: "category" | "wrong" | "bookmarks";

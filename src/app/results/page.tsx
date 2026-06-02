@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { questions as allQuestions, withShuffledOptions } from "@/data/questions";
-import { categoryLabels, Category, examLabels, Question, QuestionOutcome } from "@/lib/types";
+import { categoryLabels, Category, examLabels, ipFieldLabels, IpField, Question, QuestionOutcome } from "@/lib/types";
 import {
   buildGradeItems,
   DomainResult,
@@ -12,6 +12,7 @@ import {
   examRules,
   gradeExam,
   PRACTICE_PASS_PERCENT,
+  questionDomain,
 } from "@/lib/scoring";
 import { isBookmarked, saveResult, toggleBookmark } from "@/lib/history";
 import { clearQuizSession, loadQuizSession, QuizSessionPayload } from "@/lib/quizSession";
@@ -79,17 +80,20 @@ export default function ResultsPage() {
     }
 
     // 練習モードは分野別正答率を参考表示し、汎用の合格ラインで判定する。
+    // 知財3級は分野（IpField）別、ITパスポートはカテゴリ別に集計する。
     const pct = totalCount > 0 ? Math.round((correct / totalCount) * 100) : 0;
-    const buckets = new Map<string, { correct: number; total: number }>();
+    const domainExam = session.examType ?? "it-passport";
+    const buckets = new Map<string, { label: string; correct: number; total: number }>();
     qs.forEach((q, i) => {
-      const b = buckets.get(q.category) ?? { correct: 0, total: 0 };
+      const d = questionDomain(domainExam, q);
+      const b = buckets.get(d.key) ?? { label: d.label, correct: 0, total: 0 };
       b.total++;
       if (oc[i].isCorrect) b.correct++;
-      buckets.set(q.category, b);
+      buckets.set(d.key, b);
     });
     const domains: DomainResult[] = Array.from(buckets.entries()).map(([key, v]) => ({
       key,
-      label: categoryLabels[key as Category] ?? key,
+      label: v.label,
       correct: v.correct,
       total: v.total,
       percentage: v.total > 0 ? Math.round((v.correct / v.total) * 100) : 0,
@@ -150,7 +154,8 @@ export default function ResultsPage() {
 
   const minutes = Math.floor(session.timeSeconds / 60);
   const seconds = session.timeSeconds % 60;
-  const examRule = session.examType ? examRules[session.examType] : null;
+  // 分野別合格基準は本番試験モードだけに適用する（練習では参考表示にとどめる）。
+  const examRule = session.mode === "exam" && session.examType ? examRules[session.examType] : null;
   const domainThreshold = examRule?.domainPassPercent;
 
   const categoryLabel = session.mode === "exam" && session.examType
@@ -159,9 +164,13 @@ export default function ResultsPage() {
       ? "間違えた問題のみ"
       : session.source === "bookmarks"
         ? "ブックマーク"
-        : session.category === "all"
-          ? "全分野"
-          : categoryLabels[session.category as Category] || session.category;
+        : session.examType === "chizai"
+          ? session.field && session.field !== "all"
+            ? `知財3級 · ${ipFieldLabels[session.field as IpField] ?? session.field}`
+            : "知財3級 全分野"
+          : session.category === "all"
+            ? "全分野"
+            : categoryLabels[session.category as Category] || session.category;
 
   const encouragement = percentage === 100
     ? "パーフェクト！素晴らしい！🎉"
@@ -321,6 +330,9 @@ export default function ResultsPage() {
               params.set("exam", session.examType ?? "it-passport");
             } else if (session.source !== "category") {
               params.set("source", session.source);
+            } else if (session.examType === "chizai") {
+              params.set("exam", "chizai");
+              params.set("field", session.field ?? "all");
             } else {
               params.set("category", session.category);
             }

@@ -2,8 +2,8 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
-import { getQuestionsByCategory, getQuestionsByExam, shuffleQuestions, withShuffledOptions, questions as allQuestions } from "@/data/questions";
-import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels } from "@/lib/types";
+import { getChizaiQuestionsByField, getQuestionsByCategory, getQuestionsByExam, shuffleQuestions, withShuffledOptions, questions as allQuestions } from "@/data/questions";
+import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels, ipFieldLabels, IpField } from "@/lib/types";
 import { examRules } from "@/lib/scoring";
 import { getBookmarks, getWrongQuestionIds, isBookmarked, toggleBookmark } from "@/lib/history";
 import { saveQuizSession } from "@/lib/quizSession";
@@ -32,6 +32,8 @@ function QuizContent() {
   const examTimeLimitSeconds = examRules[examType].timeLimitSeconds;
   const sourceParam = searchParams.get("source");
   const source: Source = sourceParam === "wrong" || sourceParam === "bookmarks" ? sourceParam : "category";
+  // 知財3級の分野別練習で出題範囲を絞る IpField（"all" 含む）。
+  const field = searchParams.get("field") || "all";
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,6 +50,9 @@ function QuizContent() {
     if (mode === "exam") {
       // 本番試験モードは試験種別ごとの全問題から規定数を出題する。
       pool = shuffleQuestions(getQuestionsByExam(examType)).slice(0, examRules[examType].questionCount);
+    } else if (source === "category" && examType === "chizai") {
+      // 知財3級は分野別（特許・意匠商標・著作権・その他）に練習できる。
+      pool = shuffleQuestions(getChizaiQuestionsByField(field));
     } else {
       pool = shuffleQuestions(buildQuestionPool(source, category));
     }
@@ -63,7 +68,7 @@ function QuizContent() {
     setAnswers(new Array(pool.length).fill(null));
     setStartTime(nextStartTime);
     setElapsed(0);
-  }, [category, mode, source, examType]);
+  }, [category, mode, source, examType, field]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,8 +85,10 @@ function QuizContent() {
       const totalTime = Math.floor((Date.now() - startTime) / 1000);
       saveQuizSession({
         category,
+        field,
         mode,
-        examType: mode === "exam" ? examType : undefined,
+        // 練習でも試験種別を残し、結果画面で知財は分野（IpField）別に集計する。
+        examType,
         source,
         questionIds: questions.map((q) => q.id),
         answers: finalAnswers,
@@ -89,7 +96,7 @@ function QuizContent() {
       });
       router.push("/results");
     },
-    [category, mode, examType, source, questions, startTime, router]
+    [category, field, mode, examType, source, questions, startTime, router]
   );
 
   const handleAnswer = useCallback(
@@ -205,9 +212,13 @@ function QuizContent() {
     ? "間違えた問題のみ"
     : source === "bookmarks"
       ? "ブックマーク"
-      : category === "all"
-        ? "全分野"
-        : categoryLabels[category as Category] || category;
+      : examType === "chizai"
+        ? field === "all"
+          ? "知財3級 全分野"
+          : ipFieldLabels[field as IpField] ?? field
+        : category === "all"
+          ? "全分野"
+          : categoryLabels[category as Category] || category;
 
   const minutes = Math.floor(elapsed / 60);
   const seconds = elapsed % 60;

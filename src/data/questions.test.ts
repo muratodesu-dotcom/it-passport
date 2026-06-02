@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   questions,
   getQuestionsByExam,
+  getChizaiQuestionsByField,
   itPassportQuestions,
   chizaiQuestions,
   withShuffledOptions,
@@ -42,6 +43,20 @@ describe("exam pools", () => {
     for (const q of getQuestionsByExam("chizai")) {
       expect(q.ipField).toBeDefined();
     }
+  });
+
+  it("getChizaiQuestionsByField filters the chizai pool by IP field", () => {
+    expect(getChizaiQuestionsByField("all").length).toBe(chizaiQuestions.length);
+    const fields = ["patent", "design-trademark", "copyright", "other"] as const;
+    let sum = 0;
+    for (const f of fields) {
+      const qs = getChizaiQuestionsByField(f);
+      expect(qs.length).toBeGreaterThan(0);
+      for (const q of qs) expect(q.ipField ?? "other").toBe(f);
+      sum += qs.length;
+    }
+    // The four fields partition the whole chizai pool.
+    expect(sum).toBe(chizaiQuestions.length);
   });
 
   it("untagged questions default to ITパスポート only", () => {

@@ -6014,6 +6014,12 @@ export function getQuestionsByCategory(category: string): Question[] {
   return itPassportQuestions.filter((q) => q.category === category);
 }
 
+// 知財3級の分野別練習用。fieldは "all" または IpField。
+export function getChizaiQuestionsByField(field: string): Question[] {
+  if (field === "all") return chizaiQuestions;
+  return chizaiQuestions.filter((q) => (q.ipField ?? "other") === field);
+}
+
 export function shuffleQuestions(qs: Question[]): Question[] {
   const shuffled = [...qs];
   for (let i = shuffled.length - 1; i > 0; i--) {

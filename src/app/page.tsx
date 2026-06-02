@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { chizaiQuestions, itPassportQuestions } from "@/data/questions";
+import { ipFieldLabels } from "@/lib/types";
 import StudyPulse from "@/components/StudyPulse";
 
 const categoryDefinitions = [
@@ -43,6 +44,19 @@ const categories = categoryDefinitions.map((category) => ({
 
 const totalQuestions = itPassportQuestions.length;
 const chizaiCount = chizaiQuestions.length;
+
+// 知財3級の分野別練習カード（全分野＋4分野）。本番試験ではなく解説付きの練習導線。
+const chizaiFieldDefinitions = [
+  { id: "all", title: "全分野", description: "特許・意匠商標・著作権・その他をまとめて", color: "from-amber-500 to-orange-500", icon: "⚖️" },
+  { id: "patent", title: ipFieldLabels.patent, description: "特許法・実用新案法", color: "from-blue-500 to-cyan-500", icon: "🔬" },
+  { id: "design-trademark", title: ipFieldLabels["design-trademark"], description: "意匠法・商標法", color: "from-pink-500 to-rose-500", icon: "🎨" },
+  { id: "copyright", title: ipFieldLabels.copyright, description: "著作権法・著作隣接権", color: "from-purple-500 to-fuchsia-500", icon: "✍️" },
+  { id: "other", title: ipFieldLabels.other, description: "不正競争防止法・契約・条約", color: "from-emerald-500 to-teal-500", icon: "📜" },
+];
+const chizaiFields = chizaiFieldDefinitions.map((f) => ({
+  ...f,
+  count: f.id === "all" ? chizaiQuestions.length : chizaiQuestions.filter((q) => (q.ipField ?? "other") === f.id).length,
+}));
 const totalCategories = categories.length - 1;
 const estimatedMinutes = Math.ceil(totalQuestions * 0.7);
 
@@ -205,6 +219,33 @@ export default function Home() {
                     className={`inline-block text-xs text-white px-2 py-1 rounded-full bg-gradient-to-r ${cat.color}`}
                   >
                     {cat.count}問
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-8 sm:mb-12">
+        <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+          <h2 className="text-xl font-semibold">知財3級 分野別で練習</h2>
+          <p className="text-sm text-[var(--muted)]">解説を見ながら分野ごとに練習。本番前の弱点補強に。</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {chizaiFields.map((f) => (
+            <Link
+              key={f.id}
+              href={`/quiz?mode=practice&exam=chizai&field=${f.id}`}
+              className="group block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-all hover:shadow-lg hover:-translate-y-0.5"
+            >
+              <div className="flex items-start gap-4">
+                <span className="text-3xl">{f.icon}</span>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg mb-1 group-hover:text-[var(--primary)]">{f.title}</h3>
+                  <p className="text-sm text-[var(--muted)] mb-2">{f.description}</p>
+                  <span className={`inline-block text-xs text-white px-2 py-1 rounded-full bg-gradient-to-r ${f.color}`}>
+                    {f.count}問
                   </span>
                 </div>
               </div>
