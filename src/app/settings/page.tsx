@@ -254,6 +254,19 @@ export default function SettingsPage() {
               label="英語の解説を表示"
             />
           </div>
+          <div className="flex items-center justify-between gap-4 p-4">
+            <div>
+              <p className="text-sm font-medium">ふりがなを表示</p>
+              <p className="mt-0.5 text-xs text-[var(--muted)]">
+                漢字の用語にふりがな（ルビ）を表示します。オフにすると漢字のみになります。
+              </p>
+            </div>
+            <Toggle
+              checked={appearance.showFurigana}
+              onChange={(v) => updateAppearance({ showFurigana: v })}
+              label="ふりがなを表示"
+            />
+          </div>
         </div>
 
         <button
