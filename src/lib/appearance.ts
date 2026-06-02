@@ -14,6 +14,10 @@ export type Appearance = {
   // (the "EN" blurbs) are hidden. Defaults to true so the bilingual study
   // experience is on out of the box.
   showEnglish: boolean;
+  // When false, the furigana (ruby readings) shown above kanji terms are
+  // hidden. Defaults to true so kanji-heavy terms stay readable; turn it off
+  // once the readings are no longer needed.
+  showFurigana: boolean;
 };
 
 export const defaultAppearance: Appearance = {
@@ -21,6 +25,7 @@ export const defaultAppearance: Appearance = {
   reduceMotion: false,
   highContrast: false,
   showEnglish: true,
+  showFurigana: true,
 };
 
 export const FONT_SCALE_OPTIONS: { id: FontScale; label: string; px: number }[] = [
@@ -47,6 +52,7 @@ export function loadAppearance(): Appearance {
       reduceMotion: typeof parsed.reduceMotion === "boolean" ? parsed.reduceMotion : false,
       highContrast: typeof parsed.highContrast === "boolean" ? parsed.highContrast : false,
       showEnglish: typeof parsed.showEnglish === "boolean" ? parsed.showEnglish : defaultAppearance.showEnglish,
+      showFurigana: typeof parsed.showFurigana === "boolean" ? parsed.showFurigana : defaultAppearance.showFurigana,
     };
   } catch {
     return defaultAppearance;
@@ -60,6 +66,7 @@ export function applyAppearance(a: Appearance) {
   root.classList.toggle("no-motion", a.reduceMotion);
   root.classList.toggle("high-contrast", a.highContrast);
   root.classList.toggle("hide-en", !a.showEnglish);
+  root.classList.toggle("hide-furigana", !a.showFurigana);
 }
 
 export function saveAppearance(a: Appearance) {
@@ -80,6 +87,7 @@ export const appearanceBootScript = `
     if (a.reduceMotion) root.classList.add('no-motion');
     if (a.highContrast) root.classList.add('high-contrast');
     if (a.showEnglish === false) root.classList.add('hide-en');
+    if (a.showFurigana === false) root.classList.add('hide-furigana');
   } catch (e) {}
 })();
 `;

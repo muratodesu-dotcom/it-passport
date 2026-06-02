@@ -712,3 +712,10 @@ body {
 .hide-en .explanation-en {
   display: none;
 }
+
+/* Opt-out: hide the furigana (ruby readings) above kanji terms when the user
+   turns them off in settings. Hiding only the <rt> leaves the base term as
+   plain text. Set on <html> before first paint to avoid a flash of readings. */
+.hide-furigana .furigana-rt {
+  display: none;
+}
