@@ -276,6 +276,28 @@ export default function Home() {
             </Link>
           ))}
         </div>
+
+        <div className="mt-6 mb-3 flex items-baseline gap-2 flex-wrap">
+          <h3 className="text-base font-semibold">知財3級も学習モードに対応</h3>
+          <span className="text-xs text-[var(--muted)]">分野別に解説（日英）付きで学べます</span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {chizaiFields.filter((f) => f.id !== "all").map((f) => (
+            <Link
+              key={f.id}
+              href={`/study?exam=chizai&category=${f.id}`}
+              className="block rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-5 transition-all hover:shadow-lg hover:-translate-y-0.5"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-2xl">{f.icon}</span>
+                <span className="rounded-full bg-[var(--badge-bg)] px-2 py-1 text-xs text-[var(--muted)]">{f.count} cards</span>
+              </div>
+              <h3 className="font-semibold mb-1">{f.title}</h3>
+              <p className="text-xs text-[var(--muted)] mb-3">解説付き学習 / Doom Scroll対応</p>
+              <span className="text-sm font-medium text-[var(--primary)]">学習を始める →</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="mb-8 sm:mb-12">
