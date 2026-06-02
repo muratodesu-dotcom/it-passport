@@ -215,18 +215,18 @@ function QuizContent() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between gap-2 mb-6">
         <button
           onClick={() => router.push("/")}
-          className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
+          className="shrink-0 text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
         >
           ← 戻る
         </button>
-        <span className="text-sm font-medium text-[var(--muted)]">
+        <span className="min-w-0 flex-1 truncate text-center text-sm font-medium text-[var(--muted)]">
           {mode === "exam" ? `${examShortLabels[examType]} 本番試験モード` : headerLabel}
         </span>
-        <div className="text-right">
-          <span className="text-sm font-medium block">
+        <div className="shrink-0 text-right">
+          <span className="text-sm font-medium block tabular-nums">
             {currentIndex + 1} / {questions.length}
           </span>
           {timeLeft !== null ? (
@@ -297,14 +297,14 @@ function QuizContent() {
               key={index}
               onClick={() => handleAnswer(index)}
               disabled={revealAnswers && showExplanation}
-              className={`w-full text-left p-4 rounded-xl border-2 transition-all bg-[var(--card)] ${style}`}
+              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 transition-all bg-[var(--card)] ${style}`}
             >
-              <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[var(--badge-bg)] text-sm font-medium mr-3">
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
                 {String.fromCharCode(65 + index)}
               </span>
-              {option}
+              <span className="flex-1 leading-relaxed">{option}</span>
               {!(revealAnswers && showExplanation) && (
-                <span className="float-right text-xs text-[var(--muted)] mt-1">
+                <span className="mt-0.5 hidden shrink-0 text-xs text-[var(--muted)] sm:block">
                   {index + 1}
                 </span>
               )}

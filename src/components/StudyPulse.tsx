@@ -21,7 +21,7 @@ export default function StudyPulse() {
   if (streak.current === 0 && wrongCount === 0 && bookmarkCount === 0) return null;
 
   return (
-    <section className="mb-12 grid gap-4 md:grid-cols-3">
+    <section className="mb-8 sm:mb-12 grid gap-4 md:grid-cols-3">
       <div className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs font-medium text-[var(--muted)]">連続学習</span>

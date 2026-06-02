@@ -1,448 +1,604 @@
 @import "tailwindcss";
 
-/* ===== DEFAULT THEME (Blue) — Light ===== */
+/*
+ * ============================================================
+ *  THEME TOKENS
+ *  Each color theme defines a light variant (its own selector)
+ *  and a dark variant (selector + .dark). All component styles
+ *  read these CSS variables so themes stay fully decoupled.
+ * ============================================================
+ */
+
+/* ===== INDIGO (default) — Light ===== */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f6f7fb;
+  --foreground: #161823;
   --card: #ffffff;
-  --card-border: #e2e8f0;
-  --card-hover: #f1f5f9;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --primary-light: #eff6ff;
-  --success: #16a34a;
+  --card-border: #e7e9f2;
+  --card-hover: #f0f2fa;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-light: #eef0ff;
+  --success: #15a34a;
   --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --danger-border: #fecaca;
-  --muted: #64748b;
-  --progress-bg: #e2e8f0;
-  --option-hover-border: #93c5fd;
-  --option-hover-bg: #eff6ff;
-  --option-selected-border: #3b82f6;
-  --option-selected-bg: #eff6ff;
-  --badge-bg: #f1f5f9;
-  --explanation-bg: #eff6ff;
-  --explanation-border: #bfdbfe;
-  --explanation-title: #1e40af;
-  --explanation-text: #1e3a5f;
-  --secondary-btn-bg: #f1f5f9;
-  --secondary-btn-hover: #e2e8f0;
+  --success-border: #b9f0cb;
+  --danger: #e11d48;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #646b85;
+  --progress-bg: #e7e9f2;
+  --option-hover-border: #a5b4fc;
+  --option-hover-bg: #f3f4ff;
+  --option-selected-border: #6366f1;
+  --option-selected-bg: #eef0ff;
+  --badge-bg: #eef0f7;
+  --explanation-bg: #f3f4ff;
+  --explanation-border: #d6dbfe;
+  --explanation-title: #3730a3;
+  --explanation-text: #312e81;
+  --secondary-btn-bg: #eef0f7;
+  --secondary-btn-hover: #e1e4f0;
   --accent: #7c3aed;
-  /* Gradient tokens */
-  --gradient-from: #2563eb;
-  --gradient-via: #06b6d4;
-  --gradient-to: #7c3aed;
-  --gradient-progress-from: #3b82f6;
-  --gradient-progress-to: #8b5cf6;
+  --gradient-from: #4f46e5;
+  --gradient-via: #6366f1;
+  --gradient-to: #a855f7;
+  --gradient-progress-from: #4f46e5;
+  --gradient-progress-to: #a855f7;
 }
 
-/* ===== DEFAULT THEME (Blue) — Dark ===== */
+/* ===== INDIGO (default) — Dark ===== */
 .dark {
-  --background: #0f172a;
-  --foreground: #e2e8f0;
-  --card: #1e293b;
-  --card-border: #334155;
-  --card-hover: #334155;
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --primary-light: #1e3a5f;
-  --success: #22c55e;
-  --success-bg: #052e16;
-  --success-border: #166534;
-  --danger: #ef4444;
-  --danger-bg: #450a0a;
-  --danger-border: #7f1d1d;
-  --muted: #94a3b8;
-  --progress-bg: #334155;
-  --option-hover-border: #60a5fa;
-  --option-hover-bg: #1e3a5f;
-  --option-selected-border: #3b82f6;
-  --option-selected-bg: #1e3a5f;
-  --badge-bg: #334155;
-  --explanation-bg: #1e3a5f;
-  --explanation-border: #1e40af;
-  --explanation-title: #93c5fd;
-  --explanation-text: #bfdbfe;
-  --secondary-btn-bg: #334155;
-  --secondary-btn-hover: #475569;
-  --accent: #8b5cf6;
-  --gradient-from: #3b82f6;
-  --gradient-via: #22d3ee;
-  --gradient-to: #8b5cf6;
-  --gradient-progress-from: #60a5fa;
-  --gradient-progress-to: #a78bfa;
+  --background: #0a0c12;
+  --foreground: #e6e8f0;
+  --card: #14171f;
+  --card-border: #262a36;
+  --card-hover: #1d212c;
+  --primary: #818cf8;
+  --primary-hover: #a5b4fc;
+  --primary-light: #1d1f3a;
+  --success: #34d399;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #fb7185;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #9097ad;
+  --progress-bg: #262a36;
+  --option-hover-border: #6366f1;
+  --option-hover-bg: #1d1f3a;
+  --option-selected-border: #818cf8;
+  --option-selected-bg: #1d1f3a;
+  --badge-bg: #20242f;
+  --explanation-bg: #181b30;
+  --explanation-border: #3730a3;
+  --explanation-title: #c7d2fe;
+  --explanation-text: #dbe1ff;
+  --secondary-btn-bg: #20242f;
+  --secondary-btn-hover: #2a2f3c;
+  --accent: #a78bfa;
+  --gradient-from: #818cf8;
+  --gradient-via: #a78bfa;
+  --gradient-to: #c084fc;
+  --gradient-progress-from: #818cf8;
+  --gradient-progress-to: #c084fc;
 }
 
-/* ===== SAKURA THEME (Pink/Rose) — Light ===== */
+/* ===== SAKURA — Light ===== */
 .theme-sakura {
-  --background: #fdf2f8;
-  --foreground: #1c1917;
+  --background: #fdf4f8;
+  --foreground: #2a141f;
   --card: #ffffff;
-  --card-border: #fce7f3;
-  --card-hover: #fdf2f8;
-  --primary: #db2777;
+  --card-border: #f8dde8;
+  --card-hover: #fdeef4;
+  --primary: #e11d74;
   --primary-hover: #be185d;
-  --primary-light: #fce7f3;
-  --success: #16a34a;
+  --primary-light: #fce7f1;
+  --success: #15a34a;
   --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --danger-border: #fecaca;
-  --muted: #5c4a4a;
-  --progress-bg: #fce7f3;
+  --success-border: #b9f0cb;
+  --danger: #e11d48;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #7a5968;
+  --progress-bg: #f8dde8;
   --option-hover-border: #f9a8d4;
-  --option-hover-bg: #fdf2f8;
+  --option-hover-bg: #fdeef4;
   --option-selected-border: #ec4899;
-  --option-selected-bg: #fce7f3;
-  --badge-bg: #fce7f3;
-  --explanation-bg: #fdf2f8;
-  --explanation-border: #fbcfe8;
+  --option-selected-bg: #fce7f1;
+  --badge-bg: #fbe4ee;
+  --explanation-bg: #fdeef4;
+  --explanation-border: #fbcfe2;
   --explanation-title: #9d174d;
-  --explanation-text: #6b1538;
-  --secondary-btn-bg: #fce7f3;
-  --secondary-btn-hover: #fbcfe8;
-  --accent: #c026d3;
+  --explanation-text: #831843;
+  --secondary-btn-bg: #fbe4ee;
+  --secondary-btn-hover: #f8d3e3;
+  --accent: #d6409f;
   --gradient-from: #ec4899;
   --gradient-via: #f472b6;
-  --gradient-to: #c026d3;
+  --gradient-to: #d6409f;
   --gradient-progress-from: #ec4899;
-  --gradient-progress-to: #d946ef;
+  --gradient-progress-to: #f472b6;
 }
 
-/* ===== SAKURA THEME — Dark ===== */
+/* ===== SAKURA — Dark ===== */
 .theme-sakura.dark {
-  --background: #1a0a14;
-  --foreground: #fce7f3;
-  --card: #2d1526;
-  --card-border: #4a1942;
-  --card-hover: #3d1a36;
-  --primary: #ec4899;
-  --primary-hover: #db2777;
-  --primary-light: #3d1a36;
-  --success: #22c55e;
-  --success-bg: #052e16;
-  --success-border: #166534;
-  --danger: #ef4444;
-  --danger-bg: #450a0a;
-  --danger-border: #7f1d1d;
-  --muted: #d4b5c9;
-  --progress-bg: #4a1942;
-  --option-hover-border: #f472b6;
-  --option-hover-bg: #3d1a36;
-  --option-selected-border: #ec4899;
-  --option-selected-bg: #3d1a36;
-  --badge-bg: #4a1942;
-  --explanation-bg: #3d1a36;
+  --background: #170911;
+  --foreground: #fbe0ee;
+  --card: #24121c;
+  --card-border: #3d1f30;
+  --card-hover: #2e1726;
+  --primary: #f472b6;
+  --primary-hover: #f9a8d4;
+  --primary-light: #34172a;
+  --success: #34d399;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #fb7185;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #c79bb3;
+  --progress-bg: #3d1f30;
+  --option-hover-border: #ec4899;
+  --option-hover-bg: #34172a;
+  --option-selected-border: #f472b6;
+  --option-selected-bg: #34172a;
+  --badge-bg: #2e1726;
+  --explanation-bg: #2a1422;
   --explanation-border: #9d174d;
   --explanation-title: #f9a8d4;
-  --explanation-text: #fce7f3;
-  --secondary-btn-bg: #4a1942;
-  --secondary-btn-hover: #5c2152;
-  --accent: #d946ef;
-  --gradient-from: #ec4899;
-  --gradient-via: #f472b6;
-  --gradient-to: #d946ef;
+  --explanation-text: #fbcfe2;
+  --secondary-btn-bg: #2e1726;
+  --secondary-btn-hover: #3d1f30;
+  --accent: #f0abfc;
+  --gradient-from: #f472b6;
+  --gradient-via: #f9a8d4;
+  --gradient-to: #e879f9;
   --gradient-progress-from: #f472b6;
   --gradient-progress-to: #e879f9;
 }
 
-/* ===== FOREST THEME (Green) — Light ===== */
+/* ===== FOREST — Light ===== */
 .theme-forest {
-  --background: #f0fdf4;
-  --foreground: #14532d;
+  --background: #f1faf3;
+  --foreground: #0f2417;
   --card: #ffffff;
-  --card-border: #bbf7d0;
-  --card-hover: #f0fdf4;
-  --primary: #16a34a;
-  --primary-hover: #15803d;
+  --card-border: #cdeed7;
+  --card-hover: #e8f7ed;
+  --primary: #0f9d58;
+  --primary-hover: #0c7d46;
   --primary-light: #dcfce7;
-  --success: #16a34a;
+  --success: #15a34a;
   --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --danger-border: #fecaca;
-  --muted: #4b5563;
-  --progress-bg: #d1fae5;
+  --success-border: #b9f0cb;
+  --danger: #e11d48;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #4f6b5a;
+  --progress-bg: #cdeed7;
   --option-hover-border: #6ee7b7;
-  --option-hover-bg: #ecfdf5;
-  --option-selected-border: #22c55e;
+  --option-hover-bg: #e8f7ed;
+  --option-selected-border: #10b981;
   --option-selected-bg: #dcfce7;
-  --badge-bg: #dcfce7;
-  --explanation-bg: #ecfdf5;
-  --explanation-border: #a7f3d0;
-  --explanation-title: #14532d;
-  --explanation-text: #166534;
-  --secondary-btn-bg: #dcfce7;
-  --secondary-btn-hover: #bbf7d0;
+  --badge-bg: #dcf3e3;
+  --explanation-bg: #e8f7ed;
+  --explanation-border: #b3e6c4;
+  --explanation-title: #166534;
+  --explanation-text: #14532d;
+  --secondary-btn-bg: #dcf3e3;
+  --secondary-btn-hover: #c4ecd0;
   --accent: #0d9488;
-  --gradient-from: #16a34a;
-  --gradient-via: #22d3ee;
-  --gradient-to: #0d9488;
-  --gradient-progress-from: #22c55e;
+  --gradient-from: #10b981;
+  --gradient-via: #34d399;
+  --gradient-to: #14b8a6;
+  --gradient-progress-from: #10b981;
   --gradient-progress-to: #14b8a6;
 }
 
-/* ===== FOREST THEME — Dark ===== */
+/* ===== FOREST — Dark ===== */
 .theme-forest.dark {
-  --background: #052e16;
-  --foreground: #d1fae5;
-  --card: #0c3b2e;
-  --card-border: #166534;
-  --card-hover: #14532d;
-  --primary: #22c55e;
-  --primary-hover: #16a34a;
-  --primary-light: #14532d;
-  --success: #4ade80;
-  --success-bg: #052e16;
-  --success-border: #166534;
-  --danger: #ef4444;
-  --danger-bg: #450a0a;
-  --danger-border: #7f1d1d;
-  --muted: #9cc5ab;
-  --progress-bg: #166534;
-  --option-hover-border: #4ade80;
-  --option-hover-bg: #14532d;
-  --option-selected-border: #22c55e;
-  --option-selected-bg: #14532d;
-  --badge-bg: #166534;
-  --explanation-bg: #14532d;
-  --explanation-border: #15803d;
-  --explanation-title: #96e8b4;
-  --explanation-text: #c2f5d4;
-  --secondary-btn-bg: #166534;
-  --secondary-btn-hover: #14532d;
+  --background: #07140d;
+  --foreground: #d4f3df;
+  --card: #102219;
+  --card-border: #1f3a2b;
+  --card-hover: #182d20;
+  --primary: #34d399;
+  --primary-hover: #6ee7b7;
+  --primary-light: #14271c;
+  --success: #34d399;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #fb7185;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #84ad94;
+  --progress-bg: #1f3a2b;
+  --option-hover-border: #10b981;
+  --option-hover-bg: #14271c;
+  --option-selected-border: #34d399;
+  --option-selected-bg: #14271c;
+  --badge-bg: #182d20;
+  --explanation-bg: #112a1d;
+  --explanation-border: #166534;
+  --explanation-title: #6ee7b7;
+  --explanation-text: #bbf7d0;
+  --secondary-btn-bg: #182d20;
+  --secondary-btn-hover: #1f3a2b;
   --accent: #2dd4bf;
-  --gradient-from: #22c55e;
+  --gradient-from: #34d399;
   --gradient-via: #2dd4bf;
-  --gradient-to: #14b8a6;
-  --gradient-progress-from: #4ade80;
+  --gradient-to: #22d3ee;
+  --gradient-progress-from: #34d399;
   --gradient-progress-to: #2dd4bf;
 }
 
-/* ===== SUNSET THEME (Orange/Amber) — Light ===== */
+/* ===== SUNSET — Light ===== */
 .theme-sunset {
-  --background: #fffbeb;
-  --foreground: #451a03;
+  --background: #fff8f1;
+  --foreground: #2c1606;
   --card: #ffffff;
-  --card-border: #fde68a;
-  --card-hover: #fef3c7;
-  --primary: #d97706;
-  --primary-hover: #b45309;
-  --primary-light: #fef3c7;
-  --success: #16a34a;
+  --card-border: #fbe0c4;
+  --card-hover: #fff1e0;
+  --primary: #ea580c;
+  --primary-hover: #c2410c;
+  --primary-light: #ffedd5;
+  --success: #15a34a;
   --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --danger-border: #fecaca;
-  --muted: #5a4d45;
-  --progress-bg: #fde68a;
-  --option-hover-border: #fbbf24;
-  --option-hover-bg: #fef9e7;
-  --option-selected-border: #f59e0b;
-  --option-selected-bg: #fef3c7;
-  --badge-bg: #fef3c7;
-  --explanation-bg: #fffbeb;
-  --explanation-border: #fde68a;
-  --explanation-title: #92400e;
-  --explanation-text: #78350f;
-  --secondary-btn-bg: #fef3c7;
-  --secondary-btn-hover: #fde68a;
-  --accent: #ea580c;
-  --gradient-from: #f59e0b;
-  --gradient-via: #ef4444;
-  --gradient-to: #ea580c;
-  --gradient-progress-from: #fbbf24;
+  --success-border: #b9f0cb;
+  --danger: #e11d48;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #7a5a44;
+  --progress-bg: #fbe0c4;
+  --option-hover-border: #fdba74;
+  --option-hover-bg: #fff1e0;
+  --option-selected-border: #f97316;
+  --option-selected-bg: #ffedd5;
+  --badge-bg: #ffe8d2;
+  --explanation-bg: #fff1e0;
+  --explanation-border: #fcd2a8;
+  --explanation-title: #9a3412;
+  --explanation-text: #7c2d12;
+  --secondary-btn-bg: #ffe8d2;
+  --secondary-btn-hover: #fdd9b8;
+  --accent: #e0397a;
+  --gradient-from: #f97316;
+  --gradient-via: #fb923c;
+  --gradient-to: #ef4444;
+  --gradient-progress-from: #fb923c;
   --gradient-progress-to: #f97316;
 }
 
-/* ===== SUNSET THEME — Dark ===== */
+/* ===== SUNSET — Dark ===== */
 .theme-sunset.dark {
-  --background: #1c1208;
-  --foreground: #fef3c7;
-  --card: #2a1c0a;
-  --card-border: #523a14;
-  --card-hover: #3d2b0f;
-  --primary: #f59e0b;
-  --primary-hover: #d97706;
-  --primary-light: #3d2b0f;
-  --success: #22c55e;
-  --success-bg: #052e16;
-  --success-border: #166534;
-  --danger: #ef4444;
-  --danger-bg: #450a0a;
-  --danger-border: #7f1d1d;
-  --muted: #d6d3d1;
-  --progress-bg: #523a14;
-  --option-hover-border: #fbbf24;
-  --option-hover-bg: #3d2b0f;
-  --option-selected-border: #f59e0b;
-  --option-selected-bg: #3d2b0f;
-  --badge-bg: #523a14;
-  --explanation-bg: #3d2b0f;
-  --explanation-border: #92400e;
-  --explanation-title: #fcd34d;
-  --explanation-text: #fde68a;
-  --secondary-btn-bg: #523a14;
-  --secondary-btn-hover: #6b4c1a;
-  --accent: #fb923c;
-  --gradient-from: #f59e0b;
-  --gradient-via: #ef4444;
-  --gradient-to: #fb923c;
-  --gradient-progress-from: #fcd34d;
-  --gradient-progress-to: #fb923c;
+  --background: #160c04;
+  --foreground: #fbe6cf;
+  --card: #221408;
+  --card-border: #3d2613;
+  --card-hover: #2c1c0d;
+  --primary: #fb923c;
+  --primary-hover: #fdba74;
+  --primary-light: #2f1d0d;
+  --success: #34d399;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #fb7185;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #c19a78;
+  --progress-bg: #3d2613;
+  --option-hover-border: #f97316;
+  --option-hover-bg: #2f1d0d;
+  --option-selected-border: #fb923c;
+  --option-selected-bg: #2f1d0d;
+  --badge-bg: #2c1c0d;
+  --explanation-bg: #2a1a0b;
+  --explanation-border: #9a3412;
+  --explanation-title: #fdba74;
+  --explanation-text: #fed7aa;
+  --secondary-btn-bg: #2c1c0d;
+  --secondary-btn-hover: #3d2613;
+  --accent: #fb7185;
+  --gradient-from: #fb923c;
+  --gradient-via: #f97316;
+  --gradient-to: #ef4444;
+  --gradient-progress-from: #fdba74;
+  --gradient-progress-to: #fb7185;
 }
 
-/* ===== OCEAN THEME (Teal/Cyan) — Light ===== */
+/* ===== OCEAN — Light ===== */
 .theme-ocean {
-  --background: #ecfeff;
-  --foreground: #134e4a;
+  --background: #f0fbfd;
+  --foreground: #0a2530;
   --card: #ffffff;
-  --card-border: #a5f3fc;
-  --card-hover: #ecfeff;
+  --card-border: #c7ecf2;
+  --card-hover: #e5f7fb;
   --primary: #0891b2;
   --primary-hover: #0e7490;
   --primary-light: #cffafe;
-  --success: #16a34a;
+  --success: #15a34a;
   --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --danger-border: #fecaca;
-  --muted: #64748b;
-  --progress-bg: #a5f3fc;
+  --success-border: #b9f0cb;
+  --danger: #e11d48;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #4a6b75;
+  --progress-bg: #c7ecf2;
   --option-hover-border: #67e8f9;
-  --option-hover-bg: #ecfeff;
+  --option-hover-bg: #e5f7fb;
   --option-selected-border: #06b6d4;
   --option-selected-bg: #cffafe;
-  --badge-bg: #cffafe;
-  --explanation-bg: #ecfeff;
-  --explanation-border: #a5f3fc;
+  --badge-bg: #d7f3f8;
+  --explanation-bg: #e5f7fb;
+  --explanation-border: #b3e8f0;
   --explanation-title: #155e75;
   --explanation-text: #164e63;
-  --secondary-btn-bg: #cffafe;
-  --secondary-btn-hover: #a5f3fc;
-  --accent: #0d9488;
+  --secondary-btn-bg: #d7f3f8;
+  --secondary-btn-hover: #c0ecf3;
+  --accent: #2563eb;
   --gradient-from: #06b6d4;
-  --gradient-via: #0ea5e9;
-  --gradient-to: #0d9488;
+  --gradient-via: #22d3ee;
+  --gradient-to: #3b82f6;
   --gradient-progress-from: #22d3ee;
-  --gradient-progress-to: #2dd4bf;
+  --gradient-progress-to: #38bdf8;
 }
 
-/* ===== OCEAN THEME — Dark ===== */
+/* ===== OCEAN — Dark ===== */
 .theme-ocean.dark {
-  --background: #042f2e;
-  --foreground: #ccfbf1;
-  --card: #0c3d3b;
-  --card-border: #115e59;
-  --card-hover: #134e4a;
+  --background: #04141a;
+  --foreground: #cdf2f6;
+  --card: #0c2128;
+  --card-border: #1a3a44;
+  --card-hover: #122c34;
   --primary: #22d3ee;
-  --primary-hover: #06b6d4;
-  --primary-light: #134e4a;
-  --success: #4ade80;
-  --success-bg: #052e16;
-  --success-border: #166534;
-  --danger: #ef4444;
-  --danger-bg: #450a0a;
-  --danger-border: #7f1d1d;
-  --muted: #a0d4cb;
-  --progress-bg: #115e59;
-  --option-hover-border: #5eead4;
-  --option-hover-bg: #134e4a;
+  --primary-hover: #67e8f9;
+  --primary-light: #103039;
+  --success: #34d399;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #fb7185;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #7ba6b1;
+  --progress-bg: #1a3a44;
+  --option-hover-border: #06b6d4;
+  --option-hover-bg: #103039;
   --option-selected-border: #22d3ee;
-  --option-selected-bg: #134e4a;
-  --badge-bg: #115e59;
-  --explanation-bg: #134e4a;
-  --explanation-border: #0e7490;
-  --explanation-title: #7eedf9;
-  --explanation-text: #b8f4fa;
-  --secondary-btn-bg: #115e59;
-  --secondary-btn-hover: #134e4a;
-  --accent: #2dd4bf;
+  --option-selected-bg: #103039;
+  --badge-bg: #122c34;
+  --explanation-bg: #0e2830;
+  --explanation-border: #155e75;
+  --explanation-title: #67e8f9;
+  --explanation-text: #a5f3fc;
+  --secondary-btn-bg: #122c34;
+  --secondary-btn-hover: #1a3a44;
+  --accent: #60a5fa;
   --gradient-from: #22d3ee;
   --gradient-via: #38bdf8;
-  --gradient-to: #2dd4bf;
-  --gradient-progress-from: #67e8f9;
-  --gradient-progress-to: #5eead4;
+  --gradient-to: #60a5fa;
+  --gradient-progress-from: #22d3ee;
+  --gradient-progress-to: #38bdf8;
 }
 
-/* ===== LAVENDER THEME (Purple) — Light ===== */
+/* ===== LAVENDER — Light ===== */
 .theme-lavender {
-  --background: #faf5ff;
-  --foreground: #3b0764;
+  --background: #f9f6fe;
+  --foreground: #21142e;
   --card: #ffffff;
-  --card-border: #e9d5ff;
-  --card-hover: #faf5ff;
+  --card-border: #e6dbf7;
+  --card-hover: #f3edfc;
   --primary: #7c3aed;
   --primary-hover: #6d28d9;
   --primary-light: #ede9fe;
-  --success: #16a34a;
+  --success: #15a34a;
   --success-bg: #f0fdf4;
-  --success-border: #bbf7d0;
-  --danger: #dc2626;
-  --danger-bg: #fef2f2;
-  --danger-border: #fecaca;
-  --muted: #4b5563;
-  --progress-bg: #e9d5ff;
+  --success-border: #b9f0cb;
+  --danger: #e11d48;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #695a7d;
+  --progress-bg: #e6dbf7;
   --option-hover-border: #c4b5fd;
-  --option-hover-bg: #f5f3ff;
+  --option-hover-bg: #f3edfc;
   --option-selected-border: #8b5cf6;
   --option-selected-bg: #ede9fe;
-  --badge-bg: #ede9fe;
-  --explanation-bg: #f5f3ff;
-  --explanation-border: #ddd6fe;
+  --badge-bg: #ece3fb;
+  --explanation-bg: #f3edfc;
+  --explanation-border: #ddd0fa;
   --explanation-title: #5b21b6;
   --explanation-text: #4c1d95;
-  --secondary-btn-bg: #ede9fe;
-  --secondary-btn-hover: #ddd6fe;
-  --accent: #c026d3;
-  --gradient-from: #7c3aed;
+  --secondary-btn-bg: #ece3fb;
+  --secondary-btn-hover: #ddd0fa;
+  --accent: #d6409f;
+  --gradient-from: #8b5cf6;
   --gradient-via: #a855f7;
-  --gradient-to: #c026d3;
+  --gradient-to: #d946ef;
   --gradient-progress-from: #8b5cf6;
   --gradient-progress-to: #d946ef;
 }
 
-/* ===== LAVENDER THEME — Dark ===== */
+/* ===== LAVENDER — Dark ===== */
 .theme-lavender.dark {
-  --background: #13062a;
-  --foreground: #e9d5ff;
-  --card: #1e0a3e;
-  --card-border: #3b0f6e;
-  --card-hover: #2e0d55;
+  --background: #100a1d;
+  --foreground: #e7ddf9;
+  --card: #1b1330;
+  --card-border: #2f2150;
+  --card-hover: #241a40;
   --primary: #a78bfa;
-  --primary-hover: #8b5cf6;
-  --primary-light: #2e0d55;
-  --success: #22c55e;
-  --success-bg: #052e16;
-  --success-border: #166534;
-  --danger: #ef4444;
-  --danger-bg: #450a0a;
-  --danger-border: #7f1d1d;
-  --muted: #c4b5fd;
-  --progress-bg: #3b0f6e;
-  --option-hover-border: #a78bfa;
-  --option-hover-bg: #2e0d55;
+  --primary-hover: #c4b5fd;
+  --primary-light: #241a40;
+  --success: #34d399;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #fb7185;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #a394c4;
+  --progress-bg: #2f2150;
+  --option-hover-border: #8b5cf6;
+  --option-hover-bg: #241a40;
   --option-selected-border: #a78bfa;
-  --option-selected-bg: #2e0d55;
-  --badge-bg: #3b0f6e;
-  --explanation-bg: #2e0d55;
-  --explanation-border: #6d28d9;
-  --explanation-title: #d0c4fd;
-  --explanation-text: #e5dffe;
-  --secondary-btn-bg: #3b0f6e;
-  --secondary-btn-hover: #4c1d95;
-  --accent: #d946ef;
+  --option-selected-bg: #241a40;
+  --badge-bg: #241a40;
+  --explanation-bg: #20153a;
+  --explanation-border: #5b21b6;
+  --explanation-title: #c4b5fd;
+  --explanation-text: #ddd6fe;
+  --secondary-btn-bg: #241a40;
+  --secondary-btn-hover: #2f2150;
+  --accent: #e879f9;
   --gradient-from: #a78bfa;
   --gradient-via: #c084fc;
-  --gradient-to: #d946ef;
-  --gradient-progress-from: #c4b5fd;
+  --gradient-to: #e879f9;
+  --gradient-progress-from: #a78bfa;
   --gradient-progress-to: #e879f9;
+}
+
+/* ===== MIDNIGHT — Light (cool slate-blue) ===== */
+.theme-midnight {
+  --background: #eef1f8;
+  --foreground: #14182a;
+  --card: #ffffff;
+  --card-border: #dadfee;
+  --card-hover: #e7ebf6;
+  --primary: #4338ca;
+  --primary-hover: #3730a3;
+  --primary-light: #e4e3fb;
+  --success: #15a34a;
+  --success-bg: #f0fdf4;
+  --success-border: #b9f0cb;
+  --danger: #e11d48;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #555d78;
+  --progress-bg: #dadfee;
+  --option-hover-border: #a5b4fc;
+  --option-hover-bg: #e7ebf6;
+  --option-selected-border: #6366f1;
+  --option-selected-bg: #e4e3fb;
+  --badge-bg: #e7ebf6;
+  --explanation-bg: #eceafb;
+  --explanation-border: #cdcdf6;
+  --explanation-title: #3730a3;
+  --explanation-text: #312e81;
+  --secondary-btn-bg: #e7ebf6;
+  --secondary-btn-hover: #dadfee;
+  --accent: #6366f1;
+  --gradient-from: #4338ca;
+  --gradient-via: #6366f1;
+  --gradient-to: #8b5cf6;
+  --gradient-progress-from: #4338ca;
+  --gradient-progress-to: #8b5cf6;
+}
+
+/* ===== MIDNIGHT — Dark (deep navy, the signature look) ===== */
+.theme-midnight.dark {
+  --background: #060914;
+  --foreground: #d8def0;
+  --card: #0e1322;
+  --card-border: #1e2740;
+  --card-hover: #161d33;
+  --primary: #818cf8;
+  --primary-hover: #a5b4fc;
+  --primary-light: #18203c;
+  --success: #34d399;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #fb7185;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #8590ad;
+  --progress-bg: #1e2740;
+  --option-hover-border: #6366f1;
+  --option-hover-bg: #18203c;
+  --option-selected-border: #818cf8;
+  --option-selected-bg: #18203c;
+  --badge-bg: #161d33;
+  --explanation-bg: #131a30;
+  --explanation-border: #3730a3;
+  --explanation-title: #c7d2fe;
+  --explanation-text: #dbe1ff;
+  --secondary-btn-bg: #161d33;
+  --secondary-btn-hover: #1e2740;
+  --accent: #38bdf8;
+  --gradient-from: #6366f1;
+  --gradient-via: #818cf8;
+  --gradient-to: #38bdf8;
+  --gradient-progress-from: #818cf8;
+  --gradient-progress-to: #38bdf8;
+}
+
+/* ===== MONO — Light (neutral grayscale) ===== */
+.theme-mono {
+  --background: #f4f4f5;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-border: #e4e4e7;
+  --card-hover: #efeff1;
+  --primary: #27272a;
+  --primary-hover: #18181b;
+  --primary-light: #e8e8ea;
+  --success: #15803d;
+  --success-bg: #f0fdf4;
+  --success-border: #b9f0cb;
+  --danger: #b91c1c;
+  --danger-bg: #fff1f3;
+  --danger-border: #fecdd6;
+  --muted: #6b6b75;
+  --progress-bg: #e4e4e7;
+  --option-hover-border: #a1a1aa;
+  --option-hover-bg: #efeff1;
+  --option-selected-border: #52525b;
+  --option-selected-bg: #e8e8ea;
+  --badge-bg: #ededef;
+  --explanation-bg: #f1f1f3;
+  --explanation-border: #d4d4d8;
+  --explanation-title: #27272a;
+  --explanation-text: #3f3f46;
+  --secondary-btn-bg: #ededef;
+  --secondary-btn-hover: #e0e0e3;
+  --accent: #52525b;
+  --gradient-from: #3f3f46;
+  --gradient-via: #71717a;
+  --gradient-to: #a1a1aa;
+  --gradient-progress-from: #52525b;
+  --gradient-progress-to: #a1a1aa;
+}
+
+/* ===== MONO — Dark (neutral grayscale) ===== */
+.theme-mono.dark {
+  --background: #0a0a0b;
+  --foreground: #e4e4e7;
+  --card: #161618;
+  --card-border: #2a2a2e;
+  --card-hover: #1f1f22;
+  --primary: #e4e4e7;
+  --primary-hover: #ffffff;
+  --primary-light: #26262a;
+  --success: #4ade80;
+  --success-bg: #052e1a;
+  --success-border: #14532d;
+  --danger: #f87171;
+  --danger-bg: #3f0d18;
+  --danger-border: #881337;
+  --muted: #9a9aa3;
+  --progress-bg: #2a2a2e;
+  --option-hover-border: #71717a;
+  --option-hover-bg: #26262a;
+  --option-selected-border: #a1a1aa;
+  --option-selected-bg: #26262a;
+  --badge-bg: #1f1f22;
+  --explanation-bg: #1c1c1f;
+  --explanation-border: #3f3f46;
+  --explanation-title: #d4d4d8;
+  --explanation-text: #e4e4e7;
+  --secondary-btn-bg: #1f1f22;
+  --secondary-btn-hover: #2a2a2e;
+  --accent: #d4d4d8;
+  --gradient-from: #a1a1aa;
+  --gradient-via: #d4d4d8;
+  --gradient-to: #fafafa;
+  --gradient-progress-from: #a1a1aa;
+  --gradient-progress-to: #e4e4e7;
 }
 
 
@@ -452,6 +608,7 @@ body {
   font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans JP",
     sans-serif;
   transition: background-color 0.3s, color 0.3s;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Spinner animation */
@@ -523,4 +680,28 @@ body {
 }
 .animate-shake {
   animation: shake 0.4s ease-out;
+}
+
+/* Respect users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Opt-in: disable animations when the user turns them off in settings */
+.no-motion *, .no-motion *::before, .no-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* High-contrast: strengthen borders and de-mute secondary text. Works
+   across all themes by mixing toward the current foreground color. */
+.high-contrast {
+  --card-border: color-mix(in srgb, var(--foreground) 32%, var(--card));
+  --muted: color-mix(in srgb, var(--foreground) 70%, var(--muted));
+  --progress-bg: color-mix(in srgb, var(--foreground) 24%, var(--card));
 }
