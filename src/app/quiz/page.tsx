@@ -8,6 +8,7 @@ import { examRules } from "@/lib/scoring";
 import { getBookmarks, getWrongQuestionIds, isBookmarked, toggleBookmark } from "@/lib/history";
 import { saveQuizSession } from "@/lib/quizSession";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import ExplanationEn from "@/components/ExplanationEn";
 
 type Source = "category" | "wrong" | "bookmarks";
 
@@ -367,6 +368,7 @@ function QuizContent() {
           <p className="text-sm leading-relaxed">
             {currentQuestion.explanation}
           </p>
+          <ExplanationEn id={currentQuestion.id} />
         </div>
       )}
 

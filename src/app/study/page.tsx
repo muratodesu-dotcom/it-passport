@@ -7,6 +7,7 @@ import { termPairs } from "@/data/terms";
 import { categoryLabels, Category } from "@/lib/types";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import ExplanationEn from "@/components/ExplanationEn";
 
 const termLookup = new Map(termPairs.map((t) => [t.term, { description: t.description, english: t.english }]));
 
@@ -1930,6 +1931,7 @@ function StudyContent() {
                     <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
                       {question.explanation}
                     </p>
+                    <ExplanationEn id={question.id} />
                   </div>
 
 {questionCoaching && (
@@ -2067,6 +2069,7 @@ function StudyContent() {
                         <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
                           {feedQuestion.explanation}
                         </p>
+                        <ExplanationEn id={feedQuestion.id} />
                       </div>
                     )}
 
@@ -2078,6 +2081,7 @@ function StudyContent() {
                         <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
                           {feedQuestion.explanation}
                         </p>
+                        <ExplanationEn id={feedQuestion.id} />
                       </div>
                     )}
                   </article>
