@@ -51,6 +51,7 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
   const seqRef = useRef(0);
   const loaderRef = useRef<HTMLDivElement | null>(null);
   const cardRefs = useRef<Map<number, HTMLElement>>(new Map());
+  const feedRef = useRef<FeedCard[]>(feed);
 
   // Pull the next n cards, looping (and reshuffling) through the pool forever.
   const buildBatch = useCallback((n: number): FeedCard[] => {
@@ -94,10 +95,47 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
     return () => observer.disconnect();
   }, [buildBatch]);
 
+  // Keep the scroll handler's view of the feed current without re-subscribing.
   useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 600);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    feedRef.current = feed;
+  }, [feed]);
+
+  // On scroll, toggle the back-to-top button and keep activeIndex on the card
+  // nearest the viewport center, so keyboard nav (j/k) continues from what the
+  // learner is actually looking at instead of a stale index after scrolling.
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      setShowScrollTop(window.scrollY > 600);
+      const mid = window.innerHeight / 2;
+      const cards = feedRef.current;
+      let best = -1;
+      let bestDist = Infinity;
+      for (let i = 0; i < cards.length; i++) {
+        const el = cardRefs.current.get(cards[i].key);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        const dist = Math.abs(rect.top + rect.height / 2 - mid);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = i;
+        } else if (best !== -1) {
+          // Cards are in document order, so distance is unimodal: once it grows
+          // again we have passed the centered card.
+          break;
+        }
+      }
+      if (best !== -1) setActiveIndex((prev) => (prev === best ? prev : best));
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   const reveal = useCallback((key: number) => {
@@ -105,6 +143,25 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
       if (prev.has(key)) return prev;
       const next = new Set(prev);
       next.add(key);
+      return next;
+    });
+  }, []);
+
+  const hide = useCallback((key: number) => {
+    setRevealed((prev) => {
+      if (!prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  }, []);
+
+  // Self-test mode: flip the active card between hidden and revealed.
+  const toggleReveal = useCallback((key: number) => {
+    setRevealed((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   }, []);
@@ -122,7 +179,7 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
     [feed]
   );
 
-  // Keyboard: j/k or arrows to move, space/enter to reveal in self-test mode.
+  // Keyboard: j/k or arrows to move, space/enter to flip in self-test mode.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
@@ -138,12 +195,12 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
         if (!revealMode) return;
         e.preventDefault();
         const card = feed[activeIndex];
-        if (card) reveal(card.key);
+        if (card) toggleReveal(card.key);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [activeIndex, feed, revealMode, reveal, scrollToCard]);
+  }, [activeIndex, feed, revealMode, toggleReveal, scrollToCard]);
 
   const uniqueCount = useMemo(
     () => new Set(feed.map((f) => f.term.term)).size,
@@ -167,7 +224,7 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
           <span>
             学習した用語 <span className="font-semibold text-[var(--foreground)]">{uniqueCount}</span> / {total}語
           </span>
-          <span className="hidden sm:inline">j / k · 矢印で移動{revealMode ? " · space で説明を表示" : ""}</span>
+          <span className="hidden sm:inline">j / k · 矢印で移動{revealMode ? " · space で表示／非表示" : ""}</span>
         </div>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[var(--progress-bg)]">
           <div
@@ -214,7 +271,21 @@ export default function TermFeed({ terms, exam, revealMode }: TermFeedProps) {
                 </div>
 
                 {isRevealed ? (
-                  <p className="text-[15px] leading-relaxed text-[var(--foreground)] fade-in">{t.description}</p>
+                  <div className="fade-in">
+                    <p className="text-[15px] leading-relaxed text-[var(--foreground)]">{t.description}</p>
+                    {revealMode && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          hide(card.key);
+                        }}
+                        className="mt-3 inline-flex items-center gap-1.5 rounded-lg border border-[var(--card-border)] bg-[var(--badge-bg)] px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
+                      >
+                        <span aria-hidden="true">🙈</span> 説明を隠す
+                      </button>
+                    )}
+                  </div>
                 ) : (
                   <button
                     type="button"
