@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { examShortLabels } from "@/lib/types";
 import Furigana from "@/components/Furigana";
+import TermExplanationEn from "@/components/TermExplanationEn";
 import { FieldId, fieldLabel, fieldOptions, itemField, parseExam } from "@/lib/examFields";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -171,6 +172,7 @@ function FlashcardsGame() {
                 <p className="text-lg leading-relaxed font-medium">
                   {showFront === "term" ? current.description : <Furigana term={current.term} />}
                 </p>
+                {showFront === "term" && <TermExplanationEn term={current.term} />}
               </div>
             </div>
           </div>

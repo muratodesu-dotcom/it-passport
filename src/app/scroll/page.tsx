@@ -70,7 +70,7 @@ export default function ScrollPage() {
       </div>
 
       <p className="mb-5 text-sm leading-relaxed text-[var(--muted)]">
-        用語と解説が投稿のように無限に流れてくる学習タイムライン。SNSをスクロールする感覚で、いいね・ブックマークしながら頻出用語をテンポよくインプットできます。
+        用語カードを「戻る／次へ」でめくっていく学習フィード。スワイプや矢印キーでサクサク進めて、頻出用語をテンポよくインプットできます。
       </p>
 
       <div className="mb-5 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm">

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { DrillQuestion } from "@/lib/drills";
+import TermExplanationEn from "@/components/TermExplanationEn";
 
 interface DrillRunnerProps {
   questions: DrillQuestion[];
@@ -151,6 +152,7 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
       {revealed && current.explanation && (
         <div className="rounded-xl border border-[var(--card-border)] bg-[var(--badge-bg)] p-4 mb-5 text-sm leading-relaxed fade-in">
           {current.explanation}
+          <TermExplanationEn term={current.termKey} />
         </div>
       )}
 
