@@ -23,4 +23,12 @@ describe("English term descriptions", () => {
     const missing = [...new Set(chizai.map((t) => t.term))].filter((t) => !termsEn[t]);
     expect(missing).toEqual([]);
   });
+
+  it("covers every glossary term (full bilingual coverage)", () => {
+    // Bilingual coverage is now complete: every term in the glossary has an
+    // English description. This locks it in so a new term can't ship without
+    // one — add the English entry in termsEn.ts when you add a term.
+    const missing = [...new Set(termPairs.map((t) => t.term))].filter((t) => !termsEn[t]);
+    expect(missing).toEqual([]);
+  });
 });
