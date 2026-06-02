@@ -241,6 +241,19 @@ export default function SettingsPage() {
               label="高コントラスト"
             />
           </div>
+          <div className="flex items-center justify-between gap-4 p-4">
+            <div>
+              <p className="text-sm font-medium">英語の解説を表示</p>
+              <p className="mt-0.5 text-xs text-[var(--muted)]">
+                日本語の解説の下に、英語の解説（EN）も表示します。オフにすると日本語のみになります。
+              </p>
+            </div>
+            <Toggle
+              checked={appearance.showEnglish}
+              onChange={(v) => updateAppearance({ showEnglish: v })}
+              label="英語の解説を表示"
+            />
+          </div>
         </div>
 
         <button

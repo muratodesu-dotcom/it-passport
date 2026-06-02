@@ -705,3 +705,10 @@ body {
   --muted: color-mix(in srgb, var(--foreground) 70%, var(--muted));
   --progress-bg: color-mix(in srgb, var(--foreground) 24%, var(--card));
 }
+
+/* Opt-out: hide the English explanation blurbs when the user turns them
+   off in settings. The class is set on <html> before first paint, so the
+   Japanese-only view shows without a flash of English. */
+.hide-en .explanation-en {
+  display: none;
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { Category, categoryLabels, ExamType, examShortLabels, IpField, ipFieldLabels } from "@/lib/types";
+import Furigana from "@/components/Furigana";
 
 type FieldFilter = "all" | string;
 
@@ -137,7 +138,7 @@ export default function GlossaryPage() {
                     className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm"
                   >
                     <div className="mb-1 flex items-baseline justify-between gap-2">
-                      <span className="font-semibold">{t.term}</span>
+                      <Furigana term={t.term} className="font-semibold" />
                       <span className="text-[10px] text-[var(--muted)]">{t.english}</span>
                     </div>
                     <p className="text-sm leading-relaxed text-[var(--muted)]">{t.description}</p>

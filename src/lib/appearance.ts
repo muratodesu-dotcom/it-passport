@@ -10,12 +10,17 @@ export type Appearance = {
   fontScale: FontScale;
   reduceMotion: boolean;
   highContrast: boolean;
+  // When false, the English explanations shown beneath the Japanese ones
+  // (the "EN" blurbs) are hidden. Defaults to true so the bilingual study
+  // experience is on out of the box.
+  showEnglish: boolean;
 };
 
 export const defaultAppearance: Appearance = {
   fontScale: "md",
   reduceMotion: false,
   highContrast: false,
+  showEnglish: true,
 };
 
 export const FONT_SCALE_OPTIONS: { id: FontScale; label: string; px: number }[] = [
@@ -41,6 +46,7 @@ export function loadAppearance(): Appearance {
         : defaultAppearance.fontScale,
       reduceMotion: typeof parsed.reduceMotion === "boolean" ? parsed.reduceMotion : false,
       highContrast: typeof parsed.highContrast === "boolean" ? parsed.highContrast : false,
+      showEnglish: typeof parsed.showEnglish === "boolean" ? parsed.showEnglish : defaultAppearance.showEnglish,
     };
   } catch {
     return defaultAppearance;
@@ -53,6 +59,7 @@ export function applyAppearance(a: Appearance) {
   root.style.fontSize = `${fontScaleToPx(a.fontScale)}px`;
   root.classList.toggle("no-motion", a.reduceMotion);
   root.classList.toggle("high-contrast", a.highContrast);
+  root.classList.toggle("hide-en", !a.showEnglish);
 }
 
 export function saveAppearance(a: Appearance) {
@@ -72,6 +79,7 @@ export const appearanceBootScript = `
     root.style.fontSize = px + 'px';
     if (a.reduceMotion) root.classList.add('no-motion');
     if (a.highContrast) root.classList.add('high-contrast');
+    if (a.showEnglish === false) root.classList.add('hide-en');
   } catch (e) {}
 })();
 `;
