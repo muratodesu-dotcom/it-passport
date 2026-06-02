@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense, useMemo, useRef, useCallback } from "react";
-import { getQuestionsByCategory } from "@/data/questions";
+import { getQuestionsByCategory, withShuffledOptions } from "@/data/questions";
 import { termPairs } from "@/data/terms";
 import { categoryLabels, Category } from "@/lib/types";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
@@ -1223,7 +1223,11 @@ function StudyContent() {
   const router = useRouter();
   const category = searchParams.get("category") || "strategy";
 
-  const questions = useMemo(() => getQuestionsByCategory(category), [category]);
+  // 選択肢を並び替える（出題データは正解が先頭に偏っているため）。
+  const questions = useMemo(
+    () => getQuestionsByCategory(category).map((q) => withShuffledOptions(q)),
+    [category]
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [doomScrollMode, setDoomScrollMode] = useState(true);

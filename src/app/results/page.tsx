@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { questions as allQuestions } from "@/data/questions";
+import { questions as allQuestions, withShuffledOptions } from "@/data/questions";
 import { categoryLabels, Category, examLabels, Question, QuestionOutcome } from "@/lib/types";
 import {
   buildGradeItems,
@@ -45,7 +45,10 @@ export default function ResultsPage() {
 
     const qs = session.questionIds
       .map((id) => allQuestions.find((q) => q.id === id))
-      .filter((q): q is Question => Boolean(q));
+      .filter((q): q is Question => Boolean(q))
+      // クイズ画面と同じ並びを再現する（idで決まる）。保存された回答indexは
+      // 並び替え後の選択肢に対するものなので、ここで揃えないと採点がずれる。
+      .map((q) => withShuffledOptions(q));
     const oc: QuestionOutcome[] = qs.map((q, i) => {
       const answeredIndex = session.answers[i] ?? null;
       return {

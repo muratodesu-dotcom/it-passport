@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
-import { getQuestionsByCategory, getQuestionsByExam, shuffleQuestions, questions as allQuestions } from "@/data/questions";
+import { getQuestionsByCategory, getQuestionsByExam, shuffleQuestions, withShuffledOptions, questions as allQuestions } from "@/data/questions";
 import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels } from "@/lib/types";
 import { examRules } from "@/lib/scoring";
 import { getBookmarks, getWrongQuestionIds, isBookmarked, toggleBookmark } from "@/lib/history";
@@ -51,6 +51,9 @@ function QuizContent() {
     } else {
       pool = shuffleQuestions(buildQuestionPool(source, category));
     }
+    // 選択肢を並び替える（出題データは正解が先頭に偏っているため）。問題idで
+    // 並びが決まるので、結果画面でも同じ並びを再現できる。
+    pool = pool.map((q) => withShuffledOptions(q));
     const nextStartTime = Date.now();
     setQuestions(pool);
     setEmptyPool(pool.length === 0);
