@@ -1060,6 +1060,29 @@ export const termsEn: Record<string, string> = {
   LLM: "A large-scale natural language processing model trained on massive amounts of text data.",
   ノーコード: "A method and toolset that enables application development without any programming.",
   ローコード: "A method and platform that enables application development with minimal coding.",
+
+  // ===== 知財3級: 著作権の支分権・職務著作 =====
+  上映権: "The right to present a work to the public, such as projecting it onto a screen.",
+  演奏権: "The right to perform a work, such as music, in public.",
+  展示権: "The right to publicly display the original of an artistic work or an unpublished photograph.",
+  頒布権: "The right to distribute (transfer or rent) copies of a cinematographic work.",
+  譲渡権: "The right to transfer the original or copies of a work to the public; it is exhausted by a lawful sale.",
+  貸与権: "The right to rent copies of a work to the public.",
+  職務著作: "A work created by an employee in the course of duties at the employer's initiative and published under the employer's name; the employer is, in principle, the author.",
+
+  // ===== 知財3級: 特許の争訟・侵害 =====
+  特許無効審判: "A trial at the Patent Office to decide whether a granted patent should be invalidated; it can be requested by an interested party.",
+  訂正審判: "A trial requested by the patentee to correct the description or the scope of claims.",
+  特許異議申立て: "A system that lets anyone request revocation of a patent within six months of the patent gazette being issued.",
+  間接侵害: "A provision that treats preparatory or contributory acts — such as making goods used only for infringement — as infringement.",
+  均等論: "A doctrine that finds infringement when something differs in part from the claims but is substantially identical.",
+
+  // ===== 知財3級: 知財マネジメント（契約・実務） =====
+  秘密保持契約: "A contract that governs how disclosed confidential information is handled and bars its use outside the agreed purpose (NDA).",
+  ライセンス契約: "A contract that licenses the use of intellectual property and sets the consideration and scope of use.",
+  職務発明規程: "Internal rules that predetermine the ownership of employee inventions and the reasonable profit (compensation).",
+  先行技術調査: "A search of patent literature and other sources before filing to check whether a similar invention is already public.",
+  IPランドスケープ: "A method that integrates and analyzes IP and market information to inform management and business strategy.",
 };
 
 export function descriptionEnFor(term: string): string | undefined {

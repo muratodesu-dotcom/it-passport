@@ -459,6 +459,14 @@ export const explanationsEn: Record<number, string> = {
   1451: "The Act bars transferring goods that imitate another's product form for three years from the first sale date in Japan (dead-copy regulation); forms essential to function are excluded.",
   1452: "\"Limited provision data\" is technical/business information provided as a business to specific parties, accumulated in quantity and electronically managed; even non-trade-secret data is protected against wrongful acquisition/use/disclosure.",
   1453: "An exclusive license takes effect on registration and, within its scope, even the patentee cannot work the invention while the licensee can seek an injunction; a non-exclusive license merely permits working (non-exclusive in principle) and needs no registration.",
+
+  // ===== 知財3級 追加問題 (2001-2006) =====
+  2001: "The right of distribution is specific to cinematographic works and covers offering copies to the public by transfer or rental; the right of exhibition concerns displaying originals, and the right of presentation concerns public projection.",
+  2002: "When an employee creates a work in the course of duties at the employer's initiative and it is published under the employer's name (for programs, regardless of the publishing name), the employer is the author unless an agreement provides otherwise.",
+  2003: "A trial for patent invalidation contests the validity of a granted patent before the Patent Office and can be requested by an interested party; a trial for correction lets the patentee amend the specification, and a trial against an examiner's decision of refusal contests a rejection.",
+  2004: "An opposition to a granted patent may be filed by anyone, but only within six months from the date the patent gazette is issued.",
+  2005: "Employee invention regulations predetermine, within the company, the ownership of the right to obtain a patent for employee inventions and the content and procedure of the reasonable profit (compensation) given to the employee.",
+  2006: "A non-disclosure agreement (NDA) sets the scope, handling, no-purpose-beyond-use, and return of disclosed confidential information to prevent leakage of trade secrets.",
 };
 
 export function explanationEnFor(id: number): string | undefined {
