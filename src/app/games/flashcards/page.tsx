@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { examShortLabels } from "@/lib/types";
+import Furigana from "@/components/Furigana";
 import { FieldId, fieldLabel, fieldOptions, itemField, parseExam } from "@/lib/examFields";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -159,7 +160,7 @@ function FlashcardsGame() {
                   {fieldLabel(exam, itemField(exam, current))}
                 </span>
                 <p className="text-xl font-bold leading-relaxed">
-                  {showFront === "term" ? current.term : current.description}
+                  {showFront === "term" ? <Furigana term={current.term} /> : current.description}
                 </p>
                 <p className="mt-4 text-xs text-[var(--muted)]">クリックでめくる（Space/Enter）</p>
               </div>
@@ -168,7 +169,7 @@ function FlashcardsGame() {
               <div className={`absolute inset-0 rounded-2xl border-2 border-[var(--primary)] bg-[var(--option-selected-bg)] p-8 flex flex-col items-center justify-center text-center backface-hidden rotate-y-180 shadow-lg ${!flipped ? "invisible" : ""}`}>
                 <p className="text-xs text-[var(--muted)] mb-2">{showFront === "term" ? "説明" : "用語"}</p>
                 <p className="text-lg leading-relaxed font-medium">
-                  {showFront === "term" ? current.description : current.term}
+                  {showFront === "term" ? current.description : <Furigana term={current.term} />}
                 </p>
               </div>
             </div>
