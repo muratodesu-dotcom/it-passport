@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { getQuestionsByExam } from "@/data/questions";
+import { getQuestionsByExam, withShuffledOptions } from "@/data/questions";
 import { Question, examShortLabels } from "@/lib/types";
 import { FieldId, fieldOptions, itemField, parseExam } from "@/lib/examFields";
 
@@ -41,7 +41,7 @@ function SpeedChallenge() {
   const current = pool[index];
 
   const startGame = useCallback(() => {
-    setPool(shuffle(filteredPool));
+    setPool(shuffle(filteredPool).map((q) => withShuffledOptions(q)));
     setIndex(0);
     setCorrect(0);
     setWrong(0);

@@ -116,23 +116,26 @@ export default function ScrollPage() {
           ))}
         </div>
 
-        <label className="mt-4 flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-[var(--badge-bg)] px-4 py-3">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={revealMode}
+          onClick={() => setRevealMode((v) => !v)}
+          className="mt-4 flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl bg-[var(--badge-bg)] px-4 py-3 text-left"
+        >
           <span className="text-sm font-medium">
             自己テストモード
             <span className="ml-1 text-xs text-[var(--muted)]">説明を隠して思い出す</span>
           </span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={revealMode}
-            onClick={() => setRevealMode((v) => !v)}
+          <span
+            aria-hidden="true"
             className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${revealMode ? "bg-[var(--primary)]" : "bg-[var(--progress-bg)]"}`}
           >
             <span
               className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${revealMode ? "translate-x-5" : "translate-x-0.5"}`}
             />
-          </button>
-        </label>
+          </span>
+        </button>
       </div>
 
       <TermFeed key={feedKey} terms={filtered} exam={exam} revealMode={revealMode} />

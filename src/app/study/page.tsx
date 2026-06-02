@@ -2,11 +2,12 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense, useMemo, useRef, useCallback } from "react";
-import { getQuestionsByCategory } from "@/data/questions";
+import { getChizaiQuestionsByField, getQuestionsByCategory, withShuffledOptions } from "@/data/questions";
 import { termPairs } from "@/data/terms";
-import { categoryLabels, Category } from "@/lib/types";
+import { categoryLabels, Category, ipFieldLabels, IpField } from "@/lib/types";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import ExplanationEn from "@/components/ExplanationEn";
 
 const termLookup = new Map(termPairs.map((t) => [t.term, { description: t.description, english: t.english }]));
 
@@ -192,6 +193,83 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
         "ハードウェアでは論理回路、メモリ階層、入出力装置、RAID、仮想化を押さえると取りこぼしを減らせます。",
         "ネットワークではTCP/IP、HTTP、DNS、DHCP、NAT、VPN、無線LAN、サブネットの基本まで広げると本番向きです。",
         "データベースでは主キー・外部キー・正規化・トランザクション、セキュリティでは認証・認可・暗号・署名・マルウェア対策まで押さえたいです。",
+      ],
+    },
+  ],
+};
+
+// 知財3級向けの「試験のコツ」。ITパスポートのexamTipMapに相当する軽量コンテンツで、
+// IpField（特許・意匠商標・著作権・その他）ごとに頻出論点を整理する。
+const chizaiExamTipMap: Record<IpField, ExamTipSection[]> = {
+  patent: [
+    {
+      title: "数字と基本原則を固める",
+      points: [
+        "特許権は出願日から20年、実用新案は出願日から10年。起算点が『出願日』である点がねらわれます。",
+        "日本は先願主義で、『最先の出願人』が権利を得ます。発明の前後と混同しないようにしましょう。",
+        "出願審査請求は出願日から3年以内。請求しなければ取り下げたものとみなされる点も頻出です。",
+      ],
+    },
+    {
+      title: "ひっかけの見抜き方",
+      points: [
+        "新規性（新しさ）と進歩性（容易に発明できないこと）は別の要件です。選択肢の言い換えに注意します。",
+        "職務発明は『発明者は従業者・従業者は相当の利益・使用者は無償の通常実施権』をセットで覚えます。",
+        "実用新案は無審査登録なので、権利行使の際は技術評価書の提示が必要、という流れを押さえましょう。",
+      ],
+    },
+  ],
+  "design-trademark": [
+    {
+      title: "意匠・商標の数字と制度",
+      points: [
+        "意匠権は出願日から25年（2020年改正）、商標権は登録から10年で更新により半永久。数字の対比が重要です。",
+        "商標は継続して3年以上の不使用で不使用取消審判の対象になります。期間『3年』を押さえましょう。",
+        "部分意匠・関連意匠・組物の意匠・秘密意匠など、意匠の周辺制度の役割を区別します。",
+      ],
+    },
+    {
+      title: "ひっかけの見抜き方",
+      points: [
+        "識別力のない記述的商標（産地・品質などの普通表示）は、原則として登録できません。",
+        "商標も先願主義です。出所混同のおそれがある他人の先願登録商標との関係は不登録事由になります。",
+        "立体・色彩・音なども商標になり得る点と、商標の機能（識別・出所表示・品質保証・広告）を整理します。",
+      ],
+    },
+  ],
+  copyright: [
+    {
+      title: "著作権の基本を固める",
+      points: [
+        "著作権（財産権）は原則『著作者の死後70年』。無方式主義で創作時に自動発生する点も頻出です。",
+        "著作者人格権（公表権・氏名表示権・同一性保持権）は一身専属で譲渡できません。財産権との違いがねらわれます。",
+        "私的複製（30条）と引用（32条）の要件（公正な慣行・正当な範囲・明瞭区別・出所明示）を区別して覚えます。",
+      ],
+    },
+    {
+      title: "ひっかけの見抜き方",
+      points: [
+        "保護されるのは『表現』であり、アイデア・事実・解法そのものは保護されません（アイデア・表現二分論）。",
+        "著作隣接権の主体は実演家・レコード製作者・放送／有線放送事業者です。著作者本人と区別します。",
+        "職務著作は『法人の発意・職務上の作成・法人名義での公表』等の要件で、法人が著作者になります。",
+      ],
+    },
+  ],
+  other: [
+    {
+      title: "条約・不正競争防止法の要点",
+      points: [
+        "パリ条約の優先権は特許・実用新案12か月、意匠・商標6か月。PCTは特許、マドプロは商標、ハーグは意匠、ベルヌは著作権の条約です。",
+        "営業秘密の3要件は秘密管理性・有用性・非公知性。新規性は特許の要件なので混同に注意します。",
+        "商品形態模倣（デッドコピー）は、最初の販売日から3年間規制される点を押さえます。",
+      ],
+    },
+    {
+      title: "ひっかけの見抜き方",
+      points: [
+        "産業財産権（特許・実用新案・意匠・商標）は特許庁、著作権は文化庁が所管、という違いがねらわれます。",
+        "専用実施権は登録が効力発生要件で、その範囲では権利者も実施できません。通常実施権は非独占・登録不要です。",
+        "知的財産権は属地主義です。一つの出願で全世界の権利が発生することはありません（PCTも各国移行が必要）。",
       ],
     },
   ],
@@ -1221,9 +1299,18 @@ const commonExamTips = [
 function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const category = searchParams.get("category") || "strategy";
+  // 知財3級では category パラメータが IpField（特許・意匠商標・著作権・その他）を表す。
+  const examType = searchParams.get("exam") === "chizai" ? "chizai" : "it-passport";
+  const category = searchParams.get("category") || (examType === "chizai" ? "patent" : "strategy");
 
-  const questions = useMemo(() => getQuestionsByCategory(category), [category]);
+  // 選択肢を並び替える（出題データは正解が先頭に偏っているため）。
+  const questions = useMemo(
+    () =>
+      (examType === "chizai" ? getChizaiQuestionsByField(category) : getQuestionsByCategory(category)).map(
+        (q) => withShuffledOptions(q)
+      ),
+    [examType, category]
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [doomScrollMode, setDoomScrollMode] = useState(true);
@@ -1235,9 +1322,10 @@ function StudyContent() {
   const [aiError, setAiError] = useState("");
   const [isGeneratingAiNote, setIsGeneratingAiNote] = useState(false);
   const [showStudyGuide, setShowStudyGuide] = useState(false);
-  const [openGuideSections, setOpenGuideSections] = useState<Record<GuideSection, boolean>>({
-    lessons: true, coverage: false, audit: false, deepDive: false, examTips: false,
-  });
+  const [openGuideSections, setOpenGuideSections] = useState<Record<GuideSection, boolean>>(() => ({
+    // 知財3級は詳細レッスンを持たないため、最初から「試験のコツ」を開いておく。
+    lessons: examType !== "chizai", coverage: false, audit: false, deepDive: false, examTips: examType === "chizai",
+  }));
   const [expandedLessons, setExpandedLessons] = useState<Record<number, boolean>>({});
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [activeFeedIndex, setActiveFeedIndex] = useState(0);
@@ -1245,11 +1333,16 @@ function StudyContent() {
   const feedCardRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   const question = questions[currentIndex];
-  const categoryLabel = categoryLabels[category as Category] || category;
+  const categoryLabel = examType === "chizai"
+    ? ipFieldLabels[category as IpField] || category
+    : categoryLabels[category as Category] || category;
+  const examLabel = examType === "chizai" ? "知的財産管理技能検定3級" : "ITパスポート試験";
   const feedAnsweredCount = Object.keys(selectedFeedAnswers).length;
   const studiedCount = doomScrollMode ? feedAnsweredCount : (showAnswer ? currentIndex + 1 : currentIndex);
   const mastery = questions.length > 0 ? Math.round((studiedCount / questions.length) * 100) : 0;
-  const categoryExamTips = examTipMap[category as Category] || [];
+  const categoryExamTips = examType === "chizai"
+    ? chizaiExamTipMap[category as IpField] || []
+    : examTipMap[category as Category] || [];
   const lessonBlocks = lessonBlocksMap[category as Category] || [];
   const coverageFocuses = coverageFocusMap[category as Category] || [];
   const readinessAudits = readinessAuditMap[category as Category] || [];
@@ -1273,7 +1366,7 @@ function StudyContent() {
         body: JSON.stringify({
           apiKey: aiSettings.apiKey,
           model: aiSettings.model,
-          prompt: `ITパスポート試験の${categoryLabel}について学習中です。現在の問題: ${question.question}
+          prompt: `${examLabel}の${categoryLabel}について学習中です。現在の問題: ${question.question}
 選択肢: ${question.options.join(" / ")}
 正解: ${question.options[question.correctIndex]}
 既存解説: ${question.explanation}
@@ -1535,21 +1628,31 @@ function StudyContent() {
       <nav className="rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--muted)] mb-3">ガイド目次</p>
         <div className="flex flex-wrap gap-2">
+          {lessonBlocks.length > 0 && (
           <button onClick={() => toggleGuideSection("lessons")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.lessons ? "bg-sky-100 border-sky-300 text-sky-800 dark:bg-sky-500/20 dark:border-sky-400/40 dark:text-sky-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.lessons ? "▼" : "▶"} ミニレッスン <span className="ml-1.5 text-[10px] opacity-60">{lessonBlocks.length}件</span>
           </button>
+          )}
+          {coverageFocuses.length > 0 && (
           <button onClick={() => toggleGuideSection("coverage")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.coverage ? "bg-violet-100 border-violet-300 text-violet-800 dark:bg-violet-500/20 dark:border-violet-400/40 dark:text-violet-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.coverage ? "▼" : "▶"} 弱点カバー <span className="ml-1.5 text-[10px] opacity-60">{coverageFocuses.length}件</span>
           </button>
+          )}
+          {readinessAudits.length > 0 && (
           <button onClick={() => toggleGuideSection("audit")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.audit ? "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800 dark:bg-fuchsia-500/20 dark:border-fuchsia-400/40 dark:text-fuchsia-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.audit ? "▼" : "▶"} レッスン監査 <span className="ml-1.5 text-[10px] opacity-60">{readinessAudits.length}件</span>
           </button>
+          )}
+          {deepDiveModules.length > 0 && (
           <button onClick={() => toggleGuideSection("deepDive")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.deepDive ? "bg-teal-100 border-teal-300 text-teal-800 dark:bg-teal-500/20 dark:border-teal-400/40 dark:text-teal-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.deepDive ? "▼" : "▶"} 深掘りモジュール <span className="ml-1.5 text-[10px] opacity-60">{deepDiveModules.length}件</span>
           </button>
+          )}
+          {categoryExamTips.length > 0 && (
           <button onClick={() => toggleGuideSection("examTips")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.examTips ? "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-500/20 dark:border-amber-400/40 dark:text-amber-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.examTips ? "▼" : "▶"} 試験のコツ <span className="ml-1.5 text-[10px] opacity-60">{categoryExamTips.length}件</span>
           </button>
+          )}
         </div>
         <p className="mt-2 text-[10px] text-[var(--muted)]">用語にカーソルを合わせると定義が表示されます</p>
       </nav>
@@ -1926,6 +2029,7 @@ function StudyContent() {
                     <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
                       {question.explanation}
                     </p>
+                    <ExplanationEn id={question.id} />
                   </div>
 
 {questionCoaching && (
@@ -2063,6 +2167,7 @@ function StudyContent() {
                         <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
                           {feedQuestion.explanation}
                         </p>
+                        <ExplanationEn id={feedQuestion.id} />
                       </div>
                     )}
 
@@ -2074,6 +2179,7 @@ function StudyContent() {
                         <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
                           {feedQuestion.explanation}
                         </p>
+                        <ExplanationEn id={feedQuestion.id} />
                       </div>
                     )}
                   </article>
