@@ -4,7 +4,20 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { clearHistory, getBookmarks, getHistory, getStreak, getWrongQuestionIds } from "@/lib/history";
+import { analyzeHistory, HistoryAnalytics } from "@/lib/analytics";
 import { QuizResult, categoryLabels, Category, examShortLabels } from "@/lib/types";
+import ScoreTrend from "@/components/ScoreTrend";
+
+const emptyAnalytics: HistoryAnalytics = {
+  trend: [],
+  categoryAccuracy: [],
+  ipFieldAccuracy: [],
+  totalAnswered: 0,
+  totalCorrect: 0,
+  weakest: null,
+  practiceCount: 0,
+  examCount: 0,
+};
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -12,9 +25,12 @@ export default function HistoryPage() {
   const [wrongCount, setWrongCount] = useState(0);
   const [bookmarkCount, setBookmarkCount] = useState(0);
   const [streak, setStreak] = useState({ current: 0, longest: 0, studiedToday: false });
+  const [analytics, setAnalytics] = useState<HistoryAnalytics>(emptyAnalytics);
 
   useEffect(() => {
-    setHistory(getHistory());
+    const h = getHistory();
+    setHistory(h);
+    setAnalytics(analyzeHistory(h));
     setWrongCount(getWrongQuestionIds().length);
     setBookmarkCount(getBookmarks().length);
     setStreak(getStreak());
@@ -24,9 +40,15 @@ export default function HistoryPage() {
     if (!window.confirm("学習履歴をすべて削除しますか？間違えた問題の追跡もリセットされます。")) return;
     clearHistory();
     setHistory([]);
+    setAnalytics(emptyAnalytics);
     setWrongCount(0);
     setStreak({ current: 0, longest: 0, studiedToday: false });
   };
+
+  const allTimeAccuracy = analytics.totalAnswered > 0
+    ? Math.round((analytics.totalCorrect / analytics.totalAnswered) * 100)
+    : 0;
+  const domainBreakdown = [...analytics.categoryAccuracy, ...analytics.ipFieldAccuracy];
 
   const bestScore = history.length > 0
     ? Math.max(...history.map((h) => h.percentage))
@@ -107,6 +129,64 @@ export default function HistoryPage() {
               <p className="text-xs text-[var(--muted)]">合格率</p>
             </div>
           </div>
+
+          {analytics.trend.length >= 2 && (
+            <div className="mb-6">
+              <ScoreTrend points={analytics.trend} />
+            </div>
+          )}
+
+          {analytics.weakest && (
+            <Link
+              href={`/quiz?${analytics.weakest.query}`}
+              className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div>
+                <p className="text-xs font-medium text-[var(--muted)]">💡 重点的に復習したい分野</p>
+                <p className="mt-1 text-lg font-bold">{analytics.weakest.label}</p>
+                <p className="text-xs text-[var(--muted)]">
+                  正答率 {analytics.weakest.percentage}%（{analytics.weakest.correct}/{analytics.weakest.total}問）
+                </p>
+              </div>
+              <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white">
+                この分野を解く →
+              </span>
+            </Link>
+          )}
+
+          {domainBreakdown.length > 0 && (
+            <div className="mb-6 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 shadow-sm">
+              <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
+                <h2 className="font-semibold">分野別の通算正答率</h2>
+                <span className="text-xs text-[var(--muted)]">
+                  全{analytics.totalAnswered}問中 {allTimeAccuracy}% 正解
+                </span>
+              </div>
+              <div className="space-y-3">
+                {domainBreakdown.map((d) => (
+                  <div key={`${d.label}-${d.query}`}>
+                    <div className="mb-1 flex justify-between text-sm">
+                      <span>{d.label}</span>
+                      <span className="text-[var(--muted)]">
+                        {d.correct}/{d.total} ({d.percentage}%)
+                      </span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-[var(--progress-bg)]">
+                      <div
+                        className={`h-full rounded-full transition-all duration-700 ${d.percentage >= 60 ? "bg-[var(--success)]" : d.percentage >= 40 ? "bg-[var(--primary)]" : "bg-[var(--danger)]"}`}
+                        style={{ width: `${d.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {(analytics.practiceCount > 0 || analytics.examCount > 0) && (
+                <p className="mt-4 text-xs text-[var(--muted)]">
+                  練習 {analytics.practiceCount}回 · 本番試験 {analytics.examCount}回
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm">
             <h2 className="font-semibold mb-4">過去の結果（最新{history.length}件）</h2>
