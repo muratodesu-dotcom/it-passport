@@ -89,7 +89,6 @@ function QuizContent() {
   }, [startTime]);
 
   const currentQuestion = questions[currentIndex];
-  const revealAnswers = mode === "practice";
 
   const finishQuiz = useCallback(
     (finalAnswers: (number | null)[]) => {
@@ -112,25 +111,26 @@ function QuizContent() {
 
   const handleAnswer = useCallback(
     (index: number) => {
-      if (revealAnswers && showExplanation) return;
+      // 一度回答して解説が出たら、その問題の選択肢は確定して変更できない。
+      if (showExplanation) return;
       setSelectedAnswer(index);
-      if (revealAnswers) {
-        setShowExplanation(true);
-      }
+      setShowExplanation(true);
       setAnswers((prev) => {
         const next = [...prev];
         next[currentIndex] = index;
         return next;
       });
     },
-    [revealAnswers, showExplanation, currentIndex]
+    [showExplanation, currentIndex]
   );
 
   const handleNext = useCallback(() => {
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex((i) => i + 1);
-      setSelectedAnswer(answers[currentIndex + 1] ?? null);
-      setShowExplanation(false);
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setSelectedAnswer(answers[nextIndex] ?? null);
+      // 回答済みの問題に移動したときは、解説を再表示する。
+      setShowExplanation(answers[nextIndex] != null);
     } else {
       finishQuiz(answers);
     }
@@ -138,9 +138,10 @@ function QuizContent() {
 
   const handlePrev = useCallback(() => {
     if (currentIndex === 0) return;
-    setCurrentIndex((i) => i - 1);
-    setSelectedAnswer(answers[currentIndex - 1] ?? null);
-    setShowExplanation(false);
+    const prevIndex = currentIndex - 1;
+    setCurrentIndex(prevIndex);
+    setSelectedAnswer(answers[prevIndex] ?? null);
+    setShowExplanation(answers[prevIndex] != null);
   }, [currentIndex, answers]);
 
   const handleSubmitExam = useCallback(() => {
@@ -170,10 +171,7 @@ function QuizContent() {
         if (idx < currentQuestion.options.length) handleAnswer(idx);
       }
       if (e.key === "Enter" || e.key === " ") {
-        if (revealAnswers && showExplanation) {
-          e.preventDefault();
-          handleNext();
-        } else if (!revealAnswers && selectedAnswer !== null) {
+        if (showExplanation) {
           e.preventDefault();
           handleNext();
         }
@@ -184,7 +182,7 @@ function QuizContent() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [currentQuestion, revealAnswers, showExplanation, selectedAnswer, handleAnswer, handleNext, handlePrev, handleToggleBookmark]);
+  }, [currentQuestion, showExplanation, handleAnswer, handleNext, handlePrev, handleToggleBookmark]);
 
   const bookmarked = useMemo(() => {
     if (!currentQuestion) return false;
@@ -306,7 +304,7 @@ function QuizContent() {
       <div className="space-y-3 mb-6">
         {currentQuestion.options.map((option, index) => {
           let style = "border-[var(--card-border)] hover:border-[var(--option-hover-border)] hover:bg-[var(--option-hover-bg)]";
-          if (revealAnswers && showExplanation) {
+          if (showExplanation) {
             if (index === currentQuestion.correctIndex) {
               style = "border-[var(--success)] bg-[var(--success-bg)]";
             } else if (
@@ -325,14 +323,14 @@ function QuizContent() {
             <button
               key={index}
               onClick={() => handleAnswer(index)}
-              disabled={revealAnswers && showExplanation}
+              disabled={showExplanation}
               className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 transition-all bg-[var(--card)] ${style}`}
             >
               <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
                 {String.fromCharCode(65 + index)}
               </span>
               <span className="flex-1 leading-relaxed">{option}</span>
-              {!(revealAnswers && showExplanation) && (
+              {!showExplanation && (
                 <span className="mt-0.5 hidden shrink-0 text-xs text-[var(--muted)] sm:block">
                   {index + 1}
                 </span>
@@ -342,10 +340,34 @@ function QuizContent() {
         })}
       </div>
 
-      {mode === "practice" && !showExplanation && (
+      {!showExplanation && (
         <p className="text-center text-xs text-[var(--muted)] mb-4">
           キーボード: 1〜4で選択 · Bでブックマーク
         </p>
+      )}
+
+      {showExplanation && (
+        <div
+          className={`rounded-xl p-5 mb-6 fade-in ${isCorrect ? "bg-[var(--success-bg)] border border-[var(--success-border)]" : "bg-[var(--danger-bg)] border border-[var(--danger-border)]"}`}
+        >
+          <p className="font-bold mb-2">
+            {isCorrect ? "⭕ 正解！" : "❌ 不正解"}
+          </p>
+          <p className="text-sm leading-relaxed">
+            {currentQuestion.explanation}
+          </p>
+          <ExplanationEn id={currentQuestion.id} />
+        </div>
+      )}
+
+      {mode === "practice" && showExplanation && (
+        <button
+          onClick={handleNext}
+          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors fade-in"
+        >
+          {currentIndex < questions.length - 1 ? "次の問題へ →" : "結果を見る →"}
+          <span className="text-xs opacity-60 ml-2">(Enter)</span>
+        </button>
       )}
 
       {mode === "exam" && (
@@ -370,30 +392,6 @@ function QuizContent() {
             </button>
           </div>
         </div>
-      )}
-
-      {revealAnswers && showExplanation && (
-        <div
-          className={`rounded-xl p-5 mb-6 fade-in ${isCorrect ? "bg-[var(--success-bg)] border border-[var(--success-border)]" : "bg-[var(--danger-bg)] border border-[var(--danger-border)]"}`}
-        >
-          <p className="font-bold mb-2">
-            {isCorrect ? "⭕ 正解！" : "❌ 不正解"}
-          </p>
-          <p className="text-sm leading-relaxed">
-            {currentQuestion.explanation}
-          </p>
-          <ExplanationEn id={currentQuestion.id} />
-        </div>
-      )}
-
-      {revealAnswers && showExplanation && (
-        <button
-          onClick={handleNext}
-          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors fade-in"
-        >
-          {currentIndex < questions.length - 1 ? "次の問題へ →" : "結果を見る →"}
-          <span className="text-xs opacity-60 ml-2">(Enter)</span>
-        </button>
       )}
 
       {mode === "exam" && (
