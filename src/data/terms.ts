@@ -1149,6 +1149,29 @@ export const termPairs: TermPair[] = [
   { term: "専用実施権", english: "Exclusive License", description: "登録により独占的に実施できる物権的な実施権", category: "strategy", exams: ["chizai"], ipField: "other" },
   { term: "通常実施権", english: "Non-exclusive License", description: "非独占的に実施できる実施権", category: "strategy", exams: ["chizai"], ipField: "other" },
   { term: "弁理士", english: "Patent Attorney", description: "特許等の出願手続の代理を行う知的財産の専門家", category: "strategy", exams: ["chizai"], ipField: "other" },
+
+  // --- 著作権（支分権・職務著作） ---
+  { term: "上映権", english: "Right of Presentation", description: "著作物を公に上映（スクリーン等への映写）する権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "演奏権", english: "Right of Public Performance", description: "音楽などの著作物を公衆に向けて演奏する権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "展示権", english: "Right of Exhibition", description: "美術の著作物・未発行の写真の原作品を公に展示する権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "頒布権", english: "Right of Distribution", description: "映画の著作物の複製物を頒布（譲渡・貸与）する権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "譲渡権", english: "Right of Transfer of Ownership", description: "著作物の原作品・複製物を公衆へ譲渡する権利。適法な譲渡で消尽する", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "貸与権", english: "Rental Right", description: "著作物の複製物を公衆に貸与する権利", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+  { term: "職務著作", english: "Work Made in the Course of Duties", description: "法人等の発意で従業者が職務上作成し法人名義で公表する著作物。原則として法人が著作者となる", category: "strategy", exams: ["chizai"], ipField: "copyright" },
+
+  // --- 特許の争訟・侵害 ---
+  { term: "特許無効審判", english: "Trial for Patent Invalidation", description: "登録された特許を無効にすべきか特許庁で争う審判。利害関係人等が請求できる", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "訂正審判", english: "Trial for Correction", description: "特許権者が明細書・特許請求の範囲等を訂正するために請求する審判", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "特許異議申立て", english: "Opposition to a Granted Patent", description: "特許掲載公報の発行から6か月以内に誰でも特許の取消しを求められる制度", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "間接侵害", english: "Indirect Infringement", description: "侵害の予備的・幇助的行為（侵害専用品の製造等）を侵害とみなす規定", category: "strategy", exams: ["chizai"], ipField: "patent" },
+  { term: "均等論", english: "Doctrine of Equivalents", description: "特許請求の範囲と一部が異なっても実質的に同一とみなし侵害を認める法理", category: "strategy", exams: ["chizai"], ipField: "patent" },
+
+  // --- 知財マネジメント（契約・実務） ---
+  { term: "秘密保持契約", english: "Non-Disclosure Agreement (NDA)", description: "開示する秘密情報の取扱いや目的外使用の禁止を取り決める契約", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "ライセンス契約", english: "License Agreement", description: "知的財産権の利用を許諾し、対価や実施範囲を定める契約", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "職務発明規程", english: "Employee Invention Regulations", description: "職務発明の権利の帰属や相当の利益（対価）を社内であらかじめ定める規程", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "先行技術調査", english: "Prior Art Search", description: "出願前に同様の発明が公知でないかを特許文献等で調べる調査", category: "strategy", exams: ["chizai"], ipField: "other" },
+  { term: "IPランドスケープ", english: "IP Landscape", description: "知財情報と市場情報を統合分析し経営・事業戦略に活かす手法", category: "strategy", exams: ["chizai"], ipField: "other" },
 ];
 
 function termExams(t: TermPair): ExamType[] {

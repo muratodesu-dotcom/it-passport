@@ -6559,6 +6559,74 @@ export const questions: Question[] = [
     ipField: "other",
   },
 
+  // ===== 知財3級 追加問題（著作権の支分権・特許の争訟・知財マネジメント） =====
+  {
+    id: 2001,
+    category: "strategy",
+    question: "映画の著作物について、その複製物を販売・貸与する形で配布することに及ぶ権利はどれか。",
+    options: ["頒布権", "展示権", "貸与権", "上映権"],
+    correctIndex: 0,
+    explanation:
+      "頒布権は映画の著作物に特有の権利で、複製物を譲渡・貸与により公衆に提供（頒布）する行為に及びます。展示権は美術等の原作品の展示、上映権は公への映写に関する権利です。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 2002,
+    category: "strategy",
+    question: "職務著作（法人著作）が成立した場合、原則として著作者となるのは誰か。",
+    options: ["法人その他の使用者", "実際に創作した従業者", "発注した取引先", "従業者と法人の共有"],
+    correctIndex: 0,
+    explanation:
+      "法人等の発意に基づき従業者が職務上作成し、法人名義で公表する著作物（プログラムは公表名義を問わない）は、契約等に別段の定めがなければ法人が著作者となります。",
+    exams: ["chizai"],
+    ipField: "copyright",
+  },
+  {
+    id: 2003,
+    category: "strategy",
+    question: "登録された特許を無効にすべきかどうかを特許庁で争う手続はどれか。",
+    options: ["特許無効審判", "訂正審判", "拒絶査定不服審判", "出願審査請求"],
+    correctIndex: 0,
+    explanation:
+      "特許無効審判は、登録後の特許の有効性を特許庁で争う手続で、利害関係人等が請求できます。訂正審判は特許権者が明細書等を訂正する手続、拒絶査定不服審判は拒絶査定を争う手続です。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 2004,
+    category: "strategy",
+    question: "特許異議申立てを行うことができる期間として正しいものはどれか。",
+    options: ["特許掲載公報の発行から6か月以内", "出願公開から1年6か月以内", "設定登録から3年以内", "出願から20年以内"],
+    correctIndex: 0,
+    explanation:
+      "特許異議申立ては、特許掲載公報の発行の日から6か月以内に限り、誰でも特許庁長官に対して行うことができます。",
+    exams: ["chizai"],
+    ipField: "patent",
+  },
+  {
+    id: 2005,
+    category: "strategy",
+    question: "従業者が行った職務発明の権利の帰属や相当の利益について、企業があらかじめ社内で定めておく文書はどれか。",
+    options: ["職務発明規程", "秘密保持契約", "ライセンス契約", "就業規則の懲戒規定"],
+    correctIndex: 0,
+    explanation:
+      "職務発明規程は、職務発明に係る特許を受ける権利の帰属や、従業者に与える相当の利益（対価）の内容・手続を社内であらかじめ定めるものです。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+  {
+    id: 2006,
+    category: "strategy",
+    question: "取引先に技術情報を開示する際、目的外使用や第三者への漏えいを防ぐために締結する契約はどれか。",
+    options: ["秘密保持契約（NDA）", "ライセンス契約", "クロスライセンス契約", "売買契約"],
+    correctIndex: 0,
+    explanation:
+      "秘密保持契約（NDA）は、開示する秘密情報の範囲・取扱い・目的外使用の禁止・返却等を取り決め、営業秘密の漏えいを防ぐための契約です。",
+    exams: ["chizai"],
+    ipField: "other",
+  },
+
 ];
 
 function effectiveExams(q: Question): ExamType[] {

@@ -670,6 +670,16 @@ body {
 .backface-hidden { backface-visibility: hidden; }
 .rotate-y-180 { transform: rotateY(180deg); }
 
+/* Reveal/hide flip used by the term feed (self-test mode) */
+@keyframes flipIn {
+  from { opacity: 0; transform: rotateX(-75deg); }
+  to { opacity: 1; transform: rotateX(0deg); }
+}
+.flip-in {
+  animation: flipIn 0.3s ease-out;
+  transform-origin: top center;
+}
+
 /* Shake animation */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
