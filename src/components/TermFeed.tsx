@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { TermPair } from "@/data/terms";
-import { Category, categoryLabels, ExamType, IpField, ipFieldLabels } from "@/lib/types";
+import { sameName, TermPair } from "@/data/terms";
+import { Category, categoryLabels, DevField, ExamType, IpField } from "@/lib/types";
+import { fieldLabel, itemField } from "@/lib/examFields";
 import Furigana from "@/components/Furigana";
 import TermExplanationEn from "@/components/TermExplanationEn";
 import {
@@ -17,24 +18,34 @@ import {
 } from "@/lib/termProgress";
 
 const accentByCategory: Record<Category, string> = {
-  strategy: "from-blue-500 to-cyan-500",
-  management: "from-emerald-500 to-green-500",
-  technology: "from-purple-500 to-pink-500",
+  strategy: "bg-blue-600",
+  management: "bg-emerald-700",
+  technology: "bg-purple-600",
 };
 
 const accentByIpField: Record<IpField, string> = {
-  patent: "from-indigo-500 to-blue-500",
-  "design-trademark": "from-rose-500 to-orange-500",
-  copyright: "from-amber-500 to-yellow-500",
-  other: "from-teal-500 to-emerald-500",
+  patent: "bg-indigo-600",
+  "design-trademark": "bg-rose-600",
+  copyright: "bg-amber-700",
+  other: "bg-teal-700",
+};
+
+const accentByDevField: Record<DevField, string> = {
+  git: "bg-orange-700",
+  database: "bg-emerald-700",
+  vercel: "bg-neutral-800",
+  web: "bg-sky-700",
+  ai: "bg-violet-600",
 };
 
 function badgeLabel(exam: ExamType, t: TermPair): string {
-  return exam === "chizai" ? ipFieldLabels[t.ipField ?? "other"] : categoryLabels[t.category];
+  return fieldLabel(exam, itemField(exam, t));
 }
 
 function accentFor(exam: ExamType, t: TermPair): string {
-  return exam === "chizai" ? accentByIpField[t.ipField ?? "other"] : accentByCategory[t.category];
+  if (exam === "chizai") return accentByIpField[t.ipField ?? "other"];
+  if (exam === "dev") return accentByDevField[t.devField ?? "web"];
+  return accentByCategory[t.category];
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -266,7 +277,7 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
         </div>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[var(--progress-bg)]">
           <div
-            className="h-full rounded-full transition-all duration-500"
+            className="h-full rounded-full transition-[width] duration-500"
             style={{
               backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`,
               width: `${progress}%`,
@@ -287,10 +298,10 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
           revealMode ? "cursor-pointer" : ""
         }`}
       >
-        <div className={`h-1.5 w-full shrink-0 bg-gradient-to-r ${accent}`} />
+        <div className={`h-1.5 w-full shrink-0 ${accent}`} />
         <div className="flex flex-1 flex-col p-6 sm:p-7">
           <div className="mb-4 flex items-center justify-between gap-3">
-            <span className={`rounded-full bg-gradient-to-r ${accent} px-3 py-1 text-[11px] font-medium text-white`}>
+            <span className={`rounded-full ${accent} px-3 py-1 text-[11px] font-medium text-white`}>
               {badgeLabel(exam, t)}
             </span>
             {/* Per-card actions */}
@@ -333,7 +344,7 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
           <h2 className="text-2xl font-bold leading-snug sm:text-3xl">
             <Furigana term={t.term} />
           </h2>
-          <p className="mt-1 text-sm text-[var(--muted)]">{t.english}</p>
+          {!sameName(t.term, t.english) && <p className="mt-1 text-sm text-[var(--muted)]">{t.english}</p>}
 
           <div className="mt-5 flex-1">
             {isRevealed ? (
@@ -341,7 +352,7 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
                 <p className="text-[15px] leading-relaxed text-[var(--foreground)] sm:text-base">
                   {t.description}
                 </p>
-                <TermExplanationEn term={t.term} />
+                <TermExplanationEn term={t.term} exam={exam} />
                 {revealMode && (
                   <p className="mt-3 text-center text-xs text-[var(--muted)]">タップで隠す</p>
                 )}
@@ -388,7 +399,7 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
           type="button"
           onClick={goBack}
           disabled={pos === 0}
-          className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] px-4 py-3.5 font-medium transition-all hover:bg-[var(--card-hover)] disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] px-4 py-3.5 font-medium transition-colors hover:bg-[var(--card-hover)] disabled:cursor-not-allowed disabled:opacity-40"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M15 18l-6-6 6-6" />
@@ -398,7 +409,7 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
         <button
           type="button"
           onClick={goNext}
-          className="flex flex-[1.6] items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] px-4 py-3.5 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+          className="flex flex-[1.6] items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] px-4 py-3.5 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
         >
           次へ
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

@@ -2,10 +2,11 @@
   "name": "ITパスポート＆知財3級 学習アプリ",
   "short_name": "ITパス＆知財3級",
   "description": "ITパスポート試験と知的財産管理技能検定3級に対応した学習・クイズアプリ",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0c12",
+  "background_color": "#f6f7fb",
   "theme_color": "#4f46e5",
   "orientation": "portrait-primary",
   "lang": "ja",
@@ -14,17 +15,25 @@
       "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

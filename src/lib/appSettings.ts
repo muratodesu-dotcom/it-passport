@@ -1,3 +1,5 @@
+import { safeGet, safeSet } from "./storage";
+
 export const APP_SETTINGS_STORAGE_KEY = "it-passport-ai-settings";
 
 export type AiSettings = {
@@ -16,7 +18,7 @@ export function loadAiSettings(): AiSettings {
   }
 
   try {
-    const raw = window.localStorage.getItem(APP_SETTINGS_STORAGE_KEY);
+    const raw = safeGet(APP_SETTINGS_STORAGE_KEY);
     if (!raw) {
       return defaultAiSettings;
     }
@@ -43,5 +45,5 @@ export function saveAiSettings(settings: AiSettings) {
     model: settings.model.trim() || defaultAiSettings.model,
   };
 
-  window.localStorage.setItem(APP_SETTINGS_STORAGE_KEY, JSON.stringify(normalizedSettings));
+  safeSet(APP_SETTINGS_STORAGE_KEY, JSON.stringify(normalizedSettings));
 }

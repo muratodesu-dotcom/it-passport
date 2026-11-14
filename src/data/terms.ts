@@ -1,4 +1,5 @@
-import { Category, ExamType, IpField } from "@/lib/types";
+import { Category, DevField, ExamType, IpField } from "@/lib/types";
+import { devTermPairs } from "./devTerms";
 
 export interface TermPair {
   term: string;
@@ -9,6 +10,8 @@ export interface TermPair {
   exams?: ExamType[];
   // 知財3級 sub-field, used to group 知財 terms in the glossary and drills.
   ipField?: IpField;
+  // AIエンジニア track sub-field.
+  devField?: DevField;
 }
 
 export const termPairs: TermPair[] = [
@@ -1172,7 +1175,19 @@ export const termPairs: TermPair[] = [
   { term: "職務発明規程", english: "Employee Invention Regulations", description: "職務発明の権利の帰属や相当の利益（対価）を社内であらかじめ定める規程", category: "strategy", exams: ["chizai"], ipField: "other" },
   { term: "先行技術調査", english: "Prior Art Search", description: "出願前に同様の発明が公知でないかを特許文献等で調べる調査", category: "strategy", exams: ["chizai"], ipField: "other" },
   { term: "IPランドスケープ", english: "IP Landscape", description: "知財情報と市場情報を統合分析し経営・事業戦略に活かす手法", category: "strategy", exams: ["chizai"], ipField: "other" },
+  // ===== AI Engineer track (English) — src/data/devTerms.ts =====
+  ...devTermPairs,
 ];
+
+/**
+ * True when a term's English name only repeats its headword ("Prompt" /
+ * "Prompt"), as often happens in the English AI Engineer glossary; the
+ * subtitle is then left out.
+ */
+export function sameName(term: string, english: string): boolean {
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return norm(term) === norm(english);
+}
 
 function termExams(t: TermPair): ExamType[] {
   return t.exams ?? ["it-passport"];
@@ -1184,3 +1199,4 @@ export function getTermsByExam(exam: ExamType): TermPair[] {
 
 export const itPassportTerms = getTermsByExam("it-passport");
 export const chizaiTerms = getTermsByExam("chizai");
+export const devTerms = getTermsByExam("dev");

@@ -2,14 +2,17 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
-import { getChizaiQuestionsByField, getQuestionsByCategory, getQuestionsByExam, shuffleQuestions, withShuffledOptions, questions as allQuestions } from "@/data/questions";
-import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels, ipFieldLabels, IpField } from "@/lib/types";
+import { getQuestionsByCategory, getQuestionsByExam, getQuestionsByExamField, shuffleQuestions, withShuffledOptions, questions as allQuestions } from "@/data/questions";
+import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels, devFieldLabels } from "@/lib/types";
+import { fieldLabel, hasExamMode, itemField, parseExam } from "@/lib/examFields";
+import { fieldStyle } from "@/lib/fieldColors";
 import { examRules } from "@/lib/scoring";
 import { getBookmarks, getWrongQuestionIds, isBookmarked, toggleBookmark } from "@/lib/history";
 import { getDueQuestionIds } from "@/lib/srs";
 import { saveQuizSession } from "@/lib/quizSession";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ExplanationEn from "@/components/ExplanationEn";
+import CodeText from "@/components/CodeText";
 
 type Source = "category" | "wrong" | "bookmarks" | "review";
 
@@ -35,8 +38,9 @@ function QuizContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const category = searchParams.get("category") || "all";
-  const mode: QuizMode = searchParams.get("mode") === "exam" ? "exam" : "practice";
-  const examType: ExamType = searchParams.get("exam") === "chizai" ? "chizai" : "it-passport";
+  const examType: ExamType = parseExam(searchParams.get("exam"));
+  // The AIエンジニア track has no 本番試験; an exam link for it falls back to practice.
+  const mode: QuizMode = searchParams.get("mode") === "exam" && hasExamMode(examType) ? "exam" : "practice";
   const examTimeLimitSeconds = examRules[examType].timeLimitSeconds;
   const sourceParam = searchParams.get("source");
   const source: Source =
@@ -55,15 +59,17 @@ function QuizContent() {
   const [elapsed, setElapsed] = useState(0);
   const [bookmarkTick, setBookmarkTick] = useState(0);
   const [emptyPool, setEmptyPool] = useState(false);
+  // Consecutive correct answers in this session (reset on a wrong answer).
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     let pool: Question[];
     if (mode === "exam") {
       // 本番試験モードは試験種別ごとの全問題から規定数を出題する。
       pool = shuffleQuestions(getQuestionsByExam(examType)).slice(0, examRules[examType].questionCount);
-    } else if (source === "category" && examType === "chizai") {
-      // 知財3級は分野別（特許・意匠商標・著作権・その他）に練習できる。
-      pool = shuffleQuestions(getChizaiQuestionsByField(field));
+    } else if (source === "category" && examType !== "it-passport") {
+      // 知財3級・AIエンジニアは分野別に練習できる。
+      pool = shuffleQuestions(getQuestionsByExamField(examType, field));
     } else {
       pool = shuffleQuestions(buildQuestionPool(source, category));
     }
@@ -79,6 +85,7 @@ function QuizContent() {
     setAnswers(new Array(pool.length).fill(null));
     setStartTime(nextStartTime);
     setElapsed(0);
+    setStreak(0);
   }, [category, mode, source, examType, field]);
 
   useEffect(() => {
@@ -89,6 +96,8 @@ function QuizContent() {
   }, [startTime]);
 
   const currentQuestion = questions[currentIndex];
+  // The AI Engineer track is in English, so its quiz screen is too.
+  const en = examType === "dev";
 
   const finishQuiz = useCallback(
     (finalAnswers: (number | null)[]) => {
@@ -120,8 +129,11 @@ function QuizContent() {
         next[currentIndex] = index;
         return next;
       });
+      if (currentQuestion) {
+        setStreak((s) => (index === currentQuestion.correctIndex ? s + 1 : 0));
+      }
     },
-    [showExplanation, currentIndex]
+    [showExplanation, currentIndex, currentQuestion]
   );
 
   const handleNext = useCallback(() => {
@@ -204,7 +216,7 @@ function QuizContent() {
           <p className="text-lg font-medium">{message}</p>
           <button
             onClick={() => router.push("/")}
-            className="mt-4 rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+            className="mt-4 rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
           >
             ホームに戻る
           </button>
@@ -219,16 +231,23 @@ function QuizContent() {
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const isCorrect = selectedAnswer === currentQuestion.correctIndex;
+  const { color: fieldColor, icon: fieldIcon } = fieldStyle(itemField(examType, currentQuestion));
+  // Quiz limited to a single field/category (practice by field only).
+  const scopedToField =
+    mode === "practice" &&
+    source === "category" &&
+    (examType !== "it-passport" ? field !== "all" : category !== "all");
+  const showAnswerBar = mode === "practice" && showExplanation;
   const headerLabel = source === "wrong"
     ? "間違えた問題のみ"
     : source === "bookmarks"
       ? "ブックマーク"
       : source === "review"
       ? "復習（間隔反復）"
-      : examType === "chizai"
+      : examType !== "it-passport"
         ? field === "all"
-          ? "知財3級 全分野"
-          : ipFieldLabels[field as IpField] ?? field
+          ? `${examShortLabels[examType]} ${examType === "dev" ? "· All fields" : "全分野"}`
+          : fieldLabel(examType, field)
         : category === "all"
           ? "全分野"
           : categoryLabels[category as Category] || category;
@@ -241,19 +260,22 @@ function QuizContent() {
   const answeredCount = answers.filter((a) => a !== null).length;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className={`max-w-2xl mx-auto px-4 py-8 ${showAnswerBar ? "pb-24" : ""}`}>
       <div className="flex items-center justify-between gap-2 mb-6">
         <button
           onClick={() => router.push("/")}
           className="shrink-0 text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
         >
-          ← 戻る
+          ← {en ? "Back" : "戻る"}
         </button>
         <span className="min-w-0 flex-1 truncate text-center text-sm font-medium text-[var(--muted)]">
           {mode === "exam" ? `${examShortLabels[examType]} 本番試験モード` : headerLabel}
         </span>
         <div className="shrink-0 text-right">
-          <span className="text-sm font-medium block tabular-nums">
+          <span
+            className={scopedToField ? "inline-block rounded-full px-2 py-0.5 text-sm font-bold tabular-nums" : "text-sm font-medium block tabular-nums"}
+            style={scopedToField ? { backgroundColor: `${fieldColor}1f`, color: fieldColor } : undefined}
+          >
             {currentIndex + 1} / {questions.length}
           </span>
           {timeLeft !== null ? (
@@ -268,36 +290,52 @@ function QuizContent() {
         </div>
       </div>
 
-      <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
+      <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full">
         <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${progress}%` }}
+          className="h-full rounded-full transition-[width] duration-500"
+          style={
+            scopedToField
+              ? { backgroundColor: fieldColor, width: `${progress}%` }
+              : { backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${progress}%` }
+          }
         />
+      </div>
+      {/* Fixed-height row so the streak chip appearing doesn't move the card. */}
+      <div className="mb-4 mt-1.5 flex h-6 items-center justify-end">
+        {streak >= 2 && (
+          <span className="rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-bold text-orange-700 tabular-nums dark:bg-orange-400/15 dark:text-orange-300">
+            {en ? `🔥 ${streak} in a row` : `🔥 ${streak}連続`}
+          </span>
+        )}
       </div>
 
       <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm fade-in" key={currentIndex}>
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs px-2 py-1 rounded-full bg-[var(--badge-bg)] text-[var(--muted)]">
-              {categoryLabels[currentQuestion.category]}
+            <span
+              className="text-xs font-medium px-2 py-1 rounded-full text-white"
+              style={{ backgroundColor: fieldColor }}
+            >
+              {fieldIcon}{" "}
+              {currentQuestion.devField ? devFieldLabels[currentQuestion.devField] : categoryLabels[currentQuestion.category]}
             </span>
             <span className="text-xs text-[var(--muted)]">
-              問{currentIndex + 1}
+              {en ? `Q${currentIndex + 1}` : `問${currentIndex + 1}`}
             </span>
           </div>
           <button
             type="button"
             onClick={handleToggleBookmark}
             aria-pressed={bookmarked}
-            aria-label={bookmarked ? "ブックマークを外す" : "ブックマークに追加"}
+            aria-label={bookmarked ? (en ? "Remove bookmark" : "ブックマークを外す") : (en ? "Bookmark" : "ブックマークに追加")}
             className={`flex items-center gap-1 rounded-full border px-3 py-1 text-xs transition-colors ${bookmarked ? "border-amber-400 bg-amber-100 text-amber-900 dark:border-amber-300/40 dark:bg-amber-400/20 dark:text-amber-100" : "border-[var(--card-border)] bg-[var(--card)] text-[var(--muted)] hover:border-amber-400 hover:text-amber-700"}`}
           >
             <span>{bookmarked ? "★" : "☆"}</span>
-            <span>{bookmarked ? "ブックマーク済" : "あとで復習"}</span>
+            <span>{bookmarked ? (en ? "Bookmarked" : "ブックマーク済") : (en ? "Review later" : "あとで復習")}</span>
           </button>
         </div>
         <p className="text-lg font-medium leading-relaxed">
-          {currentQuestion.question}
+          <CodeText text={currentQuestion.question} />
         </p>
       </div>
 
@@ -324,12 +362,12 @@ function QuizContent() {
               key={index}
               onClick={() => handleAnswer(index)}
               disabled={showExplanation}
-              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 transition-all bg-[var(--card)] ${style}`}
+              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 transition-colors bg-[var(--card)] ${style}`}
             >
               <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
                 {String.fromCharCode(65 + index)}
               </span>
-              <span className="flex-1 leading-relaxed">{option}</span>
+              <span className="flex-1 leading-relaxed"><CodeText text={option} /></span>
               {!showExplanation && (
                 <span className="mt-0.5 hidden shrink-0 text-xs text-[var(--muted)] sm:block">
                   {index + 1}
@@ -342,7 +380,7 @@ function QuizContent() {
 
       {!showExplanation && (
         <p className="text-center text-xs text-[var(--muted)] mb-4">
-          キーボード: 1〜4で選択 · Bでブックマーク
+          {en ? "Keys: 1–4 to answer · B to bookmark" : "キーボード: 1〜4で選択 · Bでブックマーク"}
         </p>
       )}
 
@@ -351,23 +389,38 @@ function QuizContent() {
           className={`rounded-xl p-5 mb-6 fade-in ${isCorrect ? "bg-[var(--success-bg)] border border-[var(--success-border)]" : "bg-[var(--danger-bg)] border border-[var(--danger-border)]"}`}
         >
           <p className="font-bold mb-2">
-            {isCorrect ? "⭕ 正解！" : "❌ 不正解"}
+            {isCorrect ? (en ? "⭕ Correct" : "⭕ 正解！") : (en ? "❌ Incorrect" : "❌ 不正解")}
           </p>
           <p className="text-sm leading-relaxed">
-            {currentQuestion.explanation}
+            <CodeText text={currentQuestion.explanation} />
           </p>
           <ExplanationEn id={currentQuestion.id} />
         </div>
       )}
 
-      {mode === "practice" && showExplanation && (
-        <button
-          onClick={handleNext}
-          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors fade-in"
+      {showAnswerBar && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--card-border)] px-4 pt-3 backdrop-blur"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--card) 95%, transparent)",
+            paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))",
+          }}
         >
-          {currentIndex < questions.length - 1 ? "次の問題へ →" : "結果を見る →"}
-          <span className="text-xs opacity-60 ml-2">(Enter)</span>
-        </button>
+          <div className="mx-auto flex max-w-2xl items-center gap-3">
+            <span
+              className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-bold whitespace-nowrap transition-colors ${isCorrect ? "bg-[var(--success-bg)] text-[var(--success)]" : "bg-[var(--danger-bg)] text-[var(--danger)]"}`}
+            >
+              {isCorrect ? (en ? "⭕ Correct" : "⭕ 正解") : (en ? "❌ Incorrect" : "❌ 不正解")}
+            </span>
+            <button
+              onClick={handleNext}
+              className="min-h-12 flex-1 whitespace-nowrap rounded-xl bg-[var(--primary)] px-5 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)] sm:ml-auto sm:flex-none"
+            >
+              {currentIndex < questions.length - 1 ? (en ? "Next question →" : "次の問題へ →") : (en ? "See results →" : "結果を見る →")}
+              <span className="ml-2 hidden text-xs opacity-60 sm:inline">(Enter)</span>
+            </button>
+          </div>
+        </div>
       )}
 
       {mode === "exam" && (
@@ -397,7 +450,7 @@ function QuizContent() {
       {mode === "exam" && (
         <button
           onClick={handleSubmitExam}
-          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
         >
           {currentIndex < questions.length - 1 ? "途中で採点する" : "提出して採点する →"}
         </button>

@@ -2,8 +2,10 @@ import { describe, it, expect } from "vitest";
 import { termPairs, getTermsByExam, itPassportTerms, chizaiTerms } from "./terms";
 
 describe("glossary integrity", () => {
-  it("has unique (category, term) keys", () => {
-    const keys = termPairs.map((t) => `${t.category}|${t.term}`);
+  it("has unique (track, category, term) keys", () => {
+    // The English AI Engineer track may reuse a headword such as "API" that the
+    // Japanese ITパスポート glossary also has; each glossary is shown on its own.
+    const keys = termPairs.map((t) => `${(t.exams ?? ["it-passport"]).join("+")}|${t.category}|${t.term}`);
     expect(new Set(keys).size).toBe(keys.length);
   });
 

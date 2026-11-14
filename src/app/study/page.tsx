@@ -2,12 +2,14 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, Suspense, useMemo, useRef, useCallback } from "react";
-import { getChizaiQuestionsByField, getQuestionsByCategory, withShuffledOptions } from "@/data/questions";
+import { getQuestionsByCategory, getQuestionsByExamField, withShuffledOptions } from "@/data/questions";
 import { termPairs } from "@/data/terms";
-import { categoryLabels, Category, ipFieldLabels, IpField } from "@/lib/types";
+import { Category, DevField, examLabels, IpField } from "@/lib/types";
+import { fieldLabel, parseExam } from "@/lib/examFields";
 import { defaultAiSettings, loadAiSettings } from "@/lib/appSettings";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ExplanationEn from "@/components/ExplanationEn";
+import CodeText from "@/components/CodeText";
 
 const termLookup = new Map(termPairs.map((t) => [t.term, { description: t.description, english: t.english }]));
 
@@ -193,6 +195,100 @@ const examTipMap: Record<Category, ExamTipSection[]> = {
         "ハードウェアでは論理回路、メモリ階層、入出力装置、RAID、仮想化を押さえると取りこぼしを減らせます。",
         "ネットワークではTCP/IP、HTTP、DNS、DHCP、NAT、VPN、無線LAN、サブネットの基本まで広げると本番向きです。",
         "データベースでは主キー・外部キー・正規化・トランザクション、セキュリティでは認証・認可・暗号・署名・マルウェア対策まで押さえたいです。",
+      ],
+    },
+  ],
+};
+
+// AI Engineer track (English): the traps that matter in day-to-day work, per field.
+const devTipMap: Record<DevField, ExamTipSection[]> = {
+  git: [
+    {
+      title: "Does it rewrite history?",
+      points: [
+        "rebase, reset and commit --amend rewrite history. Never use them on shared branches; undo shared commits with revert.",
+        "When you must force-push, use --force-with-lease, not --force, so you can't wipe someone else's push.",
+        "Commits you 'lost' are usually still in the reflog. Look there before redoing work.",
+      ],
+    },
+    {
+      title: "merge vs rebase",
+      points: [
+        "merge keeps history as it happened and adds a merge commit; rebase replays your commits on top so history is linear.",
+        "GitHub's squash merge turns a whole PR into one commit; the individual commits don't reach main.",
+        "Resolve conflicts by reading both sides' intent, run the tests, then continue (git rebase --continue or commit the merge).",
+      ],
+    },
+  ],
+  database: [
+    {
+      title: "Keys and RLS carry the security",
+      points: [
+        "The publishable (anon) key is meant to be public; Row Level Security policies are what protect the data.",
+        "The secret (service_role) key bypasses RLS. Keep it server-side only, never in a NEXT_PUBLIC_ variable.",
+        "A table in an exposed schema without RLS is readable and writable by anyone through the Data API.",
+      ],
+    },
+    {
+      title: "Connections and migrations",
+      points: [
+        "From serverless functions, connect through the pooler's transaction mode (port 6543) and turn off prepared statements.",
+        "The old deployment keeps running during a deploy: make migrations additive first, remove old columns later.",
+        "N+1 queries (one query per row of a list) are fixed with a JOIN or by embedding related rows in one select.",
+      ],
+    },
+  ],
+  vercel: [
+    {
+      title: "Previews, production and env vars",
+      points: [
+        "Environment variables are set per environment (Development, Preview, Production); a change applies to the next deployment, not running ones.",
+        "A preview pointed at the production database can change production data before the PR is merged.",
+        "Instant Rollback puts a previous production deployment back in seconds while you fix forward.",
+      ],
+    },
+    {
+      title: "Where and how code runs",
+      points: [
+        "Functions run on Node.js with Fluid Compute by default; the Edge runtime is deprecated, and streaming works on Node.js.",
+        "Put functions in the region nearest the database: most latency comes from round trips to the DB.",
+        "A build skipped by the Ignored Build Step shows as canceled, which is not the same as passing.",
+      ],
+    },
+  ],
+  web: [
+    {
+      title: "Where does this code run?",
+      points: [
+        "In Next.js only environment variables prefixed NEXT_PUBLIC_ reach the browser. Never give a secret that prefix.",
+        "SSR renders per request, SSG at build time, ISR regenerates on a timer or on demand.",
+        "CORS is enforced by the browser; the server grants access with response headers.",
+      ],
+    },
+    {
+      title: "Status codes and webhooks",
+      points: [
+        "401 means not authenticated, 403 means authenticated but not allowed, 429 means rate limited.",
+        "A 200 can still be an error page: check the content, not just the status.",
+        "Verify webhook signatures and process each event idempotently, because providers retry.",
+      ],
+    },
+  ],
+  ai: [
+    {
+      title: "What the model does vs what your app does",
+      points: [
+        "With tool use the model only asks for a tool call with arguments; your application runs it and returns the result.",
+        "Use RAG to supply fresh or private knowledge; consider fine-tuning to change style or format, not facts.",
+        "Instructions inside web pages, emails or files are prompt injection vectors: treat that content as data.",
+      ],
+    },
+    {
+      title: "Cost and latency",
+      points: [
+        "Put the long, unchanging part of the prompt first and cache it to cut cost and latency.",
+        "On HTTP 429, retry with exponential backoff and jitter; send non-urgent bulk work through a batch API.",
+        "Perceived speed is time to first token, so stream responses.",
       ],
     },
   ],
@@ -1300,13 +1396,14 @@ function StudyContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   // 知財3級では category パラメータが IpField（特許・意匠商標・著作権・その他）を表す。
-  const examType = searchParams.get("exam") === "chizai" ? "chizai" : "it-passport";
-  const category = searchParams.get("category") || (examType === "chizai" ? "patent" : "strategy");
+  const examType = parseExam(searchParams.get("exam"));
+  const category =
+    searchParams.get("category") || (examType === "chizai" ? "patent" : examType === "dev" ? "git" : "strategy");
 
   // 選択肢を並び替える（出題データは正解が先頭に偏っているため）。
   const questions = useMemo(
     () =>
-      (examType === "chizai" ? getChizaiQuestionsByField(category) : getQuestionsByCategory(category)).map(
+      (examType === "it-passport" ? getQuestionsByCategory(category) : getQuestionsByExamField(examType, category)).map(
         (q) => withShuffledOptions(q)
       ),
     [examType, category]
@@ -1324,7 +1421,7 @@ function StudyContent() {
   const [showStudyGuide, setShowStudyGuide] = useState(false);
   const [openGuideSections, setOpenGuideSections] = useState<Record<GuideSection, boolean>>(() => ({
     // 知財3級は詳細レッスンを持たないため、最初から「試験のコツ」を開いておく。
-    lessons: examType !== "chizai", coverage: false, audit: false, deepDive: false, examTips: examType === "chizai",
+    lessons: examType === "it-passport", coverage: false, audit: false, deepDive: false, examTips: examType !== "it-passport",
   }));
   const [expandedLessons, setExpandedLessons] = useState<Record<number, boolean>>({});
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -1333,16 +1430,16 @@ function StudyContent() {
   const feedCardRefs = useRef<Map<string, HTMLElement>>(new Map());
 
   const question = questions[currentIndex];
-  const categoryLabel = examType === "chizai"
-    ? ipFieldLabels[category as IpField] || category
-    : categoryLabels[category as Category] || category;
-  const examLabel = examType === "chizai" ? "知的財産管理技能検定3級" : "ITパスポート試験";
+  const categoryLabel = fieldLabel(examType, category);
+  const examLabel = examType === "it-passport" ? "ITパスポート試験" : examLabels[examType];
   const feedAnsweredCount = Object.keys(selectedFeedAnswers).length;
   const studiedCount = doomScrollMode ? feedAnsweredCount : (showAnswer ? currentIndex + 1 : currentIndex);
   const mastery = questions.length > 0 ? Math.round((studiedCount / questions.length) * 100) : 0;
   const categoryExamTips = examType === "chizai"
     ? chizaiExamTipMap[category as IpField] || []
-    : examTipMap[category as Category] || [];
+    : examType === "dev"
+      ? devTipMap[category as DevField] || []
+      : examTipMap[category as Category] || [];
   const lessonBlocks = lessonBlocksMap[category as Category] || [];
   const coverageFocuses = coverageFocusMap[category as Category] || [];
   const readinessAudits = readinessAuditMap[category as Category] || [];
@@ -1588,13 +1685,13 @@ function StudyContent() {
             <div className="flex items-center gap-1.5 rounded-full bg-[var(--badge-bg)] p-1">
               <button
                 onClick={() => setDoomScrollMode(true)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${doomScrollMode ? "bg-[var(--accent)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${doomScrollMode ? "bg-[var(--accent)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
               >
                 フィード
               </button>
               <button
                 onClick={() => setDoomScrollMode(false)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${!doomScrollMode ? "bg-[var(--primary)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${!doomScrollMode ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
               >
                 集中
               </button>
@@ -1610,7 +1707,7 @@ function StudyContent() {
 
         <div className="mt-3 h-1.5 w-full rounded-full bg-[var(--progress-bg)] overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-500"
+            className="h-full rounded-full transition-[width] duration-500"
             style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${mastery}%` }}
           />
         </div>
@@ -1629,27 +1726,27 @@ function StudyContent() {
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--muted)] mb-3">ガイド目次</p>
         <div className="flex flex-wrap gap-2">
           {lessonBlocks.length > 0 && (
-          <button onClick={() => toggleGuideSection("lessons")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.lessons ? "bg-sky-100 border-sky-300 text-sky-800 dark:bg-sky-500/20 dark:border-sky-400/40 dark:text-sky-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("lessons")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.lessons ? "bg-sky-100 border-sky-300 text-sky-800 dark:bg-sky-500/20 dark:border-sky-400/40 dark:text-sky-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.lessons ? "▼" : "▶"} ミニレッスン <span className="ml-1.5 text-[10px] opacity-60">{lessonBlocks.length}件</span>
           </button>
           )}
           {coverageFocuses.length > 0 && (
-          <button onClick={() => toggleGuideSection("coverage")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.coverage ? "bg-violet-100 border-violet-300 text-violet-800 dark:bg-violet-500/20 dark:border-violet-400/40 dark:text-violet-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("coverage")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.coverage ? "bg-violet-100 border-violet-300 text-violet-800 dark:bg-violet-500/20 dark:border-violet-400/40 dark:text-violet-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.coverage ? "▼" : "▶"} 弱点カバー <span className="ml-1.5 text-[10px] opacity-60">{coverageFocuses.length}件</span>
           </button>
           )}
           {readinessAudits.length > 0 && (
-          <button onClick={() => toggleGuideSection("audit")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.audit ? "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800 dark:bg-fuchsia-500/20 dark:border-fuchsia-400/40 dark:text-fuchsia-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("audit")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.audit ? "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800 dark:bg-fuchsia-500/20 dark:border-fuchsia-400/40 dark:text-fuchsia-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.audit ? "▼" : "▶"} レッスン監査 <span className="ml-1.5 text-[10px] opacity-60">{readinessAudits.length}件</span>
           </button>
           )}
           {deepDiveModules.length > 0 && (
-          <button onClick={() => toggleGuideSection("deepDive")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.deepDive ? "bg-teal-100 border-teal-300 text-teal-800 dark:bg-teal-500/20 dark:border-teal-400/40 dark:text-teal-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("deepDive")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.deepDive ? "bg-teal-100 border-teal-300 text-teal-800 dark:bg-teal-500/20 dark:border-teal-400/40 dark:text-teal-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.deepDive ? "▼" : "▶"} 深掘りモジュール <span className="ml-1.5 text-[10px] opacity-60">{deepDiveModules.length}件</span>
           </button>
           )}
           {categoryExamTips.length > 0 && (
-          <button onClick={() => toggleGuideSection("examTips")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.examTips ? "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-500/20 dark:border-amber-400/40 dark:text-amber-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("examTips")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.examTips ? "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-500/20 dark:border-amber-400/40 dark:text-amber-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.examTips ? "▼" : "▶"} 試験のコツ <span className="ml-1.5 text-[10px] opacity-60">{categoryExamTips.length}件</span>
           </button>
           )}
@@ -1680,7 +1777,7 @@ function StudyContent() {
             return (
             <section
               key={lesson.title}
-              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/20 transition-all"
+              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/20 transition-colors"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-200">Lesson {index + 1}</p>
@@ -1973,7 +2070,7 @@ function StudyContent() {
             <>
               <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
                 <div
-                  className="h-full rounded-full transition-all duration-500"
+                  className="h-full rounded-full transition-[width] duration-500"
                   style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${((currentIndex + 1) / questions.length) * 100}%` }}
                 />
               </div>
@@ -1983,7 +2080,7 @@ function StudyContent() {
                   問{currentIndex + 1}
                 </span>
                 <p className="text-lg font-medium leading-relaxed mt-4">
-                  {question.question}
+                  <CodeText text={question.question} />
                 </p>
               </div>
 
@@ -1991,7 +2088,7 @@ function StudyContent() {
                 {question.options.map((option, index) => (
                   <div
                     key={index}
-                    className={`p-4 rounded-xl border-2 transition-all bg-[var(--card)] ${
+                    className={`p-4 rounded-xl border-2 transition-[color,background-color,border-color,opacity] bg-[var(--card)] ${
                       showAnswer && index === question.correctIndex
                         ? "border-[var(--success)] bg-[var(--success-bg)]"
                         : showAnswer
@@ -2002,7 +2099,7 @@ function StudyContent() {
                     <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[var(--badge-bg)] text-sm font-medium mr-3">
                       {String.fromCharCode(65 + index)}
                     </span>
-                    {option}
+                    <CodeText text={option} />
                   </div>
                 ))}
               </div>
@@ -2027,7 +2124,7 @@ function StudyContent() {
                       {question.options[question.correctIndex]}
                     </p>
                     <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
-                      {question.explanation}
+                      <CodeText text={question.explanation} />
                     </p>
                     <ExplanationEn id={question.id} />
                   </div>
@@ -2083,14 +2180,14 @@ function StudyContent() {
                           setCurrentIndex((i) => i + 1);
                           setShowAnswer(false);
                         }}
-                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
                       >
                         次の問題 →
                       </button>
                     ) : (
                       <button
                         onClick={() => router.push("/")}
-                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
                       >
                         ホームに戻る
                       </button>
@@ -2118,7 +2215,7 @@ function StudyContent() {
                     onClick={() => setActiveFeedIndex(feedPosition)}
                   >
                     <div className="mb-3 flex items-center justify-between gap-3">
-                      <h2 className="font-semibold leading-snug">{feedQuestion.question}</h2>
+                      <h2 className="font-semibold leading-snug"><CodeText text={feedQuestion.question} /></h2>
                       <span className="shrink-0 rounded-full bg-[var(--badge-bg)] px-2.5 py-1 text-[11px] text-[var(--muted)]">
                         {item.questionIndex + 1}/{questions.length}
                       </span>
@@ -2148,12 +2245,12 @@ function StudyContent() {
                               handleFeedAnswer(item.feedId, feedQuestion.id, optionIndex);
                             }}
                             disabled={hasAnswered}
-                            className={`w-full text-left rounded-xl border-2 px-4 py-3 transition-all ${optionStyle} ${hasAnswered && isSelected && !isCorrect ? "animate-shake" : ""}`}
+                            className={`w-full text-left rounded-xl border-2 px-4 py-3 transition-colors ${optionStyle} ${hasAnswered && isSelected && !isCorrect ? "animate-shake" : ""}`}
                           >
                             <span className="mr-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--badge-bg)] text-xs font-medium">
                               {String.fromCharCode(65 + optionIndex)}
                             </span>
-                            <span className="text-sm">{option}</span>
+                            <span className="text-sm"><CodeText text={option} /></span>
                           </button>
                         );
                       })}
@@ -2165,7 +2262,7 @@ function StudyContent() {
                           {selectedAnswer === feedQuestion.correctIndex ? "正解!" : `不正解 — 正解は ${String.fromCharCode(65 + feedQuestion.correctIndex)}`}
                         </p>
                         <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
-                          {feedQuestion.explanation}
+                          <CodeText text={feedQuestion.explanation} />
                         </p>
                         <ExplanationEn id={feedQuestion.id} />
                       </div>
@@ -2177,7 +2274,7 @@ function StudyContent() {
                           正解: {String.fromCharCode(65 + feedQuestion.correctIndex)}. {feedQuestion.options[feedQuestion.correctIndex]}
                         </p>
                         <p className="text-sm leading-relaxed text-[var(--explanation-text)]">
-                          {feedQuestion.explanation}
+                          <CodeText text={feedQuestion.explanation} />
                         </p>
                         <ExplanationEn id={feedQuestion.id} />
                       </div>
@@ -2198,7 +2295,7 @@ function StudyContent() {
                     <p className="text-xs text-[var(--muted)]">{feedAnsweredCount}問回答済み · {feedCorrectCount}問正解</p>
                     <button
                       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                      className="mt-3 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)] transition-colors"
+                      className="mt-3 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--on-primary)] hover:bg-[var(--primary-hover)] transition-colors"
                     >
                       トップに戻る
                     </button>
@@ -2272,7 +2369,7 @@ function StudyContent() {
             <div className="space-y-3">
               <button
                 onClick={() => router.push(`/quiz?category=${category}`)}
-                className="w-full rounded-xl bg-[var(--primary)] px-4 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+                className="w-full rounded-xl bg-[var(--primary)] px-4 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
               >
                 この分野でクイズに挑戦
               </button>
@@ -2290,7 +2387,7 @@ function StudyContent() {
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-lg hover:bg-[var(--primary-hover)] transition-all hover:scale-105 fade-in"
+          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--on-primary)] shadow-lg hover:bg-[var(--primary-hover)] transition-colors fade-in"
           aria-label="トップに戻る"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 15l-6-6-6 6"/></svg>

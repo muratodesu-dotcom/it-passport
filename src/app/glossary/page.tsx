@@ -1,44 +1,50 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo, useState } from "react";
-import { getTermsByExam, TermPair } from "@/data/terms";
-import { Category, categoryLabels, ExamType, examShortLabels, IpField, ipFieldLabels } from "@/lib/types";
+import Link from "@/components/SiteLink";
+import { useEffect, useMemo, useState } from "react";
+import { getTermsByExam, sameName, TermPair } from "@/data/terms";
+import { ExamType, examShortLabels } from "@/lib/types";
+import { fieldLabel, fieldOptions, itemField } from "@/lib/examFields";
+import { parseExam } from "@/lib/examFields";
 import Furigana from "@/components/Furigana";
+import { fieldStyle } from "@/lib/fieldColors";
 
 type FieldFilter = "all" | string;
 
-const itFilters: { id: FieldFilter; label: string }[] = [
-  { id: "all", label: "すべて" },
-  { id: "strategy", label: "ストラテジ系" },
-  { id: "management", label: "マネジメント系" },
-  { id: "technology", label: "テクノロジ系" },
-];
-
-const chizaiFilters: { id: FieldFilter; label: string }[] = [
-  { id: "all", label: "すべて" },
-  { id: "patent", label: ipFieldLabels.patent },
-  { id: "design-trademark", label: ipFieldLabels["design-trademark"] },
-  { id: "copyright", label: ipFieldLabels.copyright },
-  { id: "other", label: ipFieldLabels.other },
-];
+// Field filters for the selected exam, with "すべて" in place of "全分野".
+function filtersFor(exam: ExamType): { id: FieldFilter; label: string }[] {
+  return fieldOptions(exam).map((o) => (o.id === "all" && exam !== "dev" ? { id: "all", label: "すべて" } : o));
+}
 
 function groupKey(exam: ExamType, t: TermPair): string {
-  return exam === "chizai" ? t.ipField ?? "other" : t.category;
+  return itemField(exam, t);
 }
 
 function groupLabel(exam: ExamType, key: string): string {
-  return exam === "chizai" ? ipFieldLabels[key as IpField] ?? key : categoryLabels[key as Category] ?? key;
+  return fieldLabel(exam, key);
 }
 
 export default function GlossaryPage() {
   const [exam, setExam] = useState<ExamType>("it-passport");
+  // Links such as /glossary?exam=dev open on that track.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("exam");
+    if (requested) setExam(parseExam(requested));
+  }, []);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FieldFilter>("all");
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  const toggleExpanded = (k: string) =>
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(k)) next.delete(k);
+      else next.add(k);
+      return next;
+    });
 
   const normalizedQuery = query.trim().toLowerCase();
   const baseTerms = useMemo(() => getTermsByExam(exam), [exam]);
-  const filters = exam === "chizai" ? chizaiFilters : itFilters;
+  const filters = filtersFor(exam);
 
   const filtered = useMemo(() => {
     return baseTerms.filter((t) => {
@@ -83,12 +89,12 @@ export default function GlossaryPage() {
       </div>
 
       <div className="mb-6 flex gap-2">
-        {(["it-passport", "chizai"] as const).map((e) => (
+        {(["it-passport", "chizai", "dev"] as const).map((e) => (
           <button
             key={e}
             type="button"
             onClick={() => switchExam(e)}
-            className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${exam === e ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--card-border)] bg-[var(--card)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+            className={`min-h-11 flex-1 whitespace-nowrap rounded-xl border px-2 py-2 text-[13px] font-medium transition-colors sm:px-4 sm:text-sm ${exam === e ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]" : "border-[var(--card-border)] bg-[var(--card)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
           >
             {examShortLabels[e]}
           </button>
@@ -109,8 +115,13 @@ export default function GlossaryPage() {
               key={f.id}
               type="button"
               onClick={() => setFilter(f.id)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${filter === f.id ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--card-border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${filter === f.id ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]" : "border-[var(--card-border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
             >
+              {f.id !== "all" && (
+                <span aria-hidden="true" className="mr-1">
+                  {fieldStyle(f.id).icon}
+                </span>
+              )}
               {f.label}
             </button>
           ))}
@@ -128,22 +139,37 @@ export default function GlossaryPage() {
         <div className="space-y-8">
           {(Array.from(grouped.entries()) as [string, TermPair[]][]).map(([key, items]) => (
             <section key={key}>
-              <h2 className="mb-3 text-sm font-semibold text-[var(--muted)]">
-                {groupLabel(exam, key)} <span className="text-[var(--muted)]">({items.length})</span>
+              <h2 className="mb-2 flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm leading-none text-white"
+                  style={{ backgroundColor: fieldStyle(key).color }}
+                >
+                  {fieldStyle(key).icon}
+                </span>
+                <span className="text-[15px] font-bold text-[var(--foreground)]">{groupLabel(exam, key)}</span>
+                <span className="text-xs text-[var(--muted)]">{items.length}</span>
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {items.map((t) => (
-                  <div
-                    key={`${t.term}-${t.english}`}
-                    className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 shadow-sm"
-                  >
-                    <div className="mb-1 flex items-baseline justify-between gap-2">
-                      <Furigana term={t.term} className="font-semibold" />
-                      <span className="text-[10px] text-[var(--muted)]">{t.english}</span>
-                    </div>
-                    <p className="text-sm leading-relaxed text-[var(--muted)]">{t.description}</p>
-                  </div>
-                ))}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {items.map((t) => {
+                  const k = `${t.term}-${t.english}`;
+                  const open = expanded.has(k);
+                  return (
+                    <button
+                      key={k}
+                      type="button"
+                      aria-expanded={open}
+                      onClick={() => toggleExpanded(k)}
+                      className="block w-full cursor-pointer rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-3 py-2.5 text-left transition-colors hover:border-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)]"
+                    >
+                      <div className="mb-1 flex items-baseline justify-between gap-2">
+                        <Furigana term={t.term} className="font-semibold" />
+                        {!sameName(t.term, t.english) && <span className="text-[10px] text-[var(--muted)]">{t.english}</span>}
+                      </div>
+                      <p className={`text-[13px] leading-snug text-[var(--muted)] ${open ? "" : "line-clamp-2"}`}>{t.description}</p>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           ))}

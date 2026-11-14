@@ -1,3 +1,5 @@
+import { safeGet, safeRemove, safeSet } from "./storage";
+
 // Shared theme + appearance logic used by the header controls and the
 // settings page. Keeping it in one place avoids duplicating the localStorage
 // keys and the class-application rules across components.
@@ -51,13 +53,13 @@ export function applyTheme(themeId: ThemeId, dark: boolean) {
 
 export function loadThemeId(): ThemeId {
   if (typeof window === "undefined") return "default";
-  const saved = window.localStorage.getItem(COLOR_THEME_KEY);
+  const saved = safeGet(COLOR_THEME_KEY);
   return isThemeId(saved) ? saved : "default";
 }
 
 export function loadDarkMode(): boolean {
   if (typeof window === "undefined") return false;
-  const saved = window.localStorage.getItem(DARK_MODE_KEY);
+  const saved = safeGet(DARK_MODE_KEY);
   if (saved === "dark") return true;
   if (saved === "light") return false;
   return window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -65,19 +67,19 @@ export function loadDarkMode(): boolean {
 
 export function saveThemeId(themeId: ThemeId) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(COLOR_THEME_KEY, themeId);
+  safeSet(COLOR_THEME_KEY, themeId);
 }
 
 export function saveDarkMode(dark: boolean) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(DARK_MODE_KEY, dark ? "dark" : "light");
+  safeSet(DARK_MODE_KEY, dark ? "dark" : "light");
 }
 
 export type ThemeMode = "light" | "dark" | "system";
 
 export function loadThemeMode(): ThemeMode {
   if (typeof window === "undefined") return "system";
-  const saved = window.localStorage.getItem(DARK_MODE_KEY);
+  const saved = safeGet(DARK_MODE_KEY);
   if (saved === "dark") return "dark";
   if (saved === "light") return "light";
   return "system";
@@ -93,9 +95,9 @@ export function resolveDark(mode: ThemeMode): boolean {
 export function saveThemeMode(mode: ThemeMode) {
   if (typeof window === "undefined") return;
   if (mode === "system") {
-    window.localStorage.removeItem(DARK_MODE_KEY);
+    safeRemove(DARK_MODE_KEY);
   } else {
-    window.localStorage.setItem(DARK_MODE_KEY, mode);
+    safeSet(DARK_MODE_KEY, mode);
   }
 }
 

@@ -84,7 +84,7 @@ export default function OrderRunner({ sets }: { sets: FlowSet[] }) {
               key={step}
               onClick={() => pick(step)}
               disabled={picked.includes(step)}
-              className={`rounded-xl border-2 px-4 py-2 text-sm transition-all ${
+              className={`rounded-xl border-2 px-4 py-2 text-sm transition-colors ${
                 picked.includes(step)
                   ? "border-[var(--card-border)] opacity-40"
                   : "border-[var(--card-border)] bg-[var(--card)] hover:border-[var(--option-hover-border)] hover:bg-[var(--option-hover-bg)]"
@@ -111,7 +111,7 @@ export default function OrderRunner({ sets }: { sets: FlowSet[] }) {
             やり直す
           </button>
         ) : (
-          <button onClick={reshuffle} className="rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-medium text-white hover:bg-[var(--primary-hover)]">
+          <button onClick={reshuffle} className="rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-medium text-[var(--on-primary)] hover:bg-[var(--primary-hover)]">
             もう一度
           </button>
         )}

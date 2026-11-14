@@ -28,7 +28,10 @@ describe("English term descriptions", () => {
     // Bilingual coverage is now complete: every term in the glossary has an
     // English description. This locks it in so a new term can't ship without
     // one — add the English entry in termsEn.ts when you add a term.
-    const missing = [...new Set(termPairs.map((t) => t.term))].filter((t) => !termsEn[t]);
+    // The AI Engineer track is written in English, so its own descriptions
+    // are already English and need no entry here.
+    const japanese = termPairs.filter((t) => !(t.exams ?? []).includes("dev"));
+    const missing = [...new Set(japanese.map((t) => t.term))].filter((t) => !termsEn[t]);
     expect(missing).toEqual([]);
   });
 });

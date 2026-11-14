@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+import BottomNav from "@/components/BottomNav";
 import { themeBootScript } from "@/lib/theme";
 import { appearanceBootScript } from "@/lib/appearance";
 import "./globals.css";
@@ -10,8 +11,12 @@ export const metadata: Metadata = {
   description: "ITパスポート試験と知的財産管理技能検定3級に対応した学習・クイズアプリ",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/icon.svg",
-    apple: "/icon.svg",
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    // iOS ignores SVG touch icons; it needs a full-bleed PNG.
+    apple: "/apple-touch-icon.png",
   },
   appleWebApp: {
     capable: true,
@@ -41,6 +46,7 @@ export default function RootLayout({
         <ServiceWorkerRegistrar />
         <SiteHeader />
         {children}
+        <BottomNav />
       </body>
     </html>
   );

@@ -3,8 +3,10 @@ import { questions } from "./questions";
 import { explanationsEn } from "./explanationsEn";
 
 describe("English explanations coverage", () => {
-  it("has a non-empty English explanation for every question", () => {
+  it("has a non-empty English explanation for every Japanese question", () => {
+    // AI Engineer questions are written in English, so they need no translation.
     const missing = questions
+      .filter((q) => !(q.exams ?? []).includes("dev"))
       .filter((q) => !explanationsEn[q.id] || explanationsEn[q.id].trim() === "")
       .map((q) => q.id);
     expect(missing).toEqual([]);

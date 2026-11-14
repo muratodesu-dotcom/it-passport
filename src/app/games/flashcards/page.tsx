@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { examShortLabels } from "@/lib/types";
 import Furigana from "@/components/Furigana";
@@ -102,7 +102,7 @@ function FlashcardsGame() {
             onClick={() => { setField(opt.id); setGameStarted(false); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               field === opt.id
-                ? "bg-[var(--primary)] text-white"
+                ? "bg-[var(--primary)] text-[var(--on-primary)]"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
@@ -126,7 +126,7 @@ function FlashcardsGame() {
           <p className="text-lg mb-6 text-[var(--muted)]">{pool.length}枚のカードで学習</p>
           <button
             onClick={startGame}
-            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
           >
             スタート
           </button>
@@ -144,7 +144,7 @@ function FlashcardsGame() {
           </div>
           <div className="w-full h-2 rounded-full bg-[var(--progress-bg)] mb-6">
             <div
-              className="h-full rounded-full bg-[var(--primary)] transition-all duration-300"
+              className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-300"
               style={{ width: `${((index) / cards.length) * 100}%` }}
             />
           </div>
@@ -172,7 +172,7 @@ function FlashcardsGame() {
                 <p className="text-lg leading-relaxed font-medium">
                   {showFront === "term" ? current.description : <Furigana term={current.term} />}
                 </p>
-                {showFront === "term" && <TermExplanationEn term={current.term} />}
+                {showFront === "term" && <TermExplanationEn term={current.term} exam={exam} />}
               </div>
             </div>
           </div>
@@ -182,13 +182,13 @@ function FlashcardsGame() {
             <div className="flex gap-3 justify-center fade-in">
               <button
                 onClick={() => handleMark("unknown")}
-                className="flex-1 max-w-[200px] rounded-xl border-2 border-[var(--danger-border)] bg-[var(--danger-bg)] px-6 py-3 font-medium text-[var(--danger)] transition-all hover:-translate-y-0.5"
+                className="flex-1 max-w-[200px] rounded-xl border-2 border-[var(--danger-border)] bg-[var(--danger-bg)] px-6 py-3 font-medium text-[var(--danger)] transition-colors"
               >
                 もう一度 (&larr;)
               </button>
               <button
                 onClick={() => handleMark("known")}
-                className="flex-1 max-w-[200px] rounded-xl border-2 border-[var(--success-border)] bg-[var(--success-bg)] px-6 py-3 font-medium text-[var(--success)] transition-all hover:-translate-y-0.5"
+                className="flex-1 max-w-[200px] rounded-xl border-2 border-[var(--success-border)] bg-[var(--success-bg)] px-6 py-3 font-medium text-[var(--success)] transition-colors"
               >
                 覚えた (&rarr;)
               </button>
@@ -223,14 +223,14 @@ function FlashcardsGame() {
             {unknown.size > 0 && (
               <button
                 onClick={retryUnknown}
-                className="rounded-xl bg-[var(--danger)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5"
+                className="rounded-xl bg-[var(--danger)] px-6 py-3 font-medium text-white transition-colors"
               >
                 間違えた{unknown.size}枚を復習
               </button>
             )}
             <button
               onClick={startGame}
-              className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+              className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
             >
               全カードでやり直す
             </button>

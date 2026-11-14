@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { examShortLabels } from "@/lib/types";
 import { FieldId, fieldOptions, itemField, parseExam } from "@/lib/examFields";
@@ -21,8 +21,9 @@ import {
 } from "@/lib/drills";
 import { chizaiDrillMap, curatedQuestionSets, flowSets } from "@/data/chizaiDrills";
 import { itCuratedSets, itPassportDrillMap } from "@/data/itDrills";
+import { devCuratedSets, devDrillMap } from "@/data/devDrills";
 
-const curatedSets: Record<string, DrillQuestion[]> = { ...curatedQuestionSets, ...itCuratedSets };
+const curatedSets: Record<string, DrillQuestion[]> = { ...curatedQuestionSets, ...itCuratedSets, ...devCuratedSets };
 import { addMissedTerms, getMissedTerms, removeMissedTerms } from "@/lib/history";
 import DrillRunner from "@/components/DrillRunner";
 import OrderRunner from "@/components/OrderRunner";
@@ -74,7 +75,7 @@ function DrillContent() {
   const searchParams = useSearchParams();
   const kind = (Array.isArray(params.kind) ? params.kind[0] : params.kind) as DrillKind;
   const exam = parseExam(searchParams.get("exam"));
-  const def = drillMap[kind] ?? chizaiDrillMap[kind] ?? itPassportDrillMap[kind];
+  const def = drillMap[kind] ?? chizaiDrillMap[kind] ?? itPassportDrillMap[kind] ?? devDrillMap[kind];
 
   const [field, setField] = useState<FieldId>("all");
   const [questions, setQuestions] = useState<DrillQuestion[]>([]);
@@ -131,7 +132,7 @@ function DrillContent() {
               key={opt.id}
               onClick={() => { setField(opt.id); setPlaying(false); }}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                field === opt.id ? "bg-[var(--primary)] text-white" : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
+                field === opt.id ? "bg-[var(--primary)] text-[var(--on-primary)]" : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
               }`}
             >
               {opt.label}
@@ -153,13 +154,13 @@ function DrillContent() {
           <button
             onClick={start}
             disabled={def.source === "missed" && getMissedTerms().length === 0}
-            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)] disabled:opacity-40"
+            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)] disabled:opacity-40"
           >
             スタート
           </button>
         </div>
       ) : (
-        <DrillRunner key={nonce} questions={questions} onRestart={regenerate} onComplete={handleComplete} />
+        <DrillRunner key={nonce} questions={questions} exam={exam} onRestart={regenerate} onComplete={handleComplete} />
       ))}
     </div>
   );
