@@ -3,6 +3,8 @@
 import Link from "@/components/SiteLink";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { AiSettings, defaultAiSettings, loadAiSettings, saveAiSettings } from "@/lib/appSettings";
+import { BACKUP_KEYS, backupFileName, buildBackup, mergeStores, parseBackup, summarize, type RawStore } from "@/lib/backup";
+import { safeGet, safeRemove, safeSet } from "@/lib/storage";
 import {
   Appearance,
   FONT_SCALE_OPTIONS,
@@ -69,6 +71,9 @@ export default function SettingsPage() {
   const [keyDraft, setKeyDraft] = useState("");
   const [replacingKey, setReplacingKey] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
+  // Result of the last export / import, with the values to put back for Undo.
+  const [backupNote, setBackupNote] = useState<{ text: string; error?: boolean; undo?: RawStore } | null>(null);
+  const importRef = useRef<HTMLInputElement>(null);
   const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -120,6 +125,69 @@ export default function SettingsPage() {
     setKeyDraft("");
     setReplacingKey(false);
     showTemporaryMessage("AI設定を保存しました。");
+  };
+
+  const readStore = (): RawStore => {
+    const store: RawStore = {};
+    for (const key of Object.keys(BACKUP_KEYS)) {
+      const value = safeGet(key);
+      if (value !== null) store[key] = value;
+    }
+    return store;
+  };
+
+  const refreshAppearance = () => {
+    const nextTheme = loadThemeId();
+    const nextMode = loadThemeMode();
+    setThemeId(nextTheme);
+    setMode(nextMode);
+    applyTheme(nextTheme, resolveDark(nextMode));
+    const nextAppearance = loadAppearance();
+    setAppearance(nextAppearance);
+    saveAppearance(nextAppearance);
+  };
+
+  const exportProgress = () => {
+    const backup = buildBackup(safeGet, process.env.NEXT_PUBLIC_APP_VERSION ?? "");
+    const url = URL.createObjectURL(new Blob([JSON.stringify(backup, null, 1)], { type: "application/json" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = backupFileName();
+    document.body.append(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const s = summarize(backup.data);
+    setBackupNote({ text: `書き出しました: クイズ結果 ${s.results}件 · ブックマーク ${s.bookmarks}件 · 復習カード ${s.reviewCards}枚` });
+  };
+
+  const importProgress = async (file: File) => {
+    const parsed = parseBackup(await file.text());
+    if (!parsed.ok) {
+      setBackupNote({ text: parsed.error, error: true });
+      return;
+    }
+    const before = readStore();
+    const merged = mergeStores(before, parsed.backup.data);
+    for (const [key, value] of Object.entries(merged)) safeSet(key, value);
+    refreshAppearance();
+    const a = summarize(before);
+    const b = summarize(merged);
+    setBackupNote({
+      text: `取り込みました: クイズ結果 +${b.results - a.results}件 · ブックマーク +${b.bookmarks - a.bookmarks}件 · 復習カード +${b.reviewCards - a.reviewCards}枚`,
+      undo: before,
+    });
+  };
+
+  const undoImport = () => {
+    const previous = backupNote?.undo;
+    if (!previous) return;
+    for (const key of Object.keys(BACKUP_KEYS)) {
+      if (key in previous) safeSet(key, previous[key]);
+      else safeRemove(key);
+    }
+    refreshAppearance();
+    setBackupNote({ text: "取り込みを元に戻しました。" });
   };
 
   const removeKey = () => {
@@ -297,6 +365,62 @@ export default function SettingsPage() {
         >
           外観を初期設定に戻す
         </button>
+      </section>
+
+      {/* ===== Progress backup ===== */}
+      <section className="mb-6 rounded-3xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm sm:p-6">
+        <div className="mb-2 flex items-center gap-2">
+          <span className="text-xl" aria-hidden>📦</span>
+          <h2 className="text-lg font-bold">進捗のバックアップ</h2>
+        </div>
+        <p className="mb-4 text-sm leading-relaxed text-[var(--muted)]">
+          学習履歴・ブックマーク・復習予定をファイルにして、別の端末で読み込めます。読み込みは今の進捗と合わせて保存され、上書きしません。
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={exportProgress}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[var(--primary)] px-5 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
+          >
+            <span aria-hidden>⬇️</span> 書き出す
+          </button>
+          <button
+            type="button"
+            onClick={() => importRef.current?.click()}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--card-border)] px-5 font-medium transition-colors hover:bg-[var(--card-hover)]"
+          >
+            <span aria-hidden>⬆️</span> 読み込む
+          </button>
+          <input
+            ref={importRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = "";
+              if (file) void importProgress(file);
+            }}
+          />
+        </div>
+        {backupNote ? (
+          <div
+            role="status"
+            className={`mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border px-3 py-2.5 text-sm ${
+              backupNote.error
+                ? "border-[var(--danger-border)] bg-[var(--danger-bg)] text-[var(--danger)]"
+                : "border-[var(--success-border)] bg-[var(--success-bg)]"
+            }`}
+          >
+            <span className="min-w-0 flex-1">{backupNote.text}</span>
+            {backupNote.undo ? (
+              <button type="button" onClick={undoImport} className="font-semibold text-[var(--primary)] underline-offset-2 hover:underline">
+                元に戻す
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+        <p className="mt-3 text-xs text-[var(--muted)]">🔒 OpenAI APIキーはファイルに含まれません。</p>
       </section>
 
       {/* ===== AI generation ===== */}

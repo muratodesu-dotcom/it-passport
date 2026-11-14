@@ -3,6 +3,11 @@
 All notable changes to this app are listed here, newest first.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [1.2.0] - 2026-11-15
+
+### Added
+- Progress backup in Settings: **書き出す** saves your quiz history, bookmarks, review schedule, known terms and speed bests to a file; **読み込む** merges such a file into this device's progress without overwriting it, with an Undo. Your OpenAI API key is never included.
+
 ## [1.1.0] - 2026-11-15
 
 ### Added
