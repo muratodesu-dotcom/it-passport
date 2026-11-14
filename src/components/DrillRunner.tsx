@@ -97,7 +97,7 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
         <div className="flex justify-center gap-3">
           <button
             onClick={restart}
-            className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+            className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
           >
             もう一度
           </button>
@@ -115,7 +115,7 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
         <span className="text-[var(--success)]">{score} 正解</span>
       </div>
       <div className="w-full h-2 rounded-full bg-[var(--progress-bg)] mb-6">
-        <div className="h-full rounded-full bg-[var(--primary)] transition-all duration-300" style={{ width: `${progress}%` }} />
+        <div className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-300" style={{ width: `${progress}%` }} />
       </div>
 
       <div className="rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-6 mb-5 shadow-sm">
@@ -138,7 +138,7 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
               key={i}
               onClick={() => answer(i)}
               disabled={revealed}
-              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 bg-[var(--card)] transition-all ${style}`}
+              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 bg-[var(--card)] transition-colors ${style}`}
             >
               <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
                 {i + 1}
@@ -159,7 +159,7 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
       {revealed && (
         <button
           onClick={next}
-          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors fade-in"
+          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors fade-in"
         >
           {index < questions.length - 1 ? "次へ →" : "結果を見る →"}
           <span className="text-xs opacity-60 ml-2">(Enter)</span>

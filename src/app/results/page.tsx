@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { questions as allQuestions, withShuffledOptions } from "@/data/questions";
 import { categoryLabels, Category, examLabels, ipFieldLabels, IpField, Question, QuestionOutcome } from "@/lib/types";
 import {
@@ -144,7 +144,7 @@ export default function ResultsPage() {
           <p className="text-sm text-[var(--muted)] mb-4">クイズを最初からやり直してください。</p>
           <button
             onClick={() => router.push("/")}
-            className="rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+            className="rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
           >
             ホームに戻る
           </button>
@@ -263,7 +263,7 @@ export default function ResultsPage() {
                   </div>
                   <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${barColor}`}
+                      className={`h-full rounded-full transition-[width] duration-700 ${barColor}`}
                       style={{ width: `${d.percentage}%` }}
                     />
                   </div>
@@ -341,7 +341,7 @@ export default function ResultsPage() {
             }
             router.push(`/quiz?${params.toString()}`);
           }}
-          className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+          className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
         >
           もう一度挑戦
         </button>

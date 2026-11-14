@@ -204,7 +204,7 @@ function QuizContent() {
           <p className="text-lg font-medium">{message}</p>
           <button
             onClick={() => router.push("/")}
-            className="mt-4 rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+            className="mt-4 rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
           >
             ホームに戻る
           </button>
@@ -270,7 +270,7 @@ function QuizContent() {
 
       <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
         <div
-          className="h-full rounded-full transition-all duration-500"
+          className="h-full rounded-full transition-[width] duration-500"
           style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${progress}%` }}
         />
       </div>
@@ -324,7 +324,7 @@ function QuizContent() {
               key={index}
               onClick={() => handleAnswer(index)}
               disabled={showExplanation}
-              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 transition-all bg-[var(--card)] ${style}`}
+              className={`flex w-full items-start gap-3 text-left p-4 rounded-xl border-2 transition-colors bg-[var(--card)] ${style}`}
             >
               <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
                 {String.fromCharCode(65 + index)}
@@ -363,7 +363,7 @@ function QuizContent() {
       {mode === "practice" && showExplanation && (
         <button
           onClick={handleNext}
-          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors fade-in"
+          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors fade-in"
         >
           {currentIndex < questions.length - 1 ? "次の問題へ →" : "結果を見る →"}
           <span className="text-xs opacity-60 ml-2">(Enter)</span>
@@ -397,7 +397,7 @@ function QuizContent() {
       {mode === "exam" && (
         <button
           onClick={handleSubmitExam}
-          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
         >
           {currentIndex < questions.length - 1 ? "途中で採点する" : "提出して採点する →"}
         </button>

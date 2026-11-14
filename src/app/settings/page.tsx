@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { AiSettings, defaultAiSettings, loadAiSettings, saveAiSettings } from "@/lib/appSettings";
 import {
@@ -66,6 +66,8 @@ export default function SettingsPage() {
 
   // AI state
   const [settings, setSettings] = useState<AiSettings>(defaultAiSettings);
+  const [keyDraft, setKeyDraft] = useState("");
+  const [replacingKey, setReplacingKey] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
   const timeoutRef = useRef<number | null>(null);
 
@@ -105,15 +107,28 @@ export default function SettingsPage() {
     });
   };
 
+  // The saved key never goes back into an input: the form shows its last four
+  // characters, and changing it means pasting a new one.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const normalizedSettings: AiSettings = {
-      apiKey: settings.apiKey.trim(),
+      apiKey: keyDraft.trim() || settings.apiKey,
       model: settings.model.trim() || defaultAiSettings.model,
     };
     setSettings(normalizedSettings);
     saveAiSettings(normalizedSettings);
+    setKeyDraft("");
+    setReplacingKey(false);
     showTemporaryMessage("AI設定を保存しました。");
+  };
+
+  const removeKey = () => {
+    const next: AiSettings = { ...settings, apiKey: "" };
+    setSettings(next);
+    saveAiSettings(next);
+    setKeyDraft("");
+    setReplacingKey(false);
+    showTemporaryMessage("APIキーを削除しました。");
   };
 
   return (
@@ -179,7 +194,7 @@ export default function SettingsPage() {
                 aria-pressed={mode === m.id}
                 className={`flex items-center justify-center gap-1.5 rounded-xl px-2 py-2.5 text-sm font-medium transition-all ${
                   mode === m.id
-                    ? "bg-[var(--primary)] text-white shadow-sm"
+                    ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-sm"
                     : "text-[var(--muted)] hover:text-[var(--foreground)]"
                 }`}
               >
@@ -202,7 +217,7 @@ export default function SettingsPage() {
                 aria-pressed={appearance.fontScale === f.id}
                 className={`rounded-xl px-2 py-2.5 font-medium transition-all ${
                   appearance.fontScale === f.id
-                    ? "bg-[var(--primary)] text-white shadow-sm"
+                    ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-sm"
                     : "text-[var(--muted)] hover:text-[var(--foreground)]"
                 }`}
                 style={{ fontSize: `${Math.max(13, f.px - 2)}px` }}
@@ -291,31 +306,68 @@ export default function SettingsPage() {
           <h2 className="text-lg font-bold">AI生成</h2>
         </div>
         <p className="mb-5 text-sm leading-relaxed text-[var(--muted)]">
-          OpenAI APIキーとモデル名を保存すると、学習ページから補足解説や追加コンテンツを生成できます。
+          OpenAI APIキーを登録すると、学習ページで補足解説を生成できます。
         </p>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-6">
-            <label className="grid gap-2">
-              <span className="text-sm font-semibold">OpenAI API Key</span>
-              <input
-                type="password"
-                value={settings.apiKey}
-                onChange={(event) =>
-                  setSettings((current) => ({ ...current, apiKey: event.target.value }))
-                }
-                placeholder="sk-..."
-                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-4 py-3 outline-none transition focus:border-[var(--primary)]"
-                autoComplete="off"
-              />
-              <div className="rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900 dark:border-amber-300/30 dark:bg-amber-400/10 dark:text-amber-100">
-                <p className="mb-1 font-semibold">⚠ セキュリティ上の注意</p>
-                <ul className="list-disc space-y-0.5 pl-4">
-                  <li>キーはこのブラウザのlocalStorageに保存され、共用端末では他スクリプトから参照され得ます。</li>
-                  <li>不要になったら「リセット」で削除し、OpenAI側で利用上限の設定を推奨します。</li>
-                </ul>
-              </div>
-            </label>
+          <div className="grid gap-5">
+            <div className="grid gap-2">
+              <span className="text-sm font-semibold" id="api-key-label">OpenAI API Key</span>
+              {settings.apiKey && !replacingKey ? (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span
+                    className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-[var(--success-border)] bg-[var(--success-bg)] px-3 font-mono text-sm"
+                    aria-labelledby="api-key-label"
+                  >
+                    <span aria-hidden>🔑</span>
+                    ••••{settings.apiKey.slice(-4)}
+                    <span className="font-sans text-xs font-medium text-[var(--success)]">登録済み</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setReplacingKey(true)}
+                    className="inline-flex min-h-11 items-center rounded-xl border border-[var(--card-border)] px-4 text-sm font-medium transition-colors hover:bg-[var(--card-hover)]"
+                  >
+                    変更
+                  </button>
+                  <button
+                    type="button"
+                    onClick={removeKey}
+                    className="inline-flex min-h-11 items-center rounded-xl border border-[var(--danger-border)] px-4 text-sm font-medium text-[var(--danger)] transition-colors hover:bg-[var(--danger-bg)]"
+                  >
+                    削除
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="password"
+                    value={keyDraft}
+                    onChange={(event) => setKeyDraft(event.target.value)}
+                    placeholder={settings.apiKey ? `新しいキー（現在 ••••${settings.apiKey.slice(-4)}）` : "sk-..."}
+                    aria-labelledby="api-key-label"
+                    className="min-w-0 flex-1 basis-64 rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-4 py-3 text-base outline-none transition-colors focus:border-[var(--primary)]"
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                  {settings.apiKey ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setKeyDraft("");
+                        setReplacingKey(false);
+                      }}
+                      className="inline-flex min-h-11 items-center rounded-xl border border-[var(--card-border)] px-4 text-sm font-medium transition-colors hover:bg-[var(--card-hover)]"
+                    >
+                      キャンセル
+                    </button>
+                  ) : null}
+                </div>
+              )}
+              <p className="text-xs leading-relaxed text-[var(--muted)]">
+                🔒 このブラウザにだけ保存されます。共用端末では使わず、OpenAI側で利用上限を設定してください。
+              </p>
+            </div>
 
             <label className="grid gap-2">
               <span className="text-sm font-semibold">Model</span>
@@ -326,35 +378,24 @@ export default function SettingsPage() {
                   setSettings((current) => ({ ...current, model: event.target.value }))
                 }
                 placeholder="gpt-4.1-mini"
-                className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-4 py-3 outline-none transition focus:border-[var(--primary)]"
+                className="w-full max-w-xs rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-4 py-3 text-base outline-none transition-colors focus:border-[var(--primary)]"
+                spellCheck={false}
               />
-              <span className="text-xs leading-relaxed text-[var(--muted)]">
-                例: <code>gpt-4.1-mini</code> / <code>gpt-4.1</code>
-              </span>
             </label>
           </div>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <button
               type="submit"
-              className="rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+              className="rounded-xl bg-[var(--primary)] px-5 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
             >
               AI設定を保存
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setSettings(defaultAiSettings);
-                saveAiSettings(defaultAiSettings);
-                showTemporaryMessage("AI設定をリセットしました。");
-              }}
-              className="rounded-xl bg-[var(--secondary-btn-bg)] px-5 py-3 font-medium transition-colors hover:bg-[var(--secondary-btn-hover)]"
-            >
-              リセット
             </button>
           </div>
         </form>
       </section>
+
+      <p className="mt-6 text-center text-xs text-[var(--muted)]">バージョン {process.env.NEXT_PUBLIC_APP_VERSION}</p>
 
       {savedMessage ? (
         <div className="fade-in fixed inset-x-0 bottom-6 z-50 mx-auto w-fit max-w-[90%] rounded-full bg-[var(--foreground)] px-5 py-2.5 text-sm font-medium text-[var(--background)] shadow-lg">

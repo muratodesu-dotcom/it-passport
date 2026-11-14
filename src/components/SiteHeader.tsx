@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -144,7 +144,7 @@ export default function SiteHeader() {
                     <button
                       key={t.id}
                       onClick={() => selectTheme(t.id)}
-                      className={`flex flex-col items-center gap-1.5 rounded-xl p-2 text-xs transition-all ${
+                      className={`flex flex-col items-center gap-1.5 rounded-xl p-2 text-xs transition-colors ${
                         themeId === t.id
                           ? "bg-[var(--primary-light)] ring-2 ring-[var(--primary)]"
                           : "hover:bg-[var(--card-hover)]"
@@ -197,17 +197,17 @@ export default function SiteHeader() {
           >
             <span className="relative block h-3.5 w-4">
               <span
-                className={`absolute left-0 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-all ${
+                className={`absolute left-0 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-[top,transform,opacity] ${
                   menuOpen ? "top-1.5 rotate-45" : "top-0"
                 }`}
               />
               <span
-                className={`absolute left-0 top-1.5 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-all ${
+                className={`absolute left-0 top-1.5 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-[top,transform,opacity] ${
                   menuOpen ? "opacity-0" : "opacity-100"
                 }`}
               />
               <span
-                className={`absolute left-0 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-all ${
+                className={`absolute left-0 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-[top,transform,opacity] ${
                   menuOpen ? "top-1.5 -rotate-45" : "top-3"
                 }`}
               />

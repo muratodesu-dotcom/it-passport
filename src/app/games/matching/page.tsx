@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo, Suspense } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { examShortLabels } from "@/lib/types";
 import { FieldId, fieldOptions, itemField, parseExam } from "@/lib/examFields";
@@ -42,6 +42,7 @@ function MatchingGame() {
   const [attempts, setAttempts] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [roundNum, setRoundNum] = useState(0);
+  const roundRef = useRef(0);
   const [startTime, setStartTime] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
@@ -65,6 +66,7 @@ function MatchingGame() {
     setWrong(null);
     setAttempts(0);
     setScore(0);
+    roundRef.current += 1;
     setRoundNum((n) => n + 1);
     setStartTime(Date.now());
     setGameStarted(true);
@@ -108,7 +110,10 @@ function MatchingGame() {
       setSelected(null);
     } else {
       setWrong(item.id);
+      const round = roundRef.current;
       setTimeout(() => {
+        // A new round started meanwhile: leave its selection alone.
+        if (round !== roundRef.current) return;
         setWrong(null);
         setSelected(null);
       }, 600);
@@ -142,7 +147,7 @@ function MatchingGame() {
             onClick={() => { setField(opt.id); setGameStarted(false); setRound([]); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               field === opt.id
-                ? "bg-[var(--primary)] text-white"
+                ? "bg-[var(--primary)] text-[var(--on-primary)]"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
@@ -159,7 +164,7 @@ function MatchingGame() {
           </p>
           <button
             onClick={startNewRound}
-            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
           >
             スタート
           </button>
@@ -174,7 +179,7 @@ function MatchingGame() {
           </div>
           <div className="w-full h-2 rounded-full bg-[var(--progress-bg)] mb-6">
             <div
-              className="h-full rounded-full bg-[var(--primary)] transition-all duration-300"
+              className="h-full rounded-full bg-[var(--primary)] transition-[width] duration-300"
               style={{ width: `${(matched.size / round.length) * 100}%` }}
             />
           </div>
@@ -186,7 +191,7 @@ function MatchingGame() {
                 <button
                   key={item.id}
                   onClick={() => handleClick(item)}
-                  className={`w-full text-left rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all duration-200 ${getItemClass(item)}`}
+                  className={`w-full text-left rounded-xl border-2 px-4 py-3 text-sm font-medium transition-[color,background-color,border-color,opacity,transform] duration-200 ${getItemClass(item)}`}
                 >
                   {item.text}
                 </button>
@@ -198,7 +203,7 @@ function MatchingGame() {
                 <button
                   key={item.id}
                   onClick={() => handleClick(item)}
-                  className={`w-full text-left rounded-xl border-2 px-4 py-3 text-sm leading-relaxed transition-all duration-200 ${getItemClass(item)}`}
+                  className={`w-full text-left rounded-xl border-2 px-4 py-3 text-sm leading-relaxed transition-[color,background-color,border-color,opacity,transform] duration-200 ${getItemClass(item)}`}
                 >
                   {item.text}
                 </button>
@@ -223,13 +228,13 @@ function MatchingGame() {
           <div className="flex justify-center gap-3">
             <button
               onClick={startNewRound}
-              className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+              className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
             >
               次のラウンド
             </button>
             <Link
               href="/games"
-              className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+              className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-colors hover:bg-[var(--card-hover)]"
             >
               ゲーム一覧へ
             </Link>

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { useMemo, useState } from "react";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { Category, categoryLabels, ExamType, examShortLabels, IpField, ipFieldLabels } from "@/lib/types";
@@ -88,7 +88,7 @@ export default function GlossaryPage() {
             key={e}
             type="button"
             onClick={() => switchExam(e)}
-            className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${exam === e ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--card-border)] bg-[var(--card)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+            className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${exam === e ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]" : "border-[var(--card-border)] bg-[var(--card)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
           >
             {examShortLabels[e]}
           </button>
@@ -109,7 +109,7 @@ export default function GlossaryPage() {
               key={f.id}
               type="button"
               onClick={() => setFilter(f.id)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${filter === f.id ? "border-[var(--primary)] bg-[var(--primary)] text-white" : "border-[var(--card-border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${filter === f.id ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]" : "border-[var(--card-border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]"}`}
             >
               {f.label}
             </button>

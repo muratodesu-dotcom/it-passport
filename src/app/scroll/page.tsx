@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getTermsByExam, TermPair } from "@/data/terms";
 import { ExamType, examShortLabels, ipFieldLabels } from "@/lib/types";
@@ -143,7 +143,7 @@ export default function ScrollPage() {
               onClick={() => switchExam(e)}
               className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${
                 exam === e
-                  ? "border-[var(--primary)] bg-[var(--primary)] text-white"
+                  ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]"
                   : "border-[var(--card-border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]"
               }`}
             >
@@ -168,7 +168,7 @@ export default function ScrollPage() {
               onClick={() => setFilter(f.id)}
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 filter === f.id
-                  ? "border-[var(--primary)] bg-[var(--primary)] text-white"
+                  ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]"
                   : "border-[var(--card-border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]"
               }`}
             >
@@ -188,7 +188,7 @@ export default function ScrollPage() {
               type="button"
               onClick={() => setSource(s.id)}
               className={`rounded-lg px-3 py-1.5 font-medium transition-colors ${
-                source === s.id ? "bg-[var(--primary)] text-white" : "text-[var(--muted)] hover:text-[var(--foreground)]"
+                source === s.id ? "bg-[var(--primary)] text-[var(--on-primary)]" : "text-[var(--muted)] hover:text-[var(--foreground)]"
               }`}
             >
               {s.label}

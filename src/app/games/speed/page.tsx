@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { getQuestionsByExam, withShuffledOptions } from "@/data/questions";
 import { Question, examShortLabels } from "@/lib/types";
+import { safeGet, safeSet } from "@/lib/storage";
 import { FieldId, fieldOptions, itemField, parseExam } from "@/lib/examFields";
 
 function shuffle<T>(arr: T[]): T[] {
@@ -17,6 +18,17 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 const TIME_LIMIT = 60;
+const BEST_KEY = "it-passport-speed-best";
+
+// Best scores per exam + field, kept on this device only.
+function loadBests(): Record<string, number> {
+  try {
+    const parsed = JSON.parse(safeGet(BEST_KEY) ?? "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
 
 function SpeedChallenge() {
   const searchParams = useSearchParams();
@@ -32,7 +44,16 @@ function SpeedChallenge() {
   const [gameState, setGameState] = useState<"idle" | "playing" | "done">("idle");
   const [flash, setFlash] = useState<"correct" | "wrong" | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [best, setBest] = useState<number | null>(null);
+  const [newRecord, setNewRecord] = useState(false);
+  // Bumped on every start, so a reveal timer from an earlier round can't move
+  // the new round on.
+  const runRef = useRef(0);
+  // The clock is a deadline, not a count of interval ticks: browsers slow
+  // timers in background tabs, and a hidden tab pauses the round instead of
+  // letting it run out unseen.
+  const deadlineRef = useRef(0);
+  const remainingRef = useRef(TIME_LIMIT * 1000);
 
   const filteredPool = useMemo(() => {
     const base = getQuestionsByExam(exam);
@@ -40,7 +61,17 @@ function SpeedChallenge() {
   }, [exam, field]);
   const current = pool[index];
 
+  const bestKey = `${exam}:${field}`;
+  useEffect(() => {
+    setBest(loadBests()[bestKey] ?? null);
+    setNewRecord(false);
+  }, [bestKey]);
+
   const startGame = useCallback(() => {
+    runRef.current += 1;
+    remainingRef.current = TIME_LIMIT * 1000;
+    deadlineRef.current = performance.now() + TIME_LIMIT * 1000;
+    setNewRecord(false);
     setPool(shuffle(filteredPool).map((q) => withShuffledOptions(q)));
     setIndex(0);
     setCorrect(0);
@@ -56,17 +87,40 @@ function SpeedChallenge() {
   // Timer
   useEffect(() => {
     if (gameState !== "playing") return;
-    timerRef.current = setInterval(() => {
-      setTimeLeft((t) => {
-        if (t <= 1) {
-          setGameState("done");
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+    const tick = () => {
+      if (document.hidden) return;
+      const left = Math.max(0, deadlineRef.current - performance.now());
+      setTimeLeft(Math.ceil(left / 1000));
+      if (left <= 0) setGameState("done");
+    };
+    const onVisibility = () => {
+      if (document.hidden) {
+        remainingRef.current = Math.max(0, deadlineRef.current - performance.now());
+      } else {
+        deadlineRef.current = performance.now() + remainingRef.current;
+        tick();
+      }
+    };
+    const id = window.setInterval(tick, 200);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [gameState]);
+
+  // Save the device-local best when a round ends.
+  useEffect(() => {
+    if (gameState !== "done") return;
+    const bests = loadBests();
+    const previous = bests[bestKey] ?? 0;
+    if (correct > previous) {
+      bests[bestKey] = correct;
+      safeSet(BEST_KEY, JSON.stringify(bests));
+      setBest(correct);
+      setNewRecord(previous > 0);
+    }
+  }, [gameState, correct, bestKey]);
 
   const handleAnswer = useCallback((optionIdx: number) => {
     if (gameState !== "playing" || !current || flash) return;
@@ -88,7 +142,9 @@ function SpeedChallenge() {
       setFlash("wrong");
     }
 
+    const run = runRef.current;
     setTimeout(() => {
+      if (run !== runRef.current) return;
       setFlash(null);
       setSelectedIdx(null);
       if (index + 1 >= pool.length) {
@@ -102,6 +158,7 @@ function SpeedChallenge() {
   useEffect(() => {
     if (gameState !== "playing") return;
     const handler = (e: KeyboardEvent) => {
+      if (e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
       const num = parseInt(e.key);
       if (num >= 1 && num <= 4) handleAnswer(num - 1);
     };
@@ -133,7 +190,7 @@ function SpeedChallenge() {
             onClick={() => { setField(opt.id); if (gameState !== "playing") setGameState("idle"); }}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               field === opt.id
-                ? "bg-[var(--primary)] text-white"
+                ? "bg-[var(--primary)] text-[var(--on-primary)]"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"
             }`}
           >
@@ -147,9 +204,14 @@ function SpeedChallenge() {
           <div className="text-6xl mb-4">⚡</div>
           <p className="text-lg mb-2 text-[var(--muted)]">60秒間のスピードクイズ</p>
           <p className="text-sm mb-6 text-[var(--muted)]">キーボード(1-4)で素早く回答できます</p>
+          {best !== null && (
+            <p className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-[var(--badge-bg)] px-3 py-1 text-sm">
+              <span aria-hidden>🏅</span> 自己ベスト <b className="tabular-nums">{best}</b> 問
+            </p>
+          )}
           <button
             onClick={startGame}
-            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+            className="rounded-xl bg-[var(--primary)] px-8 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
           >
             チャレンジ開始
           </button>
@@ -175,7 +237,7 @@ function SpeedChallenge() {
           {/* Timer bar */}
           <div className="w-full h-2 rounded-full bg-[var(--progress-bg)] mb-6">
             <div
-              className={`h-full rounded-full ${timerBarColor} transition-all duration-1000 ease-linear`}
+              className={`h-full rounded-full ${timerBarColor} transition-[width] duration-200 ease-linear`}
               style={{ width: `${timerBarWidth}%` }}
             />
           </div>
@@ -196,7 +258,7 @@ function SpeedChallenge() {
                   key={i}
                   onClick={() => handleAnswer(i)}
                   disabled={flash !== null}
-                  className={`text-left rounded-xl border-2 px-4 py-3 text-sm transition-all duration-150 ${
+                  className={`text-left rounded-xl border-2 px-4 py-3 text-sm transition-colors duration-150 ${
                     selectedIdx === i && flash === "correct" ? "border-[var(--success)] bg-[var(--success-bg)]" :
                     selectedIdx === i && flash === "wrong" ? "border-[var(--danger)] bg-[var(--danger-bg)]" :
                     flash !== null && i === current.correctIndex ? "border-[var(--success)] bg-[var(--success-bg)]" :
@@ -221,7 +283,14 @@ function SpeedChallenge() {
           <div className="text-6xl mb-4">
             {correct >= 15 ? "🏆" : correct >= 10 ? "🔥" : correct >= 5 ? "👍" : "💪"}
           </div>
-          <h2 className="text-2xl font-bold mb-4">タイムアップ！</h2>
+          <h2 className="text-2xl font-bold mb-2">タイムアップ！</h2>
+          <p className="mb-4 text-sm text-[var(--muted)]">
+            {newRecord ? (
+              <span className="font-bold text-[var(--success)]">🎉 自己ベスト更新！</span>
+            ) : best !== null ? (
+              <>🏅 自己ベスト {best} 問</>
+            ) : null}
+          </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 max-w-md mx-auto">
             <div className="rounded-2xl bg-[var(--badge-bg)] p-4">
@@ -247,13 +316,13 @@ function SpeedChallenge() {
           <div className="flex justify-center gap-3">
             <button
               onClick={startGame}
-              className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]"
+              className="rounded-xl bg-[var(--primary)] px-6 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
             >
               もう一度挑戦
             </button>
             <Link
               href="/games"
-              className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-all hover:-translate-y-0.5 hover:bg-[var(--card-hover)]"
+              className="rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 font-medium transition-colors hover:bg-[var(--card-hover)]"
             >
               ゲーム一覧へ
             </Link>

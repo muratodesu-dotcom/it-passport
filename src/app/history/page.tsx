@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { clearHistory, getBookmarks, getHistory, getStreak, getWrongQuestionIds } from "@/lib/history";
 import { analyzeHistory, HistoryAnalytics } from "@/lib/analytics";
 import { QuizResult, categoryLabels, Category, examShortLabels } from "@/lib/types";
@@ -82,7 +82,7 @@ export default function HistoryPage() {
           </p>
           <button
             onClick={() => router.push("/quiz?category=all")}
-            className="px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+            className="px-6 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
           >
             クイズに挑戦する
           </button>
@@ -139,7 +139,7 @@ export default function HistoryPage() {
           {analytics.weakest && (
             <Link
               href={`/quiz?${analytics.weakest.query}`}
-              className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm transition-shadow hover:shadow-md"
             >
               <div>
                 <p className="text-xs font-medium text-[var(--muted)]">💡 重点的に復習したい分野</p>
@@ -148,7 +148,7 @@ export default function HistoryPage() {
                   正答率 {analytics.weakest.percentage}%（{analytics.weakest.correct}/{analytics.weakest.total}問）
                 </p>
               </div>
-              <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white">
+              <span className="shrink-0 rounded-xl bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--on-primary)]">
                 この分野を解く →
               </span>
             </Link>
@@ -173,7 +173,7 @@ export default function HistoryPage() {
                     </div>
                     <div className="h-2 w-full rounded-full bg-[var(--progress-bg)]">
                       <div
-                        className={`h-full rounded-full transition-all duration-700 ${d.percentage >= 60 ? "bg-[var(--success)]" : d.percentage >= 40 ? "bg-[var(--primary)]" : "bg-[var(--danger)]"}`}
+                        className={`h-full rounded-full transition-[width] duration-700 ${d.percentage >= 60 ? "bg-[var(--success)]" : d.percentage >= 40 ? "bg-[var(--primary)]" : "bg-[var(--danger)]"}`}
                         style={{ width: `${d.percentage}%` }}
                       />
                     </div>

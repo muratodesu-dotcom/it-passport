@@ -17,6 +17,7 @@
   --card-border: #e7e9f2;
   --card-hover: #f0f2fa;
   --primary: #4f46e5;
+  --on-primary: #ffffff;
   --primary-hover: #4338ca;
   --primary-light: #eef0ff;
   --success: #15a34a;
@@ -54,6 +55,7 @@
   --card-border: #262a36;
   --card-hover: #1d212c;
   --primary: #818cf8;
+  --on-primary: #0b0d14;
   --primary-hover: #a5b4fc;
   --primary-light: #1d1f3a;
   --success: #34d399;
@@ -91,6 +93,7 @@
   --card-border: #f8dde8;
   --card-hover: #fdeef4;
   --primary: #e11d74;
+  --on-primary: #ffffff;
   --primary-hover: #be185d;
   --primary-light: #fce7f1;
   --success: #15a34a;
@@ -128,6 +131,7 @@
   --card-border: #3d1f30;
   --card-hover: #2e1726;
   --primary: #f472b6;
+  --on-primary: #0b0d14;
   --primary-hover: #f9a8d4;
   --primary-light: #34172a;
   --success: #34d399;
@@ -165,6 +169,7 @@
   --card-border: #cdeed7;
   --card-hover: #e8f7ed;
   --primary: #0f9d58;
+  --on-primary: #0b0d14;
   --primary-hover: #0c7d46;
   --primary-light: #dcfce7;
   --success: #15a34a;
@@ -202,6 +207,7 @@
   --card-border: #1f3a2b;
   --card-hover: #182d20;
   --primary: #34d399;
+  --on-primary: #0b0d14;
   --primary-hover: #6ee7b7;
   --primary-light: #14271c;
   --success: #34d399;
@@ -239,6 +245,7 @@
   --card-border: #fbe0c4;
   --card-hover: #fff1e0;
   --primary: #ea580c;
+  --on-primary: #0b0d14;
   --primary-hover: #c2410c;
   --primary-light: #ffedd5;
   --success: #15a34a;
@@ -276,6 +283,7 @@
   --card-border: #3d2613;
   --card-hover: #2c1c0d;
   --primary: #fb923c;
+  --on-primary: #0b0d14;
   --primary-hover: #fdba74;
   --primary-light: #2f1d0d;
   --success: #34d399;
@@ -313,6 +321,7 @@
   --card-border: #c7ecf2;
   --card-hover: #e5f7fb;
   --primary: #0891b2;
+  --on-primary: #0b0d14;
   --primary-hover: #0e7490;
   --primary-light: #cffafe;
   --success: #15a34a;
@@ -350,6 +359,7 @@
   --card-border: #1a3a44;
   --card-hover: #122c34;
   --primary: #22d3ee;
+  --on-primary: #0b0d14;
   --primary-hover: #67e8f9;
   --primary-light: #103039;
   --success: #34d399;
@@ -387,6 +397,7 @@
   --card-border: #e6dbf7;
   --card-hover: #f3edfc;
   --primary: #7c3aed;
+  --on-primary: #ffffff;
   --primary-hover: #6d28d9;
   --primary-light: #ede9fe;
   --success: #15a34a;
@@ -424,6 +435,7 @@
   --card-border: #2f2150;
   --card-hover: #241a40;
   --primary: #a78bfa;
+  --on-primary: #0b0d14;
   --primary-hover: #c4b5fd;
   --primary-light: #241a40;
   --success: #34d399;
@@ -461,6 +473,7 @@
   --card-border: #dadfee;
   --card-hover: #e7ebf6;
   --primary: #4338ca;
+  --on-primary: #ffffff;
   --primary-hover: #3730a3;
   --primary-light: #e4e3fb;
   --success: #15a34a;
@@ -498,6 +511,7 @@
   --card-border: #1e2740;
   --card-hover: #161d33;
   --primary: #818cf8;
+  --on-primary: #0b0d14;
   --primary-hover: #a5b4fc;
   --primary-light: #18203c;
   --success: #34d399;
@@ -535,6 +549,7 @@
   --card-border: #e4e4e7;
   --card-hover: #efeff1;
   --primary: #27272a;
+  --on-primary: #ffffff;
   --primary-hover: #18181b;
   --primary-light: #e8e8ea;
   --success: #15803d;
@@ -572,6 +587,7 @@
   --card-border: #2a2a2e;
   --card-hover: #1f1f22;
   --primary: #e4e4e7;
+  --on-primary: #0b0d14;
   --primary-hover: #ffffff;
   --primary-light: #26262a;
   --success: #4ade80;

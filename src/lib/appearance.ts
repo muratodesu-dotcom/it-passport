@@ -2,6 +2,8 @@
 // and contrast. Stored separately from the AI settings so the two concerns
 // don't collide, and applied before paint via a boot script.
 
+import { safeGet, safeSet } from "./storage";
+
 export const APPEARANCE_KEY = "it-passport-appearance";
 
 export type FontScale = "sm" | "md" | "lg" | "xl";
@@ -42,7 +44,7 @@ function fontScaleToPx(scale: FontScale): number {
 export function loadAppearance(): Appearance {
   if (typeof window === "undefined") return defaultAppearance;
   try {
-    const raw = window.localStorage.getItem(APPEARANCE_KEY);
+    const raw = safeGet(APPEARANCE_KEY);
     if (!raw) return defaultAppearance;
     const parsed = JSON.parse(raw) as Partial<Appearance>;
     return {
@@ -71,7 +73,7 @@ export function applyAppearance(a: Appearance) {
 
 export function saveAppearance(a: Appearance) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(APPEARANCE_KEY, JSON.stringify(a));
+  safeSet(APPEARANCE_KEY, JSON.stringify(a));
   applyAppearance(a);
 }
 

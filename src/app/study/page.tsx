@@ -1588,13 +1588,13 @@ function StudyContent() {
             <div className="flex items-center gap-1.5 rounded-full bg-[var(--badge-bg)] p-1">
               <button
                 onClick={() => setDoomScrollMode(true)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${doomScrollMode ? "bg-[var(--accent)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${doomScrollMode ? "bg-[var(--accent)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
               >
                 フィード
               </button>
               <button
                 onClick={() => setDoomScrollMode(false)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${!doomScrollMode ? "bg-[var(--primary)] text-white shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${!doomScrollMode ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-sm" : "hover:bg-[var(--secondary-btn-hover)]"}`}
               >
                 集中
               </button>
@@ -1610,7 +1610,7 @@ function StudyContent() {
 
         <div className="mt-3 h-1.5 w-full rounded-full bg-[var(--progress-bg)] overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-500"
+            className="h-full rounded-full transition-[width] duration-500"
             style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${mastery}%` }}
           />
         </div>
@@ -1629,27 +1629,27 @@ function StudyContent() {
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--muted)] mb-3">ガイド目次</p>
         <div className="flex flex-wrap gap-2">
           {lessonBlocks.length > 0 && (
-          <button onClick={() => toggleGuideSection("lessons")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.lessons ? "bg-sky-100 border-sky-300 text-sky-800 dark:bg-sky-500/20 dark:border-sky-400/40 dark:text-sky-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("lessons")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.lessons ? "bg-sky-100 border-sky-300 text-sky-800 dark:bg-sky-500/20 dark:border-sky-400/40 dark:text-sky-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.lessons ? "▼" : "▶"} ミニレッスン <span className="ml-1.5 text-[10px] opacity-60">{lessonBlocks.length}件</span>
           </button>
           )}
           {coverageFocuses.length > 0 && (
-          <button onClick={() => toggleGuideSection("coverage")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.coverage ? "bg-violet-100 border-violet-300 text-violet-800 dark:bg-violet-500/20 dark:border-violet-400/40 dark:text-violet-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("coverage")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.coverage ? "bg-violet-100 border-violet-300 text-violet-800 dark:bg-violet-500/20 dark:border-violet-400/40 dark:text-violet-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.coverage ? "▼" : "▶"} 弱点カバー <span className="ml-1.5 text-[10px] opacity-60">{coverageFocuses.length}件</span>
           </button>
           )}
           {readinessAudits.length > 0 && (
-          <button onClick={() => toggleGuideSection("audit")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.audit ? "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800 dark:bg-fuchsia-500/20 dark:border-fuchsia-400/40 dark:text-fuchsia-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("audit")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.audit ? "bg-fuchsia-100 border-fuchsia-300 text-fuchsia-800 dark:bg-fuchsia-500/20 dark:border-fuchsia-400/40 dark:text-fuchsia-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.audit ? "▼" : "▶"} レッスン監査 <span className="ml-1.5 text-[10px] opacity-60">{readinessAudits.length}件</span>
           </button>
           )}
           {deepDiveModules.length > 0 && (
-          <button onClick={() => toggleGuideSection("deepDive")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.deepDive ? "bg-teal-100 border-teal-300 text-teal-800 dark:bg-teal-500/20 dark:border-teal-400/40 dark:text-teal-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("deepDive")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.deepDive ? "bg-teal-100 border-teal-300 text-teal-800 dark:bg-teal-500/20 dark:border-teal-400/40 dark:text-teal-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.deepDive ? "▼" : "▶"} 深掘りモジュール <span className="ml-1.5 text-[10px] opacity-60">{deepDiveModules.length}件</span>
           </button>
           )}
           {categoryExamTips.length > 0 && (
-          <button onClick={() => toggleGuideSection("examTips")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-all border ${openGuideSections.examTips ? "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-500/20 dark:border-amber-400/40 dark:text-amber-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
+          <button onClick={() => toggleGuideSection("examTips")} className={`rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors border ${openGuideSections.examTips ? "bg-amber-100 border-amber-300 text-amber-800 dark:bg-amber-500/20 dark:border-amber-400/40 dark:text-amber-100" : "border-[var(--card-border)] text-[var(--muted)] hover:bg-[var(--badge-bg)]"}`}>
             {openGuideSections.examTips ? "▼" : "▶"} 試験のコツ <span className="ml-1.5 text-[10px] opacity-60">{categoryExamTips.length}件</span>
           </button>
           )}
@@ -1680,7 +1680,7 @@ function StudyContent() {
             return (
             <section
               key={lesson.title}
-              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/20 transition-all"
+              className="rounded-2xl border border-sky-200/70 bg-white/85 p-5 dark:border-sky-400/20 dark:bg-black/20 transition-colors"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-200">Lesson {index + 1}</p>
@@ -1973,7 +1973,7 @@ function StudyContent() {
             <>
               <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
                 <div
-                  className="h-full rounded-full transition-all duration-500"
+                  className="h-full rounded-full transition-[width] duration-500"
                   style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${((currentIndex + 1) / questions.length) * 100}%` }}
                 />
               </div>
@@ -1991,7 +1991,7 @@ function StudyContent() {
                 {question.options.map((option, index) => (
                   <div
                     key={index}
-                    className={`p-4 rounded-xl border-2 transition-all bg-[var(--card)] ${
+                    className={`p-4 rounded-xl border-2 transition-[color,background-color,border-color,opacity] bg-[var(--card)] ${
                       showAnswer && index === question.correctIndex
                         ? "border-[var(--success)] bg-[var(--success-bg)]"
                         : showAnswer
@@ -2083,14 +2083,14 @@ function StudyContent() {
                           setCurrentIndex((i) => i + 1);
                           setShowAnswer(false);
                         }}
-                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
                       >
                         次の問題 →
                       </button>
                     ) : (
                       <button
                         onClick={() => router.push("/")}
-                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white font-medium rounded-xl transition-colors"
+                        className="flex-1 py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors"
                       >
                         ホームに戻る
                       </button>
@@ -2148,7 +2148,7 @@ function StudyContent() {
                               handleFeedAnswer(item.feedId, feedQuestion.id, optionIndex);
                             }}
                             disabled={hasAnswered}
-                            className={`w-full text-left rounded-xl border-2 px-4 py-3 transition-all ${optionStyle} ${hasAnswered && isSelected && !isCorrect ? "animate-shake" : ""}`}
+                            className={`w-full text-left rounded-xl border-2 px-4 py-3 transition-colors ${optionStyle} ${hasAnswered && isSelected && !isCorrect ? "animate-shake" : ""}`}
                           >
                             <span className="mr-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--badge-bg)] text-xs font-medium">
                               {String.fromCharCode(65 + optionIndex)}
@@ -2198,7 +2198,7 @@ function StudyContent() {
                     <p className="text-xs text-[var(--muted)]">{feedAnsweredCount}問回答済み · {feedCorrectCount}問正解</p>
                     <button
                       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                      className="mt-3 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--primary-hover)] transition-colors"
+                      className="mt-3 rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-medium text-[var(--on-primary)] hover:bg-[var(--primary-hover)] transition-colors"
                     >
                       トップに戻る
                     </button>
@@ -2272,7 +2272,7 @@ function StudyContent() {
             <div className="space-y-3">
               <button
                 onClick={() => router.push(`/quiz?category=${category}`)}
-                className="w-full rounded-xl bg-[var(--primary)] px-4 py-3 font-medium text-white transition-colors hover:bg-[var(--primary-hover)]"
+                className="w-full rounded-xl bg-[var(--primary)] px-4 py-3 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
               >
                 この分野でクイズに挑戦
               </button>
@@ -2290,7 +2290,7 @@ function StudyContent() {
       {showScrollTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-lg hover:bg-[var(--primary-hover)] transition-all hover:scale-105 fade-in"
+          className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-[var(--primary)] text-[var(--on-primary)] shadow-lg hover:bg-[var(--primary-hover)] transition-colors fade-in"
           aria-label="トップに戻る"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 15l-6-6-6 6"/></svg>

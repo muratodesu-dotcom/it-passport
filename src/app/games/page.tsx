@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/SiteLink";
 import { ExamType, examShortLabels } from "@/lib/types";
 import { drillList } from "@/lib/drills";
 import { chizaiDrillList } from "@/data/chizaiDrills";
@@ -20,7 +20,7 @@ const games = [
     title: "用語マッチング",
     description: "用語と説明をペアにしよう。正確さとスピードを競え！",
     icon: "🔗",
-    color: "from-cyan-500 to-blue-600",
+    color: "bg-cyan-700",
     badge: "記憶力",
   },
   {
@@ -28,7 +28,7 @@ const games = [
     title: "フラッシュカード",
     description: "カードをめくって用語と説明を暗記。覚えた/もう一度で仕分けできる。",
     icon: "🃏",
-    color: "from-violet-500 to-purple-600",
+    color: "bg-violet-600",
     badge: "暗記",
   },
   {
@@ -36,14 +36,14 @@ const games = [
     title: "スピードチャレンジ",
     description: "60秒以内にできるだけ多くの問題に正解しよう。連続正解でボーナス！",
     icon: "⚡",
-    color: "from-orange-500 to-red-500",
+    color: "bg-red-600",
     badge: "反射神経",
   },
 ];
 
 const exams: { id: ExamType; accent: string }[] = [
-  { id: "it-passport", accent: "from-blue-500 to-indigo-600" },
-  { id: "chizai", accent: "from-emerald-500 to-teal-600" },
+  { id: "it-passport", accent: "bg-blue-600" },
+  { id: "chizai", accent: "bg-emerald-600" },
 ];
 
 export default function GamesHub() {
@@ -65,7 +65,7 @@ export default function GamesHub() {
         {exams.map((exam) => (
           <section key={exam.id}>
             <div className="mb-4 flex items-center gap-3">
-              <span className={`inline-block h-6 w-1.5 rounded-full bg-gradient-to-b ${exam.accent}`} />
+              <span className={`inline-block h-6 w-1.5 rounded-full ${exam.accent}`} />
               <h2 className="text-xl font-bold">{examShortLabels[exam.id]}</h2>
             </div>
             <div className="grid gap-4 md:grid-cols-3">
@@ -73,12 +73,12 @@ export default function GamesHub() {
                 <Link
                   key={`${exam.id}-${game.id}`}
                   href={`/games/${game.id}?exam=${exam.id}`}
-                  className="group block rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-all hover:shadow-lg hover:-translate-y-1"
+                  className="group block rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-6 transition-shadow hover:shadow-lg"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-4xl">{game.icon}</span>
                     <span
-                      className={`inline-block text-xs text-white px-2.5 py-1 rounded-full bg-gradient-to-r ${game.color}`}
+                      className={`inline-block text-xs text-white px-2.5 py-1 rounded-full ${game.color}`}
                     >
                       {game.badge}
                     </span>
@@ -102,7 +102,7 @@ export default function GamesHub() {
                 <Link
                   key={`${exam.id}-${drill.kind}`}
                   href={`/games/drills/${drill.kind}?exam=${exam.id}`}
-                  className="group flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
+                  className="group flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-shadow hover:shadow-md"
                 >
                   <span className="text-2xl">{drill.icon}</span>
                   <span>
@@ -119,7 +119,7 @@ export default function GamesHub() {
                 <Link
                   key={`${exam.id}-${drill.kind}`}
                   href={`/games/drills/${drill.kind}?exam=${exam.id}`}
-                  className="group flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-all hover:shadow-md hover:-translate-y-0.5"
+                  className="group flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--card)] p-4 transition-shadow hover:shadow-md"
                 >
                   <span className="text-2xl">{drill.icon}</span>
                   <span>
