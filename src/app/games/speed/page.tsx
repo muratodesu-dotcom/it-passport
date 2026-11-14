@@ -53,6 +53,9 @@ function SpeedChallenge() {
   // timers in background tabs, and a hidden tab pauses the round instead of
   // letting it run out unseen.
   const deadlineRef = useRef(0);
+  // The exam + field the running round was started with. The record is saved
+  // under this key even if the selector changes before time runs out.
+  const roundKeyRef = useRef("");
   const remainingRef = useRef(TIME_LIMIT * 1000);
 
   const filteredPool = useMemo(() => {
@@ -69,6 +72,7 @@ function SpeedChallenge() {
 
   const startGame = useCallback(() => {
     runRef.current += 1;
+    roundKeyRef.current = bestKey;
     remainingRef.current = TIME_LIMIT * 1000;
     deadlineRef.current = performance.now() + TIME_LIMIT * 1000;
     setNewRecord(false);
@@ -82,7 +86,7 @@ function SpeedChallenge() {
     setGameState("playing");
     setFlash(null);
     setSelectedIdx(null);
-  }, [filteredPool]);
+  }, [filteredPool, bestKey]);
 
   // Timer
   useEffect(() => {
@@ -112,13 +116,15 @@ function SpeedChallenge() {
   // Save the device-local best when a round ends.
   useEffect(() => {
     if (gameState !== "done") return;
+    const key = roundKeyRef.current;
+    if (!key) return;
     const bests = loadBests();
-    const previous = bests[bestKey] ?? 0;
+    const previous = bests[key] ?? 0;
     if (correct > previous) {
-      bests[bestKey] = correct;
+      bests[key] = correct;
       safeSet(BEST_KEY, JSON.stringify(bests));
-      setBest(correct);
-      setNewRecord(previous > 0);
+      if (key === bestKey) setBest(correct);
+      setNewRecord(previous > 0 && key === bestKey);
     }
   }, [gameState, correct, bestKey]);
 
@@ -188,7 +194,8 @@ function SpeedChallenge() {
           <button
             key={opt.id}
             onClick={() => { setField(opt.id); if (gameState !== "playing") setGameState("idle"); }}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            disabled={gameState === "playing"}
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
               field === opt.id
                 ? "bg-[var(--primary)] text-[var(--on-primary)]"
                 : "bg-[var(--badge-bg)] text-[var(--muted)] hover:text-[var(--foreground)]"

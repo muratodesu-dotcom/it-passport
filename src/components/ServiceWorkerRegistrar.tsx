@@ -12,7 +12,9 @@ const CHECK_THROTTLE_MS = 60 * 1000;
 // Pages with nothing in progress: a new build may land on them by reloading
 // while the app is in the background. Quizzes, study sessions and games keep
 // running and get a small "update" pill instead, so no answer is lost.
-const SAFE_TO_RELOAD = new Set(["/", "/glossary", "/history", "/settings", "/games"]);
+// Settings is left out: its form holds unsaved edits (a pasted API key) in
+// memory, and switching apps to copy a key must not throw them away.
+const SAFE_TO_RELOAD = new Set(["/", "/glossary", "/history", "/games"]);
 
 export default function ServiceWorkerRegistrar() {
   const pathname = usePathname();
