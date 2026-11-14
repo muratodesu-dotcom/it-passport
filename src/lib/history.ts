@@ -1,4 +1,5 @@
 import { QuizResult } from "./types";
+import { isQuizResult } from "./validate";
 
 const STORAGE_KEY = "it-passport-history";
 const BOOKMARKS_KEY = "it-passport-bookmarks";
@@ -7,7 +8,10 @@ export function getHistory(): QuizResult[] {
   if (typeof window === "undefined") return [];
   try {
     const data = localStorage.getItem(STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    const parsed: unknown = data ? JSON.parse(data) : [];
+    // Skip anything malformed (a damaged store or an imported file) instead
+    // of letting it crash the pages that read history.
+    return Array.isArray(parsed) ? parsed.filter(isQuizResult) : [];
   } catch {
     return [];
   }

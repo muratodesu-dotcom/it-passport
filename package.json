@@ -1,6 +1,6 @@
 {
   "name": "it-passport",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "description": "ITパスポート試験と知的財産管理技能検定3級に対応した学習・クイズアプリ",
   "engines": {

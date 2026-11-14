@@ -4,6 +4,7 @@
 // correct answers push the next review further out, wrong answers bring it
 // back to tomorrow. State is stored per-question in localStorage.
 
+import { isSrsCard, validCards } from "./validate";
 const SRS_KEY = "it-passport-srs";
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_INTERVAL_DAYS = 365;
@@ -24,8 +25,8 @@ function load(): SrsState {
   if (typeof window === "undefined") return {};
   try {
     const raw = localStorage.getItem(SRS_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    return parsed && typeof parsed === "object" ? (parsed as SrsState) : {};
+    // Drop malformed cards so scheduling never reads a missing field.
+    return validCards(raw ? JSON.parse(raw) : {}, isSrsCard) as SrsState;
   } catch {
     return {};
   }
