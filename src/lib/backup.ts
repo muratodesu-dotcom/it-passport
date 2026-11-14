@@ -10,22 +10,27 @@
 //   - preferences (theme, text size, last track): this device keeps its own;
 //     the file's are used only where this device has none
 // The OpenAI API key (it-passport-ai-settings) is never exported.
+// Every imported record is checked against its full shape first; anything
+// malformed is skipped and the existing copy kept, so a damaged or crafted
+// file can't plant data that later breaks a page.
+
+import { isQuizResult, isSrsCard, isTermSrsCard } from "./validate";
 
 export const BACKUP_FORMAT = "it-passport-progress";
 export const BACKUP_VERSION = 1;
 export const HISTORY_LIMIT = 50;
 
-type MergeRule = "history" | "union" | "latest-card" | "max" | "keep-current";
+type MergeRule = "history" | "ids" | "terms" | "question-cards" | "term-cards" | "max" | "keep-current";
 
 // Every key worth backing up, with how two copies combine.
 export const BACKUP_KEYS: Record<string, MergeRule> = {
   "it-passport-history": "history",
-  "it-passport-bookmarks": "union",
-  "it-passport-missed-terms": "union",
-  "it-passport-srs": "latest-card",
-  "it-passport-term-bookmarks": "union",
-  "it-passport-known-terms": "union",
-  "it-passport-term-srs": "latest-card",
+  "it-passport-bookmarks": "ids",
+  "it-passport-missed-terms": "terms",
+  "it-passport-srs": "question-cards",
+  "it-passport-term-bookmarks": "terms",
+  "it-passport-known-terms": "terms",
+  "it-passport-term-srs": "term-cards",
   "it-passport-speed-best": "max",
   "it-passport-home-track": "keep-current",
   "it-passport-appearance": "keep-current",
@@ -102,7 +107,7 @@ function mergeHistory(current: unknown, incoming: unknown): unknown[] {
   const b = Array.isArray(incoming) ? incoming : [];
   const byId = new Map<string, unknown>();
   for (const r of [...a, ...b]) {
-    if (!isRecord(r) || typeof r.id !== "string" || typeof r.date !== "string") continue;
+    if (!isQuizResult(r)) continue;
     // A result is the same one only if both its id and its time match.
     const key = `${r.id}|${r.date}`;
     if (!byId.has(key)) byId.set(key, r);
@@ -112,29 +117,31 @@ function mergeHistory(current: unknown, incoming: unknown): unknown[] {
     .slice(0, HISTORY_LIMIT);
 }
 
-function mergeUnion(current: unknown, incoming: unknown): unknown[] {
+function mergeUnion<T extends string | number>(current: unknown, incoming: unknown, isItem: (v: unknown) => v is T): T[] {
   const a = Array.isArray(current) ? current : [];
   const b = Array.isArray(incoming) ? incoming : [];
-  const seen = new Set<string>();
-  const out: unknown[] = [];
+  const seen = new Set<T>();
+  const out: T[] = [];
   for (const v of [...a, ...b]) {
-    if (typeof v !== "string" && typeof v !== "number") continue;
-    const k = `${typeof v}:${v}`;
-    if (seen.has(k)) continue;
-    seen.add(k);
+    if (!isItem(v) || seen.has(v)) continue;
+    seen.add(v);
     out.push(v);
   }
   return out;
 }
 
-function mergeLatestCard(current: unknown, incoming: unknown): Record<string, unknown> {
+const isId = (v: unknown): v is number => typeof v === "number" && Number.isInteger(v);
+const isTerm = (v: unknown): v is string => typeof v === "string" && v.length > 0;
+
+function mergeLatestCard(current: unknown, incoming: unknown, isCard: (v: unknown) => v is { last: string }): Record<string, unknown> {
   const a = isRecord(current) ? current : {};
   const b = isRecord(incoming) ? incoming : {};
   const out: Record<string, unknown> = { ...a };
   for (const [key, card] of Object.entries(b)) {
-    if (!isRecord(card) || typeof card.last !== "string") continue;
+    // A damaged imported card never replaces anything.
+    if (!isCard(card)) continue;
     const mine = out[key];
-    if (!isRecord(mine) || typeof mine.last !== "string" || card.last > mine.last) out[key] = card;
+    if (!isCard(mine) || Date.parse(card.last) > Date.parse(mine.last)) out[key] = card;
   }
   return out;
 }
@@ -167,11 +174,18 @@ export function mergeStores(current: RawStore, incoming: RawStore): RawStore {
     const merged =
       rule === "history"
         ? mergeHistory(a, b)
-        : rule === "union"
-          ? mergeUnion(a, b)
-          : rule === "latest-card"
-            ? mergeLatestCard(a, b)
-            : mergeMax(a, b);
+        : rule === "ids"
+          ? mergeUnion(a, b, isId)
+          : rule === "terms"
+            ? mergeUnion(a, b, isTerm)
+            : rule === "question-cards"
+              ? mergeLatestCard(a, b, isSrsCard)
+              : rule === "term-cards"
+                ? mergeLatestCard(a, b, isTermSrsCard)
+                : mergeMax(a, b);
+    // Nothing valid to add where this device had nothing: write nothing.
+    const empty = Array.isArray(merged) ? merged.length === 0 : Object.keys(merged).length === 0;
+    if (mine === undefined && empty) continue;
     out[key] = JSON.stringify(merged);
   }
   return out;

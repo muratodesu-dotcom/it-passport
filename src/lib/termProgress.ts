@@ -7,6 +7,7 @@
 //                with three self-graded outcomes instead of correct/incorrect)
 // All stores degrade gracefully when localStorage is unavailable.
 
+import { isTermSrsCard, validCards } from "./validate";
 const BOOKMARKS_KEY = "it-passport-term-bookmarks";
 const KNOWN_KEY = "it-passport-known-terms";
 const SRS_KEY = "it-passport-term-srs";
@@ -144,8 +145,8 @@ function loadSrs(): TermSrsState {
   if (typeof window === "undefined") return {};
   try {
     const raw = localStorage.getItem(SRS_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    return parsed && typeof parsed === "object" ? (parsed as TermSrsState) : {};
+    // Drop malformed cards so scheduling never reads a missing field.
+    return validCards(raw ? JSON.parse(raw) : {}, isTermSrsCard);
   } catch {
     return {};
   }

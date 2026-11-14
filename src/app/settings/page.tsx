@@ -4,7 +4,7 @@ import Link from "@/components/SiteLink";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { AiSettings, defaultAiSettings, loadAiSettings, saveAiSettings } from "@/lib/appSettings";
 import { BACKUP_KEYS, backupFileName, buildBackup, mergeStores, parseBackup, summarize, type RawStore } from "@/lib/backup";
-import { safeGet, safeRemove, safeSet } from "@/lib/storage";
+import { safeGet, safeRemove, trySet } from "@/lib/storage";
 import {
   Appearance,
   FONT_SCALE_OPTIONS,
@@ -169,7 +169,25 @@ export default function SettingsPage() {
     }
     const before = readStore();
     const merged = mergeStores(before, parsed.backup.data);
-    for (const [key, value] of Object.entries(merged)) safeSet(key, value);
+    // Write only what changed, confirm each write, and put everything back if
+    // the browser refuses any of them (blocked storage, quota full).
+    const changed = Object.entries(merged).filter(([key, value]) => before[key] !== value);
+    if (changed.length === 0) {
+      setBackupNote({ text: "新しく取り込める内容はありませんでした（すでに同じ進捗か、読めないデータでした）。" });
+      return;
+    }
+    const failed = changed.filter(([key, value]) => !trySet(key, value));
+    if (failed.length > 0) {
+      for (const [key] of changed) {
+        if (key in before) trySet(key, before[key]);
+        else safeRemove(key);
+      }
+      setBackupNote({
+        text: "保存できませんでした（ブラウザの保存領域がいっぱいか、保存がブロックされています）。進捗は読み込み前のままです。",
+        error: true,
+      });
+      return;
+    }
     refreshAppearance();
     const a = summarize(before);
     const b = summarize(merged);
@@ -182,12 +200,17 @@ export default function SettingsPage() {
   const undoImport = () => {
     const previous = backupNote?.undo;
     if (!previous) return;
+    let ok = true;
     for (const key of Object.keys(BACKUP_KEYS)) {
-      if (key in previous) safeSet(key, previous[key]);
+      if (key in previous) ok = trySet(key, previous[key]) && ok;
       else safeRemove(key);
     }
     refreshAppearance();
-    setBackupNote({ text: "取り込みを元に戻しました。" });
+    setBackupNote(
+      ok
+        ? { text: "取り込みを元に戻しました。" }
+        : { text: "元に戻せない項目がありました（ブラウザの保存がブロックされています）。", error: true }
+    );
   };
 
   const removeKey = () => {

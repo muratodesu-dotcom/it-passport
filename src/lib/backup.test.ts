@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildBackup, HISTORY_LIMIT, mergeStores, parseBackup, summarize, type RawStore } from "./backup";
+import { isQuizResult, isSrsCard, validCards } from "./validate";
 
 const result = (id: string, date: string) => ({ id, date, category: "all", score: 1, total: 1, percentage: 100, timeSeconds: 1, passed: true });
 const card = (id: number, last: string, intervalDays: number) => ({ id, ease: 2.5, intervalDays, due: last, reps: 1, lapses: 0, last });
@@ -86,5 +87,53 @@ describe("progress backup", () => {
         "it-passport-srs": JSON.stringify({ 1: card(1, "x", 1) }),
       })
     ).toEqual({ results: 1, bookmarks: 3, reviewCards: 1, knownTerms: 0 });
+  });
+
+  it("skips malformed history records instead of storing them", () => {
+    const crafted = { ...result("x", "2026-11-05"), outcomes: { length: 1 } };
+    const missingFields = { id: "y", date: "2026-11-06" };
+    const out = mergeStores(
+      { "it-passport-history": JSON.stringify([result("a", "2026-11-03")]) },
+      { "it-passport-history": JSON.stringify([crafted, missingFields, result("b", "2026-11-04")]) }
+    );
+    expect(JSON.parse(out["it-passport-history"]).map((r: { id: string }) => r.id)).toEqual(["b", "a"]);
+
+    // Only malformed data and nothing stored here yet: nothing is written.
+    const none = mergeStores({}, { "it-passport-history": JSON.stringify([crafted]), "it-passport-srs": '{"5":{"last":"2026-11-14"}}' });
+    expect(none).toEqual({});
+  });
+
+  it("never lets a damaged review card replace a healthy one", () => {
+    const out = mergeStores(
+      { "it-passport-srs": JSON.stringify({ 1: card(1, "2026-11-01", 4) }) },
+      { "it-passport-srs": JSON.stringify({ 1: { last: "2026-11-14T00:00:00.000Z" }, 2: { id: 2, last: "2026-11-14" } }) }
+    );
+    const srs = JSON.parse(out["it-passport-srs"]);
+    expect(srs[1].intervalDays).toBe(4);
+    expect(srs[2]).toBeUndefined();
+  });
+
+  it("keeps only items of the right type in lists", () => {
+    const out = mergeStores(
+      { "it-passport-bookmarks": "[1]", "it-passport-known-terms": '["RAG"]' },
+      { "it-passport-bookmarks": '[2, "3", {"x":1}, 2.5]', "it-passport-known-terms": '["MCP", 7, ""]' }
+    );
+    expect(JSON.parse(out["it-passport-bookmarks"])).toEqual([1, 2]);
+    expect(JSON.parse(out["it-passport-known-terms"])).toEqual(["RAG", "MCP"]);
+  });
+});
+
+describe("stored data validation", () => {
+  it("accepts real results and rejects malformed ones", () => {
+    const ok = { ...result("a", "2026-11-01"), outcomes: [{ id: 1, answeredIndex: null, correctIndex: 0, isCorrect: false }] };
+    expect(isQuizResult(ok)).toBe(true);
+    expect(isQuizResult({ ...ok, outcomes: { length: 1 } })).toBe(false);
+    expect(isQuizResult({ ...ok, outcomes: [{ id: "1" }] })).toBe(false);
+    expect(isQuizResult({ ...ok, date: "not a date" })).toBe(false);
+  });
+
+  it("filters damaged cards out of a stored card map", () => {
+    const cards = validCards({ 1: card(1, "2026-11-01", 2), 2: { last: "2026-11-01" }, 3: "x" }, isSrsCard);
+    expect(Object.keys(cards)).toEqual(["1"]);
   });
 });
