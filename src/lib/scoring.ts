@@ -1,6 +1,7 @@
 import {
   categoryLabels,
   Category,
+  devFieldLabels,
   ExamType,
   ipFieldLabels,
   Question,
@@ -18,7 +19,7 @@ export interface ExamRule {
   passPercent: number;
   // Minimum percentage required in every domain. Undefined => no per-domain rule.
   domainPassPercent?: number;
-  domainKind: "category" | "ipField";
+  domainKind: "category" | "ipField" | "devField";
   // Short note explaining how the criteria map to the official exam.
   criteriaNote: string;
 }
@@ -43,6 +44,16 @@ export const examRules: Record<ExamType, ExamRule> = {
     passPercent: 70,
     domainKind: "ipField",
     criteriaNote: "学科試験は30問・45分、満点の70%以上で合格。",
+  },
+  // AI Engineer track: no official exam. These values only drive practice
+  // results (grouping by field and the generic 60% line).
+  dev: {
+    label: "AI Engineer",
+    questionCount: 40,
+    timeLimitSeconds: 40 * 60,
+    passPercent: PRACTICE_PASS_PERCENT,
+    domainKind: "devField",
+    criteriaNote: "Practice track with no official exam. Aim for 60% or more.",
   },
 };
 
@@ -76,6 +87,10 @@ export function questionDomain(examType: ExamType, q: Question): { key: string; 
   if (examRules[examType].domainKind === "ipField") {
     const field = q.ipField ?? "other";
     return { key: field, label: ipFieldLabels[field] };
+  }
+  if (examRules[examType].domainKind === "devField") {
+    const field = q.devField ?? "web";
+    return { key: field, label: devFieldLabels[field] };
   }
   return { key: q.category, label: categoryLabels[q.category as Category] ?? q.category };
 }

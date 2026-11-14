@@ -172,7 +172,7 @@ function FlashcardsGame() {
                 <p className="text-lg leading-relaxed font-medium">
                   {showFront === "term" ? current.description : <Furigana term={current.term} />}
                 </p>
-                {showFront === "term" && <TermExplanationEn term={current.term} />}
+                {showFront === "term" && <TermExplanationEn term={current.term} exam={exam} />}
               </div>
             </div>
           </div>

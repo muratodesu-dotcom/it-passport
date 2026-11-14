@@ -24,7 +24,8 @@ export type DrillKind =
   | "flow"
   | "calc"
   | "cat3"
-  | "acronym";
+  | "acronym"
+  | "gitcmd";
 
 export interface DrillDef {
   kind: DrillKind;

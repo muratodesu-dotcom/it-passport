@@ -1,7 +1,8 @@
 import Link from "@/components/SiteLink";
 import type { ReactNode } from "react";
-import { chizaiQuestions, itPassportQuestions } from "@/data/questions";
-import { ipFieldLabels } from "@/lib/types";
+import { chizaiQuestions, devQuestions, itPassportQuestions } from "@/data/questions";
+import { devTerms } from "@/data/terms";
+import { devFieldLabels, ipFieldLabels } from "@/lib/types";
 import StudyPulse from "@/components/StudyPulse";
 
 const categoryDefinitions = [
@@ -59,6 +60,21 @@ const chizaiFields = chizaiFieldDefinitions.map((f) => ({
   count: f.id === "all" ? chizaiQuestions.length : chizaiQuestions.filter((q) => (q.ipField ?? "other") === f.id).length,
 }));
 const estimatedMinutes = Math.ceil(totalQuestions * 0.7);
+
+// AI Engineer track (English): Git, Supabase, Vercel, web and AI. Practice only.
+const devFieldDefinitions = [
+  { id: "git", icon: "🌿", color: "bg-orange-700", hint: "rebase · merge · reset · PRs" },
+  { id: "database", icon: "🗄️", color: "bg-emerald-700", hint: "RLS · keys · pooler · migrations" },
+  { id: "vercel", icon: "🚀", color: "bg-neutral-800", hint: "previews · env vars · Fluid · rollback" },
+  { id: "web", icon: "🌐", color: "bg-sky-700", hint: "HTTP · CORS · SSR · caching" },
+  { id: "ai", icon: "🤖", color: "bg-violet-600", hint: "RAG · tool use · MCP · evals" },
+] as const;
+const devFields = devFieldDefinitions.map((f) => ({
+  ...f,
+  title: devFieldLabels[f.id],
+  questions: devQuestions.filter((q) => q.devField === f.id).length,
+  terms: devTerms.filter((t) => t.devField === f.id).length,
+}));
 
 // 本番試験の条件をチップで。補足は title（ホバー）へ。
 function ExamChips({ items, note }: { items: string[]; note?: string }) {
@@ -175,6 +191,56 @@ export default function Home() {
               </div>
               <ExamChips items={["学科30問", "45分", "70%で合格"]} />
             </Link>
+          </div>
+        </Section>
+
+        <Section icon="🧑‍💻" title="AI Engineer" hint={`Git · Supabase · Vercel · Web · AI — ${devQuestions.length} questions · ${devTerms.length} terms (English)`}>
+          <div lang="en" className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {devFields.map((f) => (
+              <div
+                key={f.id}
+                className="flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-3"
+              >
+                <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                  <span className="text-xl" aria-hidden>{f.icon}</span>
+                  <div className="min-w-0">
+                    <h3 className="truncate text-sm font-bold leading-tight">{f.title}</h3>
+                    <p className="truncate text-xs text-[var(--muted)]" title={f.hint}>{f.hint}</p>
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-1.5">
+                  <Link
+                    href={`/quiz?exam=dev&field=${f.id}`}
+                    className={`inline-flex min-h-10 items-center rounded-lg px-3 text-xs font-medium text-white transition-opacity hover:opacity-90 ${f.color}`}
+                  >
+                    Quiz {f.questions}
+                  </Link>
+                  <Link
+                    href={`/study?exam=dev&category=${f.id}`}
+                    className="inline-flex min-h-10 items-center rounded-lg border border-[var(--card-border)] px-3 text-xs font-medium transition-colors hover:bg-[var(--card-hover)]"
+                  >
+                    Study
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div lang="en" className="mt-3 flex flex-wrap gap-2">
+            {[
+              { href: "/quiz?exam=dev&field=all", icon: "✏️", label: "All-fields quiz" },
+              { href: "/scroll?exam=dev", icon: "🌀", label: "Term feed" },
+              { href: "/glossary?exam=dev", icon: "📖", label: "Glossary" },
+              { href: "/games/drills/gitcmd?exam=dev", icon: "🌿", label: "Git commands" },
+              { href: "/games/flashcards?exam=dev", icon: "🃏", label: "Flashcards" },
+            ].map((a) => (
+              <Link
+                key={a.href}
+                href={a.href}
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[var(--card-border)] bg-[var(--background)] px-3.5 text-sm font-medium transition-colors hover:bg-[var(--card-hover)]"
+              >
+                <span aria-hidden>{a.icon}</span> {a.label}
+              </Link>
+            ))}
           </div>
         </Section>
 

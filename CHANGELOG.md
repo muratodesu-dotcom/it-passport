@@ -6,6 +6,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ## [1.1.0] - 2026-11-15
 
 ### Added
+- A third track, **AI Engineer**, written in English, for the engineering around building AI apps, in five fields: Git & GitHub, Supabase & DB, Vercel, Web & HTTP, and AI & LLMs.
+  - 100 quiz questions (20 per field) with explanations.
+  - 170 glossary terms, including Vercel's current platform (Fluid Compute, Instant Rollback, Skew Protection, Global Config, AI Gateway).
+  - Study mode with tips per field, the term feed, glossary, matching, flashcards, the speed challenge and term drills all work for the track.
+  - A Git command drill (pick the command for the situation) and an acronym drill.
+  - A home screen section with each field's quiz and study buttons.
+- Commands written in backticks show as inline code in quizzes, study, results and drills.
 - Speed challenge keeps your best score for each exam and field on this device, and tells you when you beat it.
 - An update button appears when a new version is ready during a quiz, study session or game; other screens update quietly in the background.
 - Settings shows the app version.
@@ -13,6 +20,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - App icons for the home screen on iPhone and Android.
 
 ### Changed
+- History shows a separate breakdown for the AI Engineer fields, and practice results remember which field was practised (also for 知財3級).
 - Home screen is more compact: title, the two main actions and the exam rules as short tags, so the whole menu fits on one desktop screen.
 - Buttons, tags and cards across the app use flat colours and calmer hover effects.
 - A saved OpenAI API key is shown only by its last four characters, with Change and Delete buttons.

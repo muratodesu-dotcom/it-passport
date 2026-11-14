@@ -3,30 +3,22 @@
 import Link from "@/components/SiteLink";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getTermsByExam, TermPair } from "@/data/terms";
-import { ExamType, examShortLabels, ipFieldLabels } from "@/lib/types";
+import { ExamType, examShortLabels } from "@/lib/types";
+import { fieldOptions, itemField } from "@/lib/examFields";
+import { parseExam } from "@/lib/examFields";
 import { getKnownTerms, getTermBookmarks } from "@/lib/termProgress";
 import TermFeed from "@/components/TermFeed";
 
 type FieldFilter = "all" | string;
 type Source = "all" | "bookmarked";
 
-const itFilters: { id: FieldFilter; label: string }[] = [
-  { id: "all", label: "すべて" },
-  { id: "strategy", label: "ストラテジ系" },
-  { id: "management", label: "マネジメント系" },
-  { id: "technology", label: "テクノロジ系" },
-];
-
-const chizaiFilters: { id: FieldFilter; label: string }[] = [
-  { id: "all", label: "すべて" },
-  { id: "patent", label: ipFieldLabels.patent },
-  { id: "design-trademark", label: ipFieldLabels["design-trademark"] },
-  { id: "copyright", label: ipFieldLabels.copyright },
-  { id: "other", label: ipFieldLabels.other },
-];
+// Field filters for the selected exam, with "すべて" in place of "全分野".
+function filtersFor(exam: ExamType): { id: FieldFilter; label: string }[] {
+  return fieldOptions(exam).map((o) => (o.id === "all" && exam !== "dev" ? { id: "all", label: "すべて" } : o));
+}
 
 function groupKey(exam: ExamType, t: TermPair): string {
-  return exam === "chizai" ? t.ipField ?? "other" : t.category;
+  return itemField(exam, t);
 }
 
 // Small reusable toggle switch (matches the self-test toggle styling).
@@ -67,6 +59,11 @@ function Toggle({
 
 export default function ScrollPage() {
   const [exam, setExam] = useState<ExamType>("it-passport");
+  // Links such as /glossary?exam=dev open on that track.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("exam");
+    if (requested) setExam(parseExam(requested));
+  }, []);
   const [filter, setFilter] = useState<FieldFilter>("all");
   const [query, setQuery] = useState("");
   const [revealMode, setRevealMode] = useState(false);
@@ -94,7 +91,7 @@ export default function ScrollPage() {
 
   const normalizedQuery = query.trim().toLowerCase();
   const baseTerms = useMemo(() => getTermsByExam(exam), [exam]);
-  const filters = exam === "chizai" ? chizaiFilters : itFilters;
+  const filters = filtersFor(exam);
 
   const filtered = useMemo(() => {
     return baseTerms.filter((t) => {
@@ -136,7 +133,7 @@ export default function ScrollPage() {
 
       <div className="mb-5 rounded-2xl border border-[var(--card-border)] bg-[var(--card)] p-5 shadow-sm">
         <div className="mb-4 flex gap-2">
-          {(["it-passport", "chizai"] as const).map((e) => (
+          {(["it-passport", "chizai", "dev"] as const).map((e) => (
             <button
               key={e}
               type="button"

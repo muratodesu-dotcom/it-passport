@@ -6,12 +6,14 @@ import Link from "@/components/SiteLink";
 import { clearHistory, getBookmarks, getHistory, getStreak, getWrongQuestionIds } from "@/lib/history";
 import { analyzeHistory, HistoryAnalytics } from "@/lib/analytics";
 import { QuizResult, categoryLabels, Category, examShortLabels } from "@/lib/types";
+import { fieldLabel } from "@/lib/examFields";
 import ScoreTrend from "@/components/ScoreTrend";
 
 const emptyAnalytics: HistoryAnalytics = {
   trend: [],
   categoryAccuracy: [],
   ipFieldAccuracy: [],
+  devFieldAccuracy: [],
   totalAnswered: 0,
   totalCorrect: 0,
   weakest: null,
@@ -48,7 +50,7 @@ export default function HistoryPage() {
   const allTimeAccuracy = analytics.totalAnswered > 0
     ? Math.round((analytics.totalCorrect / analytics.totalAnswered) * 100)
     : 0;
-  const domainBreakdown = [...analytics.categoryAccuracy, ...analytics.ipFieldAccuracy];
+  const domainBreakdown = [...analytics.categoryAccuracy, ...analytics.ipFieldAccuracy, ...analytics.devFieldAccuracy];
 
   const bestScore = history.length > 0
     ? Math.max(...history.map((h) => h.percentage))
@@ -194,7 +196,9 @@ export default function HistoryPage() {
               {history.map((result) => {
                 const catLabel = result.mode === "exam" && result.examType
                   ? examShortLabels[result.examType]
-                  : result.category === "all"
+                  : result.examType && result.examType !== "it-passport"
+                    ? `${examShortLabels[result.examType]} · ${result.category === "all" ? "全分野" : fieldLabel(result.examType, result.category)}`
+                    : result.category === "all"
                     ? "全分野"
                     : categoryLabels[result.category as Category] || result.category;
                 const date = new Date(result.date);

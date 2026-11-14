@@ -2,6 +2,8 @@ import { questions as allQuestions } from "@/data/questions";
 import {
   Category,
   categoryLabels,
+  DevField,
+  devFieldLabels,
   IpField,
   ipFieldLabels,
   QuizMode,
@@ -33,6 +35,8 @@ export interface HistoryAnalytics {
   trend: TrendPoint[];
   categoryAccuracy: DomainAccuracy[];
   ipFieldAccuracy: DomainAccuracy[];
+  // AIエンジニア track fields (Git・Supabase・Web・AI).
+  devFieldAccuracy: DomainAccuracy[];
   totalAnswered: number;
   totalCorrect: number;
   weakest: DomainAccuracy | null;
@@ -43,11 +47,12 @@ export interface HistoryAnalytics {
 interface DomainMeta {
   category: Category;
   ipField?: IpField;
+  devField?: DevField;
 }
 
 // id -> { category, ipField } lookup, built once per module load.
 const questionMeta = new Map<number, DomainMeta>(
-  allQuestions.map((q) => [q.id, { category: q.category, ipField: q.ipField }])
+  allQuestions.map((q) => [q.id, { category: q.category, ipField: q.ipField, devField: q.devField }])
 );
 
 interface Bucket {
@@ -77,6 +82,7 @@ export function analyzeHistory(history: QuizResult[]): HistoryAnalytics {
   const trend: TrendPoint[] = [];
   const categoryBuckets = new Map<string, Bucket>();
   const ipFieldBuckets = new Map<string, Bucket>();
+  const devFieldBuckets = new Map<string, Bucket>();
   let totalAnswered = 0;
   let totalCorrect = 0;
   let practiceCount = 0;
@@ -102,6 +108,16 @@ export function analyzeHistory(history: QuizResult[]): HistoryAnalytics {
       if (!meta) continue;
       totalAnswered++;
       if (outcome.isCorrect) totalCorrect++;
+
+      // AIエンジニア questions get their own breakdown and stay out of the
+      // ITパスポート categories (they are stored as "technology").
+      if (meta.devField) {
+        const dev = devFieldBuckets.get(meta.devField) ?? { correct: 0, total: 0 };
+        dev.total++;
+        if (outcome.isCorrect) dev.correct++;
+        devFieldBuckets.set(meta.devField, dev);
+        continue;
+      }
 
       const cat = categoryBuckets.get(meta.category) ?? { correct: 0, total: 0 };
       cat.total++;
@@ -129,8 +145,14 @@ export function analyzeHistory(history: QuizResult[]): HistoryAnalytics {
     () => `mode=exam&exam=chizai`
   );
 
-  // Weakest area across both breakdowns, ignoring thinly-sampled domains.
-  const weakest = [...categoryAccuracy, ...ipFieldAccuracy]
+  const devFieldAccuracy = toAccuracy(
+    devFieldBuckets,
+    (key) => devFieldLabels[key as DevField] ?? key,
+    (key) => `exam=dev&field=${key}`
+  );
+
+  // Weakest area across all breakdowns, ignoring thinly-sampled domains.
+  const weakest = [...categoryAccuracy, ...ipFieldAccuracy, ...devFieldAccuracy]
     .filter((d) => d.total >= WEAKEST_MIN_ANSWERS)
     .reduce<DomainAccuracy | null>((min, d) => {
       if (!min || d.percentage < min.percentage) return d;
@@ -141,6 +163,7 @@ export function analyzeHistory(history: QuizResult[]): HistoryAnalytics {
     trend,
     categoryAccuracy,
     ipFieldAccuracy,
+    devFieldAccuracy,
     totalAnswered,
     totalCorrect,
     weakest,

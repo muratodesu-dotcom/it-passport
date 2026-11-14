@@ -2,15 +2,18 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { DrillQuestion } from "@/lib/drills";
+import type { ExamType } from "@/lib/types";
 import TermExplanationEn from "@/components/TermExplanationEn";
+import CodeText from "@/components/CodeText";
 
 interface DrillRunnerProps {
   questions: DrillQuestion[];
+  exam?: ExamType;
   onRestart: () => void;
   onComplete?: (result: { correct: string[]; wrong: string[] }) => void;
 }
 
-export default function DrillRunner({ questions, onRestart, onComplete }: DrillRunnerProps) {
+export default function DrillRunner({ questions, exam, onRestart, onComplete }: DrillRunnerProps) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -143,7 +146,7 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
               <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--badge-bg)] text-sm font-medium">
                 {i + 1}
               </span>
-              <span className="flex-1 leading-relaxed">{opt}</span>
+              <span className="flex-1 leading-relaxed"><CodeText text={opt} /></span>
             </button>
           );
         })}
@@ -151,8 +154,8 @@ export default function DrillRunner({ questions, onRestart, onComplete }: DrillR
 
       {revealed && current.explanation && (
         <div className="rounded-xl border border-[var(--card-border)] bg-[var(--badge-bg)] p-4 mb-5 text-sm leading-relaxed fade-in">
-          {current.explanation}
-          <TermExplanationEn term={current.termKey} />
+          <CodeText text={current.explanation} />
+          <TermExplanationEn term={current.termKey} exam={exam} />
         </div>
       )}
 

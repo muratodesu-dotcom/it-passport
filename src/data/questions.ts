@@ -1,4 +1,7 @@
 import { ExamType, Question } from "@/lib/types";
+import { devQuestionsGitDb } from "./devQuestionsGitDb";
+import { devQuestionsWebAi } from "./devQuestionsWebAi";
+import { devQuestionsVercel } from "./devQuestionsVercel";
 
 export const questions: Question[] = [
   // ===== ストラテジ系 (Strategy) =====
@@ -6627,6 +6630,10 @@ export const questions: Question[] = [
     ipField: "other",
   },
 
+  // ===== AI Engineer track (English) =====
+  ...devQuestionsGitDb,
+  ...devQuestionsWebAi,
+  ...devQuestionsVercel,
 ];
 
 function effectiveExams(q: Question): ExamType[] {
@@ -6641,11 +6648,22 @@ export function getQuestionsByExam(exam: ExamType): Question[] {
 export const itPassportQuestions = getQuestionsByExam("it-passport");
 // 知財3級の収録問題（ITパスポートと共通の知財問題を含む）。
 export const chizaiQuestions = getQuestionsByExam("chizai");
+// AI Engineer track questions (Git, Supabase, Vercel, web, AI), in English.
+export const devQuestions = getQuestionsByExam("dev");
 
 // 分野別の練習・学習はITパスポート向けの導線なので、知財3級専用問題は除外する。
 export function getQuestionsByCategory(category: string): Question[] {
   if (category === "all") return itPassportQuestions;
   return itPassportQuestions.filter((q) => q.category === category);
+}
+
+// 分野別練習用（知財3級・AIエンジニア）。fieldは "all" または各試験の分野キー。
+export function getQuestionsByExamField(exam: ExamType, field: string): Question[] {
+  if (exam === "chizai") return getChizaiQuestionsByField(field);
+  const pool = getQuestionsByExam(exam);
+  if (field === "all") return pool;
+  if (exam === "dev") return pool.filter((q) => (q.devField ?? "web") === field);
+  return pool.filter((q) => q.category === field);
 }
 
 // 知財3級の分野別練習用。fieldは "all" または IpField。

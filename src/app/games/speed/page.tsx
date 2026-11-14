@@ -7,6 +7,7 @@ import { getQuestionsByExam, withShuffledOptions } from "@/data/questions";
 import { Question, examShortLabels } from "@/lib/types";
 import { safeGet, safeSet } from "@/lib/storage";
 import { FieldId, fieldOptions, itemField, parseExam } from "@/lib/examFields";
+import CodeText from "@/components/CodeText";
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -256,7 +257,7 @@ function SpeedChallenge() {
             "border-[var(--card-border)] bg-[var(--card)]"
           }`}>
             <p className="text-base font-medium leading-relaxed mb-4">
-              {current.question}
+              <CodeText text={current.question} />
             </p>
 
             <div className="grid gap-2">
@@ -276,7 +277,7 @@ function SpeedChallenge() {
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--badge-bg)] flex items-center justify-center text-xs font-bold">
                       {i + 1}
                     </span>
-                    {opt}
+                    <CodeText text={opt} />
                   </span>
                 </button>
               ))}

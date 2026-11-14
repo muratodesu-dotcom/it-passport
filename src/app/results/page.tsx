@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "@/components/SiteLink";
 import { questions as allQuestions, withShuffledOptions } from "@/data/questions";
-import { categoryLabels, Category, examLabels, ipFieldLabels, IpField, Question, QuestionOutcome } from "@/lib/types";
+import { categoryLabels, Category, examLabels, examShortLabels, Question, QuestionOutcome } from "@/lib/types";
+import { fieldLabel } from "@/lib/examFields";
 import {
   buildGradeItems,
   DomainResult,
@@ -18,6 +19,7 @@ import { isBookmarked, saveResult, toggleBookmark } from "@/lib/history";
 import { recordOutcomes } from "@/lib/srs";
 import { clearQuizSession, loadQuizSession, QuizSessionPayload } from "@/lib/quizSession";
 import ScoreRing from "@/components/ScoreRing";
+import CodeText from "@/components/CodeText";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -119,7 +121,11 @@ export default function ResultsPage() {
     saveResult({
       id: Date.now().toString(),
       date: new Date().toISOString(),
-      category: session.category,
+      // 知財3級・AIエンジニアの分野別練習では、選んだ分野を記録する。
+      category:
+        session.examType && session.examType !== "it-passport" && session.source === "category"
+          ? session.field ?? "all"
+          : session.category,
       score: correctCount,
       total,
       percentage,
@@ -167,10 +173,10 @@ export default function ResultsPage() {
       ? "間違えた問題のみ"
       : session.source === "bookmarks"
         ? "ブックマーク"
-        : session.examType === "chizai"
+        : session.examType && session.examType !== "it-passport"
           ? session.field && session.field !== "all"
-            ? `知財3級 · ${ipFieldLabels[session.field as IpField] ?? session.field}`
-            : "知財3級 全分野"
+            ? `${examShortLabels[session.examType]} · ${fieldLabel(session.examType, session.field)}`
+            : `${examShortLabels[session.examType]} ${session.examType === "dev" ? "· All fields" : "全分野"}`
           : session.category === "all"
             ? "全分野"
             : categoryLabels[session.category as Category] || session.category;
@@ -301,7 +307,7 @@ export default function ResultsPage() {
                   <span className="mt-0.5">{correct ? "⭕" : "❌"}</span>
                   <div className="flex-1 text-sm">
                     <p className="font-medium mb-1">
-                      問{i + 1}: {q.question}
+                      問{i + 1}: <CodeText text={q.question} />
                     </p>
                     {!correct && (
                       <p className="text-[var(--muted)]">
@@ -333,8 +339,8 @@ export default function ResultsPage() {
               params.set("exam", session.examType ?? "it-passport");
             } else if (session.source !== "category") {
               params.set("source", session.source);
-            } else if (session.examType === "chizai") {
-              params.set("exam", "chizai");
+            } else if (session.examType && session.examType !== "it-passport") {
+              params.set("exam", session.examType);
               params.set("field", session.field ?? "all");
             } else {
               params.set("category", session.category);

@@ -1,4 +1,5 @@
 import { explanationEnFor } from "@/data/explanationsEn";
+import CodeText from "@/components/CodeText";
 
 // Renders the English explanation for a question beneath the Japanese one.
 // Returns null when no English text exists yet, so it is safe to drop in
@@ -11,7 +12,7 @@ export default function ExplanationEn({ id }: { id: number }) {
       <span className="mr-1.5 inline-block rounded bg-[var(--badge-bg)] px-1.5 py-0.5 text-[10px] font-semibold align-[1px]">
         EN
       </span>
-      {en}
+      <CodeText text={en} />
     </p>
   );
 }

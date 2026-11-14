@@ -3,15 +3,18 @@ import { ExamType, examShortLabels } from "@/lib/types";
 import { drillList } from "@/lib/drills";
 import { chizaiDrillList } from "@/data/chizaiDrills";
 import { itPassportDrillList } from "@/data/itDrills";
+import { devDrillList } from "@/data/devDrills";
 
 const specializedDrills: Record<ExamType, typeof drillList> = {
   "it-passport": itPassportDrillList,
   chizai: chizaiDrillList,
+  dev: devDrillList,
 };
 
 const specializedLabel: Record<ExamType, string> = {
   "it-passport": "ITパスポート 特化ドリル",
   chizai: "知財3級 特化ドリル",
+  dev: "AIエンジニア 特化ドリル",
 };
 
 const games = [
@@ -44,6 +47,7 @@ const games = [
 const exams: { id: ExamType; accent: string }[] = [
   { id: "it-passport", accent: "bg-blue-600" },
   { id: "chizai", accent: "bg-emerald-600" },
+  { id: "dev", accent: "bg-orange-600" },
 ];
 
 export default function GamesHub() {
@@ -57,7 +61,7 @@ export default function GamesHub() {
           ゲームモード
         </h1>
         <p className="text-[var(--muted)] max-w-lg mx-auto">
-          ITパスポートと知財3級、それぞれの用語をゲーム感覚で身につけよう。
+          ITパスポート・知財3級・AIエンジニア、それぞれの用語をゲーム感覚で身につけよう。
         </p>
       </header>
 
@@ -98,7 +102,7 @@ export default function GamesHub() {
 
             <p className="mt-5 mb-3 text-sm font-semibold text-[var(--muted)]">用語ドリル</p>
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {drillList.map((drill) => (
+              {drillList.filter((d) => exam.id !== "dev" || d.kind !== "en-jp").map((drill) => (
                 <Link
                   key={`${exam.id}-${drill.kind}`}
                   href={`/games/drills/${drill.kind}?exam=${exam.id}`}
@@ -113,6 +117,8 @@ export default function GamesHub() {
               ))}
             </div>
 
+            {specializedDrills[exam.id].length > 0 && (
+            <>
             <p className="mt-5 mb-3 text-sm font-semibold text-[var(--muted)]">{specializedLabel[exam.id]}</p>
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
               {specializedDrills[exam.id].map((drill) => (
@@ -129,6 +135,8 @@ export default function GamesHub() {
                 </Link>
               ))}
             </div>
+            </>
+            )}
           </section>
         ))}
       </div>

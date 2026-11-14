@@ -21,8 +21,9 @@ import {
 } from "@/lib/drills";
 import { chizaiDrillMap, curatedQuestionSets, flowSets } from "@/data/chizaiDrills";
 import { itCuratedSets, itPassportDrillMap } from "@/data/itDrills";
+import { devCuratedSets, devDrillMap } from "@/data/devDrills";
 
-const curatedSets: Record<string, DrillQuestion[]> = { ...curatedQuestionSets, ...itCuratedSets };
+const curatedSets: Record<string, DrillQuestion[]> = { ...curatedQuestionSets, ...itCuratedSets, ...devCuratedSets };
 import { addMissedTerms, getMissedTerms, removeMissedTerms } from "@/lib/history";
 import DrillRunner from "@/components/DrillRunner";
 import OrderRunner from "@/components/OrderRunner";
@@ -74,7 +75,7 @@ function DrillContent() {
   const searchParams = useSearchParams();
   const kind = (Array.isArray(params.kind) ? params.kind[0] : params.kind) as DrillKind;
   const exam = parseExam(searchParams.get("exam"));
-  const def = drillMap[kind] ?? chizaiDrillMap[kind] ?? itPassportDrillMap[kind];
+  const def = drillMap[kind] ?? chizaiDrillMap[kind] ?? itPassportDrillMap[kind] ?? devDrillMap[kind];
 
   const [field, setField] = useState<FieldId>("all");
   const [questions, setQuestions] = useState<DrillQuestion[]>([]);
@@ -159,7 +160,7 @@ function DrillContent() {
           </button>
         </div>
       ) : (
-        <DrillRunner key={nonce} questions={questions} onRestart={regenerate} onComplete={handleComplete} />
+        <DrillRunner key={nonce} questions={questions} exam={exam} onRestart={regenerate} onComplete={handleComplete} />
       ))}
     </div>
   );

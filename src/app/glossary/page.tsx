@@ -1,44 +1,41 @@
 "use client";
 
 import Link from "@/components/SiteLink";
-import { useMemo, useState } from "react";
-import { getTermsByExam, TermPair } from "@/data/terms";
-import { Category, categoryLabels, ExamType, examShortLabels, IpField, ipFieldLabels } from "@/lib/types";
+import { useEffect, useMemo, useState } from "react";
+import { getTermsByExam, sameName, TermPair } from "@/data/terms";
+import { ExamType, examShortLabels } from "@/lib/types";
+import { fieldLabel, fieldOptions, itemField } from "@/lib/examFields";
+import { parseExam } from "@/lib/examFields";
 import Furigana from "@/components/Furigana";
 
 type FieldFilter = "all" | string;
 
-const itFilters: { id: FieldFilter; label: string }[] = [
-  { id: "all", label: "すべて" },
-  { id: "strategy", label: "ストラテジ系" },
-  { id: "management", label: "マネジメント系" },
-  { id: "technology", label: "テクノロジ系" },
-];
-
-const chizaiFilters: { id: FieldFilter; label: string }[] = [
-  { id: "all", label: "すべて" },
-  { id: "patent", label: ipFieldLabels.patent },
-  { id: "design-trademark", label: ipFieldLabels["design-trademark"] },
-  { id: "copyright", label: ipFieldLabels.copyright },
-  { id: "other", label: ipFieldLabels.other },
-];
+// Field filters for the selected exam, with "すべて" in place of "全分野".
+function filtersFor(exam: ExamType): { id: FieldFilter; label: string }[] {
+  return fieldOptions(exam).map((o) => (o.id === "all" && exam !== "dev" ? { id: "all", label: "すべて" } : o));
+}
 
 function groupKey(exam: ExamType, t: TermPair): string {
-  return exam === "chizai" ? t.ipField ?? "other" : t.category;
+  return itemField(exam, t);
 }
 
 function groupLabel(exam: ExamType, key: string): string {
-  return exam === "chizai" ? ipFieldLabels[key as IpField] ?? key : categoryLabels[key as Category] ?? key;
+  return fieldLabel(exam, key);
 }
 
 export default function GlossaryPage() {
   const [exam, setExam] = useState<ExamType>("it-passport");
+  // Links such as /glossary?exam=dev open on that track.
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("exam");
+    if (requested) setExam(parseExam(requested));
+  }, []);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FieldFilter>("all");
 
   const normalizedQuery = query.trim().toLowerCase();
   const baseTerms = useMemo(() => getTermsByExam(exam), [exam]);
-  const filters = exam === "chizai" ? chizaiFilters : itFilters;
+  const filters = filtersFor(exam);
 
   const filtered = useMemo(() => {
     return baseTerms.filter((t) => {
@@ -83,7 +80,7 @@ export default function GlossaryPage() {
       </div>
 
       <div className="mb-6 flex gap-2">
-        {(["it-passport", "chizai"] as const).map((e) => (
+        {(["it-passport", "chizai", "dev"] as const).map((e) => (
           <button
             key={e}
             type="button"
@@ -139,7 +136,7 @@ export default function GlossaryPage() {
                   >
                     <div className="mb-1 flex items-baseline justify-between gap-2">
                       <Furigana term={t.term} className="font-semibold" />
-                      <span className="text-[10px] text-[var(--muted)]">{t.english}</span>
+                      {!sameName(t.term, t.english) && <span className="text-[10px] text-[var(--muted)]">{t.english}</span>}
                     </div>
                     <p className="text-sm leading-relaxed text-[var(--muted)]">{t.description}</p>
                   </div>

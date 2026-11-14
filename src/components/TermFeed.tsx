@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { TermPair } from "@/data/terms";
-import { Category, categoryLabels, ExamType, IpField, ipFieldLabels } from "@/lib/types";
+import { sameName, TermPair } from "@/data/terms";
+import { Category, categoryLabels, DevField, ExamType, IpField } from "@/lib/types";
+import { fieldLabel, itemField } from "@/lib/examFields";
 import Furigana from "@/components/Furigana";
 import TermExplanationEn from "@/components/TermExplanationEn";
 import {
@@ -29,12 +30,22 @@ const accentByIpField: Record<IpField, string> = {
   other: "bg-teal-700",
 };
 
+const accentByDevField: Record<DevField, string> = {
+  git: "bg-orange-700",
+  database: "bg-emerald-700",
+  vercel: "bg-neutral-800",
+  web: "bg-sky-700",
+  ai: "bg-violet-600",
+};
+
 function badgeLabel(exam: ExamType, t: TermPair): string {
-  return exam === "chizai" ? ipFieldLabels[t.ipField ?? "other"] : categoryLabels[t.category];
+  return fieldLabel(exam, itemField(exam, t));
 }
 
 function accentFor(exam: ExamType, t: TermPair): string {
-  return exam === "chizai" ? accentByIpField[t.ipField ?? "other"] : accentByCategory[t.category];
+  if (exam === "chizai") return accentByIpField[t.ipField ?? "other"];
+  if (exam === "dev") return accentByDevField[t.devField ?? "web"];
+  return accentByCategory[t.category];
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -333,7 +344,7 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
           <h2 className="text-2xl font-bold leading-snug sm:text-3xl">
             <Furigana term={t.term} />
           </h2>
-          <p className="mt-1 text-sm text-[var(--muted)]">{t.english}</p>
+          {!sameName(t.term, t.english) && <p className="mt-1 text-sm text-[var(--muted)]">{t.english}</p>}
 
           <div className="mt-5 flex-1">
             {isRevealed ? (
@@ -341,7 +352,7 @@ export default function TermFeed({ terms, exam, revealMode, weakFirst = false, o
                 <p className="text-[15px] leading-relaxed text-[var(--foreground)] sm:text-base">
                   {t.description}
                 </p>
-                <TermExplanationEn term={t.term} />
+                <TermExplanationEn term={t.term} exam={exam} />
                 {revealMode && (
                   <p className="mt-3 text-center text-xs text-[var(--muted)]">タップで隠す</p>
                 )}
