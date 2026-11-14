@@ -4,7 +4,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState, useEffect, useCallback, Suspense, useMemo } from "react";
 import { getQuestionsByCategory, getQuestionsByExam, getQuestionsByExamField, shuffleQuestions, withShuffledOptions, questions as allQuestions } from "@/data/questions";
 import { Question, categoryLabels, Category, QuizMode, ExamType, examShortLabels, devFieldLabels } from "@/lib/types";
-import { fieldLabel, hasExamMode, parseExam } from "@/lib/examFields";
+import { fieldLabel, hasExamMode, itemField, parseExam } from "@/lib/examFields";
+import { fieldStyle } from "@/lib/fieldColors";
 import { examRules } from "@/lib/scoring";
 import { getBookmarks, getWrongQuestionIds, isBookmarked, toggleBookmark } from "@/lib/history";
 import { getDueQuestionIds } from "@/lib/srs";
@@ -58,6 +59,8 @@ function QuizContent() {
   const [elapsed, setElapsed] = useState(0);
   const [bookmarkTick, setBookmarkTick] = useState(0);
   const [emptyPool, setEmptyPool] = useState(false);
+  // Consecutive correct answers in this session (reset on a wrong answer).
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     let pool: Question[];
@@ -82,6 +85,7 @@ function QuizContent() {
     setAnswers(new Array(pool.length).fill(null));
     setStartTime(nextStartTime);
     setElapsed(0);
+    setStreak(0);
   }, [category, mode, source, examType, field]);
 
   useEffect(() => {
@@ -125,8 +129,11 @@ function QuizContent() {
         next[currentIndex] = index;
         return next;
       });
+      if (currentQuestion) {
+        setStreak((s) => (index === currentQuestion.correctIndex ? s + 1 : 0));
+      }
     },
-    [showExplanation, currentIndex]
+    [showExplanation, currentIndex, currentQuestion]
   );
 
   const handleNext = useCallback(() => {
@@ -224,6 +231,13 @@ function QuizContent() {
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
   const isCorrect = selectedAnswer === currentQuestion.correctIndex;
+  const { color: fieldColor, icon: fieldIcon } = fieldStyle(itemField(examType, currentQuestion));
+  // Quiz limited to a single field/category (practice by field only).
+  const scopedToField =
+    mode === "practice" &&
+    source === "category" &&
+    (examType !== "it-passport" ? field !== "all" : category !== "all");
+  const showAnswerBar = mode === "practice" && showExplanation;
   const headerLabel = source === "wrong"
     ? "間違えた問題のみ"
     : source === "bookmarks"
@@ -246,7 +260,7 @@ function QuizContent() {
   const answeredCount = answers.filter((a) => a !== null).length;
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className={`max-w-2xl mx-auto px-4 py-8 ${showAnswerBar ? "pb-24" : ""}`}>
       <div className="flex items-center justify-between gap-2 mb-6">
         <button
           onClick={() => router.push("/")}
@@ -258,7 +272,10 @@ function QuizContent() {
           {mode === "exam" ? `${examShortLabels[examType]} 本番試験モード` : headerLabel}
         </span>
         <div className="shrink-0 text-right">
-          <span className="text-sm font-medium block tabular-nums">
+          <span
+            className={scopedToField ? "inline-block rounded-full px-2 py-0.5 text-sm font-bold tabular-nums" : "text-sm font-medium block tabular-nums"}
+            style={scopedToField ? { backgroundColor: `${fieldColor}1f`, color: fieldColor } : undefined}
+          >
             {currentIndex + 1} / {questions.length}
           </span>
           {timeLeft !== null ? (
@@ -273,17 +290,33 @@ function QuizContent() {
         </div>
       </div>
 
-      <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full mb-8">
+      <div className="w-full h-2 bg-[var(--progress-bg)] rounded-full">
         <div
           className="h-full rounded-full transition-[width] duration-500"
-          style={{ backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${progress}%` }}
+          style={
+            scopedToField
+              ? { backgroundColor: fieldColor, width: `${progress}%` }
+              : { backgroundImage: `linear-gradient(to right, var(--gradient-progress-from), var(--gradient-progress-to))`, width: `${progress}%` }
+          }
         />
+      </div>
+      {/* Fixed-height row so the streak chip appearing doesn't move the card. */}
+      <div className="mb-4 mt-1.5 flex h-6 items-center justify-end">
+        {streak >= 2 && (
+          <span className="rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-bold text-orange-700 tabular-nums dark:bg-orange-400/15 dark:text-orange-300">
+            {en ? `🔥 ${streak} in a row` : `🔥 ${streak}連続`}
+          </span>
+        )}
       </div>
 
       <div className="bg-[var(--card)] rounded-xl border border-[var(--card-border)] p-6 mb-6 shadow-sm fade-in" key={currentIndex}>
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs px-2 py-1 rounded-full bg-[var(--badge-bg)] text-[var(--muted)]">
+            <span
+              className="text-xs font-medium px-2 py-1 rounded-full text-white"
+              style={{ backgroundColor: fieldColor }}
+            >
+              {fieldIcon}{" "}
               {currentQuestion.devField ? devFieldLabels[currentQuestion.devField] : categoryLabels[currentQuestion.category]}
             </span>
             <span className="text-xs text-[var(--muted)]">
@@ -365,14 +398,29 @@ function QuizContent() {
         </div>
       )}
 
-      {mode === "practice" && showExplanation && (
-        <button
-          onClick={handleNext}
-          className="w-full py-3 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-[var(--on-primary)] font-medium rounded-xl transition-colors fade-in"
+      {showAnswerBar && (
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--card-border)] px-4 pt-3 backdrop-blur"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--card) 95%, transparent)",
+            paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))",
+          }}
         >
-          {currentIndex < questions.length - 1 ? (en ? "Next question →" : "次の問題へ →") : (en ? "See results →" : "結果を見る →")}
-          <span className="text-xs opacity-60 ml-2">(Enter)</span>
-        </button>
+          <div className="mx-auto flex max-w-2xl items-center gap-3">
+            <span
+              className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-bold whitespace-nowrap transition-colors ${isCorrect ? "bg-[var(--success-bg)] text-[var(--success)]" : "bg-[var(--danger-bg)] text-[var(--danger)]"}`}
+            >
+              {isCorrect ? (en ? "⭕ Correct" : "⭕ 正解") : (en ? "❌ Incorrect" : "❌ 不正解")}
+            </span>
+            <button
+              onClick={handleNext}
+              className="min-h-12 flex-1 whitespace-nowrap rounded-xl bg-[var(--primary)] px-5 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)] sm:ml-auto sm:flex-none"
+            >
+              {currentIndex < questions.length - 1 ? (en ? "Next question →" : "次の問題へ →") : (en ? "See results →" : "結果を見る →")}
+              <span className="ml-2 hidden text-xs opacity-60 sm:inline">(Enter)</span>
+            </button>
+          </div>
+        </div>
       )}
 
       {mode === "exam" && (

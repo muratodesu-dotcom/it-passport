@@ -3,6 +3,8 @@
 import Link from "@/components/SiteLink";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { NAV_ITEMS, navHref } from "@/components/BottomNav";
+import { TRACK_LINKS, useTrack } from "@/lib/track";
 import {
   THEMES,
   ThemeId,
@@ -13,27 +15,13 @@ import {
   saveThemeId,
 } from "@/lib/theme";
 
-type NavLink = {
-  href: string;
-  label: string;
-  // Used to highlight the active section regardless of query string.
-  match: string;
-};
-
-const NAV_LINKS: NavLink[] = [
-  { href: "/study?category=strategy", label: "学習", match: "/study" },
-  { href: "/scroll", label: "フィード", match: "/scroll" },
-  { href: "/games", label: "ゲーム", match: "/games" },
-  { href: "/glossary", label: "用語集", match: "/glossary" },
-  { href: "/history", label: "履歴", match: "/history" },
-];
-
 export default function SiteHeader() {
   const pathname = usePathname();
+  const track = useTrack();
+  const links = TRACK_LINKS[track];
   const [themeId, setThemeId] = useState<ThemeId>("default");
   const [dark, setDark] = useState(false);
   const [themeOpen, setThemeOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const themeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,9 +32,8 @@ export default function SiteHeader() {
     applyTheme(t, d);
   }, []);
 
-  // Close popovers when navigating between pages.
+  // Close the theme popover when navigating between pages.
   useEffect(() => {
-    setMenuOpen(false);
     setThemeOpen(false);
   }, [pathname]);
 
@@ -59,14 +46,6 @@ export default function SiteHeader() {
     if (themeOpen) document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, [themeOpen]);
-
-  // Prevent body scroll while the mobile drawer is open.
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menuOpen]);
 
   const selectTheme = (id: ThemeId) => {
     setThemeId(id);
@@ -81,8 +60,6 @@ export default function SiteHeader() {
     applyTheme(themeId, next);
   };
 
-  const isActive = (match: string) =>
-    pathname === match || pathname.startsWith(`${match}/`);
 
   const current = THEMES.find((t) => t.id === themeId) ?? THEMES[0];
 
@@ -106,19 +83,21 @@ export default function SiteHeader() {
           <span className="hidden sm:inline">ITパス＆知財3級</span>
         </Link>
 
-        {/* Desktop navigation */}
+        {/* Computer navigation: the same places as the phone tab bar, for the chosen track */}
         <nav className="hidden items-center gap-1 md:flex">
-          {NAV_LINKS.map((link) => (
+          {NAV_ITEMS.filter((item) => item.key !== "home").map((item) => (
             <Link
-              key={link.href}
-              href={link.href}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                isActive(link.match)
+              key={item.key}
+              href={navHref(item.key, links)}
+              aria-current={item.match(pathname) ? "page" : undefined}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                item.match(pathname)
                   ? "bg-[var(--primary-light)] text-[var(--primary)]"
                   : "text-[var(--muted)] hover:bg-[var(--card-hover)] hover:text-[var(--foreground)]"
               }`}
             >
-              {link.label}
+              <span aria-hidden>{item.icon}</span>
+              {item.label}
             </Link>
           ))}
         </nav>
@@ -183,76 +162,16 @@ export default function SiteHeader() {
 
           <Link
             href="/settings"
-            className="hidden h-9 items-center rounded-full border border-[var(--card-border)] bg-[var(--card)] px-3 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--card-hover)] md:inline-flex"
+            aria-label="設定"
+            className="inline-flex h-9 min-w-9 items-center justify-center rounded-full border border-[var(--card-border)] bg-[var(--card)] px-2.5 text-sm font-medium text-[var(--foreground)] transition-colors hover:bg-[var(--card-hover)]"
           >
-            設定
+            <span aria-hidden className="md:hidden">⚙️</span>
+            <span className="hidden md:inline">設定</span>
           </Link>
 
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-label="メニューを開く"
-            aria-expanded={menuOpen}
-            className="grid h-9 w-9 place-items-center rounded-full border border-[var(--card-border)] bg-[var(--card)] transition-colors hover:bg-[var(--card-hover)] md:hidden"
-          >
-            <span className="relative block h-3.5 w-4">
-              <span
-                className={`absolute left-0 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-[top,transform,opacity] ${
-                  menuOpen ? "top-1.5 rotate-45" : "top-0"
-                }`}
-              />
-              <span
-                className={`absolute left-0 top-1.5 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-[top,transform,opacity] ${
-                  menuOpen ? "opacity-0" : "opacity-100"
-                }`}
-              />
-              <span
-                className={`absolute left-0 block h-0.5 w-4 rounded bg-[var(--foreground)] transition-[top,transform,opacity] ${
-                  menuOpen ? "top-1.5 -rotate-45" : "top-3"
-                }`}
-              />
-            </span>
-          </button>
         </div>
       </div>
 
-      {/* Mobile drawer */}
-      {menuOpen && (
-        <>
-          <button
-            aria-label="メニューを閉じる"
-            onClick={() => setMenuOpen(false)}
-            className="fixed inset-0 top-14 z-30 bg-black/40 md:hidden"
-          />
-          <nav className="fade-in absolute inset-x-0 top-14 z-40 border-b border-[var(--card-border)] bg-[var(--card)] p-3 shadow-xl md:hidden">
-            <div className="grid gap-1">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`rounded-xl px-4 py-3 text-base font-medium transition-colors ${
-                    isActive(link.match)
-                      ? "bg-[var(--primary-light)] text-[var(--primary)]"
-                      : "text-[var(--foreground)] hover:bg-[var(--card-hover)]"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <Link
-                href="/settings"
-                className={`rounded-xl px-4 py-3 text-base font-medium transition-colors ${
-                  isActive("/settings")
-                    ? "bg-[var(--primary-light)] text-[var(--primary)]"
-                    : "text-[var(--foreground)] hover:bg-[var(--card-hover)]"
-                }`}
-              >
-                設定
-              </Link>
-            </div>
-          </nav>
-        </>
-      )}
     </header>
   );
 }

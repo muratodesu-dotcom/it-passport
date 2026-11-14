@@ -91,7 +91,7 @@ export default function ServiceWorkerRegistrar() {
     <button
       type="button"
       onClick={() => window.location.reload()}
-      className="fade-in fixed bottom-4 left-1/2 z-50 inline-flex min-h-11 -translate-x-1/2 items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card)] px-4 text-sm font-medium text-[var(--foreground)] shadow-lg transition-colors hover:bg-[var(--card-hover)]"
+      className="fade-in fixed bottom-24 left-1/2 z-50 md:bottom-4 inline-flex min-h-11 -translate-x-1/2 items-center gap-2 rounded-full border border-[var(--card-border)] bg-[var(--card)] px-4 text-sm font-medium text-[var(--foreground)] shadow-lg transition-colors hover:bg-[var(--card-hover)]"
       style={{ marginBottom: "env(safe-area-inset-bottom)" }}
     >
       <svg className="h-4 w-4 text-[var(--primary)]" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>

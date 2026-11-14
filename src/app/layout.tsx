@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import SiteHeader from "@/components/SiteHeader";
 import ServiceWorkerRegistrar from "@/components/ServiceWorkerRegistrar";
+import BottomNav from "@/components/BottomNav";
 import { themeBootScript } from "@/lib/theme";
 import { appearanceBootScript } from "@/lib/appearance";
 import "./globals.css";
@@ -45,6 +46,7 @@ export default function RootLayout({
         <ServiceWorkerRegistrar />
         <SiteHeader />
         {children}
+        <BottomNav />
       </body>
     </html>
   );

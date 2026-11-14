@@ -138,7 +138,7 @@ export default function ScrollPage() {
               key={e}
               type="button"
               onClick={() => switchExam(e)}
-              className={`flex-1 rounded-xl border px-4 py-2.5 text-sm font-medium transition-colors ${
+              className={`min-h-11 flex-1 whitespace-nowrap rounded-xl border px-2 py-2 text-[13px] font-medium transition-colors sm:px-4 sm:text-sm ${
                 exam === e
                   ? "border-[var(--primary)] bg-[var(--primary)] text-[var(--on-primary)]"
                   : "border-[var(--card-border)] bg-[var(--background)] text-[var(--muted)] hover:text-[var(--foreground)]"

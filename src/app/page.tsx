@@ -1,396 +1,100 @@
-import Link from "@/components/SiteLink";
-import type { ReactNode } from "react";
-import { chizaiQuestions, devQuestions, itPassportQuestions } from "@/data/questions";
-import { devTerms } from "@/data/terms";
-import { devFieldLabels, ipFieldLabels } from "@/lib/types";
-import StudyPulse from "@/components/StudyPulse";
+import { questions } from "@/data/questions";
+import { getTermsByExam } from "@/data/terms";
+import { categoryLabels, devFieldLabels, ExamType, ipFieldLabels } from "@/lib/types";
+import HomeTracks, { type QuestionMeta, type TrackData } from "@/components/HomeTracks";
 
-const categoryDefinitions = [
+// The home screen: track tabs, one "next step" card, the track's extra modes as
+// tiles, and its fields with progress rings. Study / quiz / glossary / history
+// live in the shared navigation (bottom bar on phones, header on computers).
+
+const inExam = (exam: ExamType) => (q: (typeof questions)[number]) => (q.exams ?? ["it-passport"]).includes(exam);
+const itQs = questions.filter(inExam("it-passport"));
+const chizaiQs = questions.filter(inExam("chizai"));
+const devQs = questions.filter(inExam("dev"));
+
+const tracks: TrackData[] = [
   {
-    id: "all",
-    title: "全分野",
-    description: `ストラテジ・マネジメント・テクノロジの全${itPassportQuestions.length}問`,
-    color: "bg-indigo-600",
+    id: "it-passport",
+    label: "ITパスポート",
     icon: "📚",
+    count: itQs.length,
+    lang: "ja",
+    allQuiz: { href: "/quiz?category=all", label: "全分野クイズ" },
+    tiles: [
+      { href: "/quiz?mode=exam&exam=it-passport", icon: "🎯", label: "本番試験", sub: "100問・120分", color: "#dc2626" },
+      { href: "/games/drills/calc", icon: "🧮", label: "計算ドリル", sub: "2進数・稼働率", color: "#2563eb" },
+      { href: "/games", icon: "🎮", label: "ゲーム", sub: "マッチングほか", color: "#7c3aed" },
+      { href: "/scroll?exam=it-passport", icon: "🌀", label: "フィード", sub: "用語を流し読み", color: "#0891b2" },
+    ],
+    fields: (["strategy", "management", "technology"] as const).map((key) => ({
+      key,
+      label: categoryLabels[key],
+      count: itQs.filter((q) => q.category === key).length,
+      quiz: `/quiz?category=${key}`,
+      study: `/study?category=${key}`,
+    })),
   },
   {
-    id: "strategy",
-    title: "ストラテジ系",
-    description: "企業活動、法務、経営戦略、システム戦略",
-    color: "bg-blue-600",
-    icon: "💼",
+    id: "chizai",
+    label: "知財3級",
+    icon: "⚖️",
+    count: chizaiQs.length,
+    lang: "ja",
+    allQuiz: { href: "/quiz?mode=practice&exam=chizai&field=all", label: "全分野クイズ" },
+    tiles: [
+      { href: "/quiz?mode=exam&exam=chizai", icon: "🎯", label: "本番試験", sub: "30問・45分", color: "#dc2626" },
+      { href: "/games/drills/duration?exam=chizai", icon: "⏳", label: "存続期間", sub: "期間ドリル", color: "#b45309" },
+      { href: "/games", icon: "🎮", label: "ゲーム", sub: "マッチングほか", color: "#7c3aed" },
+      { href: "/scroll?exam=chizai", icon: "🌀", label: "フィード", sub: "用語を流し読み", color: "#0891b2" },
+    ],
+    fields: (["patent", "design-trademark", "copyright", "other"] as const).map((key) => ({
+      key,
+      label: ipFieldLabels[key],
+      count: chizaiQs.filter((q) => (q.ipField ?? "other") === key).length,
+      quiz: `/quiz?mode=practice&exam=chizai&field=${key}`,
+      study: `/study?exam=chizai&category=${key}`,
+    })),
   },
   {
-    id: "management",
-    title: "マネジメント系",
-    description: "開発技術、プロジェクトマネジメント、サービスマネジメント",
-    color: "bg-emerald-700",
-    icon: "📋",
-  },
-  {
-    id: "technology",
-    title: "テクノロジ系",
-    description: "基礎理論、コンピュータシステム、技術要素、セキュリティ",
-    color: "bg-purple-600",
-    icon: "💻",
+    id: "dev",
+    label: "AI Engineer",
+    icon: "🧑‍💻",
+    count: devQs.length,
+    lang: "en",
+    allQuiz: { href: "/quiz?exam=dev&field=all", label: "All-fields quiz" },
+    tiles: [
+      { href: "/games/drills/gitcmd?exam=dev", icon: "🌿", label: "Git drill", sub: "Pick the command", color: "#c2410c" },
+      { href: "/games/flashcards?exam=dev", icon: "🃏", label: "Cards", sub: `${getTermsByExam("dev").length} terms`, color: "#7c3aed" },
+      { href: "/games/speed?exam=dev", icon: "⚡", label: "Speed", sub: "60 seconds", color: "#dc2626" },
+      { href: "/scroll?exam=dev", icon: "🌀", label: "Feed", sub: "Skim the terms", color: "#0891b2" },
+    ],
+    fields: (["git", "database", "vercel", "web", "ai"] as const).map((key) => ({
+      key,
+      label: devFieldLabels[key],
+      count: devQs.filter((q) => q.devField === key).length,
+      quiz: `/quiz?exam=dev&field=${key}`,
+      study: `/study?exam=dev&category=${key}`,
+    })),
   },
 ];
 
-const categories = categoryDefinitions.map((category) => ({
-  ...category,
-  count:
-    category.id === "all"
-      ? itPassportQuestions.length
-      : itPassportQuestions.filter((question) => question.category === category.id).length,
-}));
-
-const totalQuestions = itPassportQuestions.length;
-const chizaiCount = chizaiQuestions.length;
-
-// 知財3級の分野別練習カード（全分野＋4分野）。本番試験ではなく解説付きの練習導線。
-const chizaiFieldDefinitions = [
-  { id: "all", title: "全分野", description: "特許・意匠商標・著作権・その他をまとめて", color: "bg-amber-700", icon: "⚖️" },
-  { id: "patent", title: ipFieldLabels.patent, description: "特許法・実用新案法", color: "bg-blue-600", icon: "🔬" },
-  { id: "design-trademark", title: ipFieldLabels["design-trademark"], description: "意匠法・商標法", color: "bg-rose-600", icon: "🎨" },
-  { id: "copyright", title: ipFieldLabels.copyright, description: "著作権法・著作隣接権", color: "bg-fuchsia-700", icon: "✍️" },
-  { id: "other", title: ipFieldLabels.other, description: "不正競争防止法・契約・条約", color: "bg-teal-700", icon: "📜" },
-];
-const chizaiFields = chizaiFieldDefinitions.map((f) => ({
-  ...f,
-  count: f.id === "all" ? chizaiQuestions.length : chizaiQuestions.filter((q) => (q.ipField ?? "other") === f.id).length,
-}));
-const estimatedMinutes = Math.ceil(totalQuestions * 0.7);
-
-// AI Engineer track (English): Git, Supabase, Vercel, web and AI. Practice only.
-const devFieldDefinitions = [
-  { id: "git", icon: "🌿", color: "bg-orange-700", hint: "rebase · merge · reset · PRs" },
-  { id: "database", icon: "🗄️", color: "bg-emerald-700", hint: "RLS · keys · pooler · migrations" },
-  { id: "vercel", icon: "🚀", color: "bg-neutral-800", hint: "previews · env vars · Fluid · rollback" },
-  { id: "web", icon: "🌐", color: "bg-sky-700", hint: "HTTP · CORS · SSR · caching" },
-  { id: "ai", icon: "🤖", color: "bg-violet-600", hint: "RAG · tool use · MCP · evals" },
-] as const;
-const devFields = devFieldDefinitions.map((f) => ({
-  ...f,
-  title: devFieldLabels[f.id],
-  questions: devQuestions.filter((q) => q.devField === f.id).length,
-  terms: devTerms.filter((t) => t.devField === f.id).length,
-}));
-
-// 本番試験の条件をチップで。補足は title（ホバー）へ。
-function ExamChips({ items, note }: { items: string[]; note?: string }) {
-  return (
-    <div className="flex flex-wrap gap-1.5" title={note}>
-      {items.map((item) => (
-        <span key={item} className="rounded-full bg-[var(--badge-bg)] px-2.5 py-0.5 text-xs font-medium text-[var(--muted)]">
-          {item}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-// 折りたたみ式セクション。ネイティブの <details> を使うので追加のJSは不要。
-function Section({
-  icon,
-  title,
-  hint,
-  defaultOpen = false,
-  children,
-}: {
-  icon: string;
-  title: string;
-  hint: string;
-  defaultOpen?: boolean;
-  children: ReactNode;
-}) {
-  return (
-    <details
-      open={defaultOpen}
-      className="group overflow-hidden rounded-2xl border border-[var(--card-border)] bg-[var(--card)] shadow-sm"
-    >
-      <summary className="flex cursor-pointer list-none select-none items-center gap-3 px-4 py-3.5 transition-colors hover:bg-[var(--card-hover)] [&::-webkit-details-marker]:hidden">
-        <span className="text-xl" aria-hidden>{icon}</span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-semibold leading-tight">{title}</span>
-          <span className="mt-0.5 block text-sm text-[var(--muted)]">{hint}</span>
-        </span>
-        <svg
-          className="h-5 w-5 shrink-0 text-[var(--muted)] transition-transform group-open:rotate-180"
-          viewBox="0 0 20 20"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          aria-hidden
-        >
-          <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </summary>
-      <div className="border-t border-[var(--card-border)] p-4">{children}</div>
-    </details>
-  );
-}
+// id -> field key per track, so the client can work out accuracy per field from
+// the saved history without loading the question bank.
+const meta: QuestionMeta[] = questions.map((q) => {
+  const exams = q.exams ?? ["it-passport"];
+  return [
+    q.id,
+    exams.includes("it-passport") ? q.category : null,
+    exams.includes("chizai") ? (q.ipField ?? "other") : null,
+    exams.includes("dev") ? (q.devField ?? null) : null,
+  ];
+});
 
 export default function Home() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-5 sm:py-8">
-      {/* Title row: name, scope chips, the two everyday actions */}
-      <header className="mb-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-bold leading-tight sm:text-2xl">ITパスポート＆知財3級</h1>
-          <div className="mt-1.5 flex flex-wrap gap-1.5 text-xs">
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--badge-bg)] px-2.5 py-1">
-              <span aria-hidden>📚</span> IT <b className="font-semibold tabular-nums">{totalQuestions}</b>問
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--badge-bg)] px-2.5 py-1">
-              <span aria-hidden>⚖️</span> 知財 <b className="font-semibold tabular-nums">{chizaiCount}</b>問
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-[var(--badge-bg)] px-2.5 py-1" title="総合クイズの目安時間">
-              <span aria-hidden>⏱</span> 約<b className="font-semibold tabular-nums">{estimatedMinutes}</b>分
-            </span>
-          </div>
-        </div>
-        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
-          <Link
-            href="/quiz?category=all"
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-[var(--primary)] px-5 font-medium text-[var(--on-primary)] transition-colors hover:bg-[var(--primary-hover)]"
-          >
-            <span aria-hidden>✏️</span> 総合クイズ
-          </Link>
-          <Link
-            href="/study?category=strategy"
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl border border-[var(--card-border)] bg-[var(--card)] px-5 font-medium transition-colors hover:bg-[var(--card-hover)]"
-          >
-            <span aria-hidden>📖</span> 学習モード
-          </Link>
-        </div>
-      </header>
-
-      <StudyPulse />
-
-      {/* 目的別メニュー（折りたたみ） */}
-      <div className="space-y-3">
-        <Section icon="🎯" title="本番試験モードで腕試し" hint="公式に近い形式・合格基準で採点" defaultOpen>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Link
-              href="/quiz?mode=exam&exam=it-passport"
-              className="group/card block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-            >
-              <div className="mb-2 flex items-center gap-3">
-                <span className="text-2xl" aria-hidden>🎯</span>
-                <h3 className="text-lg font-bold group-hover/card:text-[var(--primary)]">ITパスポート 本番試験</h3>
-              </div>
-              <ExamChips items={["100問", "120分", "総合60%＋各分野30%"]} note="公式のIRT方式を正答率で近似" />
-            </Link>
-            <Link
-              href="/quiz?mode=exam&exam=chizai"
-              className="group/card block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-            >
-              <div className="mb-2 flex items-center gap-3">
-                <span className="text-2xl" aria-hidden>⚖️</span>
-                <h3 className="text-lg font-bold group-hover/card:text-[var(--primary)]">知財3級 本番試験</h3>
-              </div>
-              <ExamChips items={["学科30問", "45分", "70%で合格"]} />
-            </Link>
-          </div>
-        </Section>
-
-        <Section icon="🧑‍💻" title="AI Engineer" hint={`Git · Supabase · Vercel · Web · AI — ${devQuestions.length} questions · ${devTerms.length} terms (English)`}>
-          <div lang="en" className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {devFields.map((f) => (
-              <div
-                key={f.id}
-                className="flex items-center gap-3 rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-3"
-              >
-                <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                  <span className="text-xl" aria-hidden>{f.icon}</span>
-                  <div className="min-w-0">
-                    <h3 className="truncate text-sm font-bold leading-tight">{f.title}</h3>
-                    <p className="truncate text-xs text-[var(--muted)]" title={f.hint}>{f.hint}</p>
-                  </div>
-                </div>
-                <div className="flex shrink-0 gap-1.5">
-                  <Link
-                    href={`/quiz?exam=dev&field=${f.id}`}
-                    className={`inline-flex min-h-10 items-center rounded-lg px-3 text-xs font-medium text-white transition-opacity hover:opacity-90 ${f.color}`}
-                  >
-                    Quiz {f.questions}
-                  </Link>
-                  <Link
-                    href={`/study?exam=dev&category=${f.id}`}
-                    className="inline-flex min-h-10 items-center rounded-lg border border-[var(--card-border)] px-3 text-xs font-medium transition-colors hover:bg-[var(--card-hover)]"
-                  >
-                    Study
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div lang="en" className="mt-3 flex flex-wrap gap-2">
-            {[
-              { href: "/quiz?exam=dev&field=all", icon: "✏️", label: "All-fields quiz" },
-              { href: "/scroll?exam=dev", icon: "🌀", label: "Term feed" },
-              { href: "/glossary?exam=dev", icon: "📖", label: "Glossary" },
-              { href: "/games/drills/gitcmd?exam=dev", icon: "🌿", label: "Git commands" },
-              { href: "/games/flashcards?exam=dev", icon: "🃏", label: "Flashcards" },
-            ].map((a) => (
-              <Link
-                key={a.href}
-                href={a.href}
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[var(--card-border)] bg-[var(--background)] px-3.5 text-sm font-medium transition-colors hover:bg-[var(--card-hover)]"
-              >
-                <span aria-hidden>{a.icon}</span> {a.label}
-              </Link>
-            ))}
-          </div>
-        </Section>
-
-        <Section icon="✏️" title="クイズで挑戦" hint="ITパスポートを分野別に・知財3級を分野別に練習">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">ITパスポート（分野別）</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/quiz?category=${cat.id}`}
-                className="group/card block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">{cat.icon}</span>
-                  <div className="flex-1">
-                    <h3 className="mb-0.5 font-bold group-hover/card:text-[var(--primary)]">{cat.title}</h3>
-                    <p className="mb-2 text-sm text-[var(--muted)]">{cat.description}</p>
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white ${cat.color}`}>
-                      {cat.count}問
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          <p className="mb-3 mt-6 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">知財3級（分野別・解説付き）</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {chizaiFields.map((f) => (
-              <Link
-                key={f.id}
-                href={`/quiz?mode=practice&exam=chizai&field=${f.id}`}
-                className="group/card block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl">{f.icon}</span>
-                  <div className="flex-1">
-                    <h3 className="mb-0.5 font-bold group-hover/card:text-[var(--primary)]">{f.title}</h3>
-                    <p className="mb-2 text-sm text-[var(--muted)]">{f.description}</p>
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium text-white ${f.color}`}>
-                      {f.count}問
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </Section>
-
-        <Section icon="📖" title="学習モードで復習" hint="解説付きの通常モード＆連続インプットのDoom Scroll">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">ITパスポート</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {categories.slice(1).map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/study?category=${cat.id}`}
-                className="block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-2xl">{cat.icon}</span>
-                  <span className="rounded-full bg-[var(--badge-bg)] px-2 py-1 text-xs text-[var(--muted)]">{cat.count} cards</span>
-                </div>
-                <h3 className="mb-1 font-semibold">{cat.title}</h3>
-                <span className="text-sm font-medium text-[var(--primary)]">学習を始める →</span>
-              </Link>
-            ))}
-          </div>
-
-          <p className="mb-3 mt-6 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">知財3級（解説 日英対応）</p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {chizaiFields.filter((f) => f.id !== "all").map((f) => (
-              <Link
-                key={f.id}
-                href={`/study?exam=chizai&category=${f.id}`}
-                className="block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-              >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-2xl">{f.icon}</span>
-                  <span className="rounded-full bg-[var(--badge-bg)] px-2 py-1 text-xs text-[var(--muted)]">{f.count} cards</span>
-                </div>
-                <h3 className="mb-1 font-semibold">{f.title}</h3>
-                <span className="text-sm font-medium text-[var(--primary)]">学習を始める →</span>
-              </Link>
-            ))}
-          </div>
-        </Section>
-
-        <Section icon="🎮" title="ゲームモードで楽しく学ぶ" hint="マッチング・フラッシュカード・スピード">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {[
-              { id: "matching", title: "用語マッチング", desc: "用語と説明をペアにしよう", icon: "🔗" },
-              { id: "flashcards", title: "フラッシュカード", desc: "めくって覚えて仕分けする", icon: "🃏" },
-              { id: "speed", title: "スピードチャレンジ", desc: "60秒で何問解ける？", icon: "⚡" },
-            ].map((game) => (
-              <Link
-                key={game.id}
-                href={`/games/${game.id}`}
-                className="group/card block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-              >
-                <span className="mb-2 block text-2xl" aria-hidden>{game.icon}</span>
-                <h3 className="mb-1 font-semibold group-hover/card:text-[var(--primary)]">{game.title}</h3>
-                <p className="text-xs text-[var(--muted)]">{game.desc}</p>
-              </Link>
-            ))}
-          </div>
-          <Link href="/games" className="mt-4 inline-block text-sm font-medium text-[var(--primary)]">
-            すべてのゲームを見る →
-          </Link>
-        </Section>
-
-        <Section icon="🌀" title="用語をインプット" hint="調べたいときは用語集、覚えたいときはフィード">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <Link
-              href="/scroll"
-              className="group/card block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-            >
-              <div className="mb-2 flex items-center gap-3">
-                <span className="text-2xl" aria-hidden>🌀</span>
-                <h3 className="text-lg font-bold group-hover/card:text-[var(--primary)]">用語フィード（Doom Scroll）</h3>
-              </div>
-              <p className="text-sm text-[var(--muted)]">用語が流れるフィード。説明を隠して自己テストも。</p>
-            </Link>
-            <Link
-              href="/glossary"
-              className="group/card block rounded-xl border border-[var(--card-border)] bg-[var(--background)] p-4 transition-[box-shadow,border-color] hover:border-[var(--option-hover-border)] hover:shadow-md"
-            >
-              <div className="mb-2 flex items-center gap-3">
-                <span className="text-2xl" aria-hidden>📖</span>
-                <h3 className="text-lg font-bold group-hover/card:text-[var(--primary)]">用語集を引く</h3>
-              </div>
-              <p className="text-sm text-[var(--muted)]">頻出用語をカテゴリ別に。和英対応。</p>
-            </Link>
-          </div>
-        </Section>
-
-        <Section icon="📊" title="履歴を見て、伸びを確認" hint="最高・平均スコアと合格率から復習計画を立てる">
-          <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
-            <p className="text-sm leading-relaxed text-[var(--muted)]">
-              最高・平均スコアと合格率の推移を確認できます。
-            </p>
-            <Link
-              href="/history"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--card-border)] bg-[var(--background)] px-6 py-3 text-[var(--muted)] transition-[color,box-shadow] hover:text-[var(--foreground)] hover:shadow-md"
-            >
-              <span>📊</span>
-              <span className="font-medium">学習履歴を見る</span>
-            </Link>
-          </div>
-        </Section>
-      </div>
+      <h1 className="mb-3 text-xl font-bold leading-tight sm:text-2xl">ITパスポート＆知財3級</h1>
+      <HomeTracks tracks={tracks} meta={meta} />
     </div>
   );
 }

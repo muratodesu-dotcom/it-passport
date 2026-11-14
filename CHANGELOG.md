@@ -20,8 +20,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - App icons for the home screen on iPhone and Android.
 
 ### Changed
+- Home screen redesigned: tabs for the three tracks (remembered), one "next step" card with the most useful thing to do now, the track's extra modes as icon tiles, and its fields with progress rings showing your accuracy.
+- Phones get a bottom tab bar (ホーム, 学習, クイズ, 用語集, 履歴) that opens the track you chose; the ☰ menu is gone and Settings has a gear button. Computers get the same links with icons in the header.
+- Quiz: after answering, a bar pinned to the bottom shows Correct or Incorrect and the Next button, so there's no scrolling between questions. Field quizzes take the field's colour, and a streak chip counts correct answers in a row.
+- Glossary is compact: three columns on computers, two-line descriptions that open on tap, and coloured field headings.
 - History shows a separate breakdown for the AI Engineer fields, and practice results remember which field was practised (also for 知財3級).
-- Home screen is more compact: title, the two main actions and the exam rules as short tags, so the whole menu fits on one desktop screen.
 - Buttons, tags and cards across the app use flat colours and calmer hover effects.
 - A saved OpenAI API key is shown only by its last four characters, with Change and Delete buttons.
 - Links load the next pages only after the current page has appeared, and not at all on slow connections until you head for them.
